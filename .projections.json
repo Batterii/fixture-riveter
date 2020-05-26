@@ -1,0 +1,8 @@
+{
+	"lib/*.ts": {
+		"alternate": "test/unit/{}.ts"
+	},
+	"test/unit/*.ts": {
+		"alternate": "lib/{}.ts"
+	}
+}

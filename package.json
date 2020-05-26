@@ -1,0 +1,50 @@
+{
+	"name": "@batterii/factory-builder",
+	"version": "0.0.0",
+	"description": "",
+	"author": "Batterii, LLC",
+	"license": "UNLICENSED",
+	"repository": "github:Batterii/factory-builder",
+	"files": [
+		"dist/lib",
+		"dist/types"
+	],
+	"scripts": {
+		"generate": "yo --local-only",
+		"generate:class": "yo @batterii/ts-class  --local-only ",
+		"generate:module": "yo @batterii/ts-module --local-only ",
+		"generate:test": "yo @batterii/ts-test --local-only ",
+		"lint": "eslint . --ext .ts --cache",
+		"lintf": "eslint . --ext .ts --fix --cache",
+		"build": "tsc && tsc --project tsconfig-types.json",
+		"clean": "rm -rf dist",
+		"test": "npm run build && mocha dist/test",
+		"test:unit": "npm run build && mocha dist/test/unit",
+		"test:integration": "npm run build && mocha dist/test/integration",
+		"preversion": "npm run lint && npm run clean && npm run test",
+		"prepublishOnly": "git push && git push --tags"
+	},
+	"main": "dist/lib/index.js",
+	"types": "dist/types/index.d.ts",
+	"devDependencies": {
+		"@batterii/eslint-config-ts": "^2.1.0",
+		"@batterii/generator-ts-class": "^0.2.0",
+		"@batterii/generator-ts-module": "^0.2.0",
+		"@batterii/generator-ts-test": "^0.1.2",
+		"@types/chai": "^4.2.11",
+		"@types/mocha": "^7.0.2",
+		"@types/node": "^12.12.42",
+		"@types/sinon": "^7.5.2",
+		"@types/sinon-chai": "^3.2.4",
+		"@typescript-eslint/eslint-plugin": "^2.34.0",
+		"@typescript-eslint/parser": "^2.34.0",
+		"chai": "^4.2.0",
+		"eslint": "^6.8.0",
+		"mocha": "^7.2.0",
+		"sinon": "^7.5.0",
+		"sinon-chai": "^3.5.0",
+		"source-map-support": "^0.5.19",
+		"typescript": "3.8.3",
+		"yo": "^3.1.1"
+	}
+}

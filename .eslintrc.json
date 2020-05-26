@@ -1,0 +1,7 @@
+{
+	"extends": "@batterii/eslint-config-ts",
+	"rules": {
+		"multiline-comment-style": "off",
+		"sort-imports": "off"
+	}
+}
