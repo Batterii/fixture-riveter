@@ -1,4 +1,4 @@
-import { Factory } from '../../lib/factory';
+import { FactoryBuilder } from '../../lib/factory_builder';
 import { expect } from 'chai';
 
 class T {
@@ -9,12 +9,12 @@ class T {
 	}
 }
 
-describe('Factory', function() {
-	let factory: Factory;
+describe('FactoryBuilder', function() {
+	let factory: FactoryBuilder;
 
 	describe('#define', function() {
 		beforeEach(function() {
-			factory = new Factory();
+			factory = new FactoryBuilder();
 			factory.define('t', T);
 		});
 
@@ -29,7 +29,7 @@ describe('Factory', function() {
 
 	describe('#getFactory', function() {
 		beforeEach(function() {
-			factory = new Factory();
+			factory = new FactoryBuilder();
 			factory.define('t', T);
 		});
 

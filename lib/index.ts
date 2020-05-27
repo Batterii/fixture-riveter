@@ -1,5 +1,5 @@
-import { Factory } from './factory';
+import { FactoryBuilder } from './factory_builder';
 
-const factory = new Factory();
+const factory = new FactoryBuilder();
 
 export { factory };
