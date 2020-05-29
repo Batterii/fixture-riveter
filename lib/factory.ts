@@ -1,6 +1,9 @@
-interface Options {
-	aliases?: string[];
-	traits?: any[];
+export interface OptionsArgs {
+	options?: {
+		aliases?: string[];
+		traits?: any[];
+	};
+	block?: Function;
 }
 
 export class Factory {
@@ -13,14 +16,21 @@ export class Factory {
 	constructor(
 		name: string,
 		model: any,
-		options: any = {},
-		block?: Function,
+		rest?: OptionsArgs,
 	) {
 		this.name = name;
 		this.model = model;
-		this.aliases = options.aliases || [];
-		this.traits = options.traits;
-		if (block) {
+		this.aliases = [];
+		this.traits = [];
+
+		const { options, block } = rest || {};
+
+		if (Boolean(options) && typeof options === 'object') {
+			this.aliases = options.aliases || [];
+			this.traits = options.traits || [];
+		}
+
+		if (Boolean(block) && typeof block === 'function') {
 			this.block = block;
 		}
 	}

@@ -19,19 +19,42 @@ describe('Factory', function() {
 		const noBlock = new Factory('name', T);
 		expect(noBlock.block).to.be.undefined;
 
-		const withBlock = new Factory('name', T, function() {
+		const withBlock = new Factory('name', T, { block() {
 			return 1;
-		});
+		} });
 		expect(withBlock.block).to.exist;
 		expect(withBlock.block).to.a('function');
+	});
+
+	describe('#names', function() {
+		it('returns the name', function() {
+			const name = 'testFactory';
+			const factory = new Factory(name, T);
+			const names = factory.names();
+
+			expect(names).to.have.length(1);
+			expect(names[0]).to.equal(name);
+		});
+
+		it('returns the aliases', function() {
+			const name = 'testFactory';
+			const aliases = [ 'factory1', 'factory2' ];
+			const factory = new Factory(name, T, { options: { aliases } });
+			const names = factory.names();
+
+			expect(names).to.have.length(3);
+			expect(names[0]).to.equal(name);
+			expect(names[1]).to.equal(aliases[0]);
+			expect(names[2]).to.equal(aliases[1]);
+		});
 	});
 
 	describe('block stuff', function() {
 		it('executes with the right "this"', function() {
 			const name = 'name';
-			const factory = new Factory(name, T, function() {
+			const factory = new Factory(name, T, { block() {
 				return this.name;
-			});
+			} });
 			expect(factory.block()).to.equal(name);
 		});
 	});
