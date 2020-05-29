@@ -3,6 +3,8 @@
 	"rules": {
 		"multiline-comment-style": "off",
 		"sort-imports": "off",
-		"dot-notation": "off"
+		"dot-notation": "off",
+		"multiline-ternary": "off",
+		"no-invalid-this": "off"
 	}
 }
