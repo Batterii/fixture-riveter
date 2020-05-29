@@ -25,12 +25,14 @@ export class Factory {
 
 		const { options, block } = rest || {};
 
-		if (Boolean(options) && typeof options === 'object') {
-			this.aliases = options.aliases || [];
-			this.traits = options.traits || [];
+		if (options && options.aliases) {
+			this.aliases = options.aliases;
+		}
+		if (options && options.traits) {
+			this.traits = options.traits;
 		}
 
-		if (Boolean(block) && typeof block === 'function') {
+		if (block) {
 			this.block = block;
 		}
 	}

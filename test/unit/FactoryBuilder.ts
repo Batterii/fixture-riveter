@@ -1,32 +1,26 @@
 import { T } from '../helpers';
 import { expect } from 'chai';
+import sinon from 'sinon';
 
 import { Factory } from '../../lib/Factory';
 import { FactoryBuilder } from '../../lib/FactoryBuilder';
 
 describe('FactoryBuilder', function() {
+	it('can be built', function() {
+		const factoryBuilder = new FactoryBuilder();
+		expect(factoryBuilder).to.exist;
+		expect(factoryBuilder._factories).to.exist.and.to.be.empty;
+	});
+
 	describe('#define', function() {
-		it('defines a factory', function() {
+		it('binds function call correctly', function() {
 			const factoryBuilder = new FactoryBuilder();
+			const testArray = [ 'test' ];
 			factoryBuilder.define(function() {
-				this.factory('t', T);
+				this._factories = testArray;
 			});
 
-			const { t } = factoryBuilder._factories;
-			expect(factoryBuilder.getFactory('t', false)).to.equal(t);
-		});
-
-		it('only registers a single factory', function() {
-			const factoryBuilder = new FactoryBuilder();
-			const testFn = () => {
-				factoryBuilder.define(function() {
-					this.factory('t', T);
-				});
-			};
-
-			testFn();
-
-			expect(testFn).to.throw;
+			expect(factoryBuilder._factories).to.deep.equal(testArray);
 		});
 	});
 
@@ -51,6 +45,73 @@ describe('FactoryBuilder', function() {
 
 			expect(factoryBuilder._factories[aliases[0]]).to.equal(factory);
 			expect(factoryBuilder._factories[aliases[1]]).to.equal(factory);
+		});
+
+		it('adds the same factory multiples times', function() {
+			const factoryBuilder = new FactoryBuilder();
+			const name = 'factory1';
+			const alias = 'factory2';
+			const factory = new Factory(name, T, {
+				options: { aliases: [ alias ] },
+			});
+
+			factoryBuilder.registerFactory(factory);
+
+			const factories = factoryBuilder._factories;
+
+			expect(factories[name]).to.deep.equal(factories[alias]);
+		});
+	});
+
+	describe('#factory', function() {
+		it('creates a factory', function() {
+			const factoryBuilder = new FactoryBuilder();
+			const name = 'testFactory';
+			factoryBuilder.factory(name, T);
+
+			const factory = factoryBuilder._factories[name];
+
+			expect(factoryBuilder._factories).to.not.be.empty;
+			expect(factory).to.exist;
+			expect(factory.name).to.equal(name);
+		});
+
+		it('returns the created factory', function() {
+			const factoryBuilder = new FactoryBuilder();
+			const name = 'testFactory';
+			const factory = factoryBuilder.factory(name, T);
+
+			expect(factory.name).to.equal(name);
+		});
+
+		it('passes the options down to the factory', function() {
+			const factoryBuilder = new FactoryBuilder();
+			const name = 'testFactory';
+			const aliases = [ 'factory1', 'factory2' ];
+			const options = { options: { aliases } };
+			const factory = factoryBuilder.factory(name, T, options);
+
+			expect(factory.aliases).to.deep.equal(aliases);
+		});
+
+		it('registers the factory', function() {
+			const factoryBuilder = new FactoryBuilder();
+			const spy = sinon.spy(factoryBuilder as any, 'registerFactory');
+			sinon.stub(factoryBuilder, 'getFactory').returns(false as any);
+			factoryBuilder.factory('testFactory', T);
+
+			expect(spy.calledOnce).to.be.true;
+		});
+
+		it("doesn't register a factory twice", function() {
+			const factoryBuilder = new FactoryBuilder();
+			const testFn = () => {
+				factoryBuilder.factory('testFactory', T);
+			};
+
+			testFn();
+
+			expect(testFn).to.throw;
 		});
 	});
 

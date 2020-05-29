@@ -15,15 +15,38 @@ describe('Factory', function() {
 		expect(factory.model).to.equal(T);
 	});
 
-	it('can take a block', function() {
+	it('defines default options', function() {
+		const noOptions = new Factory('name', T);
+		expect(noOptions.aliases).to.deep.equal([]);
+		expect(noOptions.traits).to.deep.equal([]);
+	});
+
+	it('accepts aliases', function() {
+		const aliases = [ 'alias1' ];
+		const options = { options: { aliases } };
+		const withAlias = new Factory('name', T, options);
+		expect(withAlias.aliases).to.equal(aliases);
+	});
+
+	it('accepts traits', function() {
+		const traits = [ 'trait1' ];
+		const options = { options: { traits } };
+		const withTrait = new Factory('name', T, options);
+		expect(withTrait.traits).to.equal(traits);
+	});
+
+	it("doesn't define a default block", function() {
 		const noBlock = new Factory('name', T);
 		expect(noBlock.block).to.be.undefined;
+	});
 
+	it('can take a block', function() {
 		const withBlock = new Factory('name', T, { block() {
 			return 1;
 		} });
 		expect(withBlock.block).to.exist;
-		expect(withBlock.block).to.a('function');
+		expect(withBlock.block).to.be.a('function');
+		expect(withBlock.block()).to.equal(1);
 	});
 
 	describe('#names', function() {

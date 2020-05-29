@@ -5,6 +5,7 @@
 		"sort-imports": "off",
 		"dot-notation": "off",
 		"multiline-ternary": "off",
-		"no-invalid-this": "off"
+		"no-invalid-this": "off",
+		"quotes": ["error", "single", { "avoidEscape": true }]
 	}
 }
