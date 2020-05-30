@@ -5,29 +5,33 @@ import sinon from 'sinon';
 import { Factory } from '../../lib/factory';
 import { FactoryBuilder } from '../../lib/factory-builder';
 
-// const factoryBuilder = new FactoryBuilder();
-// factoryBuilder.define(function() {
-// 	this.factory('user', T, function() {
-// 		this.attr('email', faker.email);
-// 		this.attr('password', 'batterii2020');
-// 		this.attr('passwordConfirmation', 'batterii2020');
-// 		this.attr('firstName', faker.firstName);
-// 		this.attr('lastName', faker.lastName);
-// 		this.attr('role', 'guest');
+describe('experiment', function() {
+	it('works', function() {
+		const factoryBuilder = new FactoryBuilder();
+		factoryBuilder.define(function() {
+			this.factory('user', T, function() {
+				this.attr('email', 'a');
+				this.attr('password', 'batterii2020');
+				this.attr('passwordConfirmation', 'batterii2020');
+				this.attr('firstName', 'noah');
+				this.attr('lastName', 'bogart');
+				this.attr('role', 'guest');
 
-// 		this.trait('batteriiUser', function() {
-// 			this.sequence('email', 'a', (e) => `testEmail${e}@batterii.com`);
-// 			this.attr('role', 'user');
-// 		});
+				this.trait('batteriiUser', function() {
+					this.sequence('email', 'a', (e) => `testEmail${e}@batterii.com`);
+					this.attr('role', 'user');
+				});
 
-// 		this.trait('admin', function() {
-// 			this.find('batteriiUser');
-// 			this.attr('role', 'admin');
-// 		});
+				this.trait('admin', function() {
+					this.attr('batteriiUser');
+					this.attr('role', 'admin');
+				});
 
-// 		this.factory('adminUser', { traits: [ 'admin' ] });
-// 	});
-// });
+				this.factory('adminUser', { traits: [ 'admin' ] });
+			});
+		});
+	});
+});
 
 describe('FactoryBuilder', function() {
 	it('can be built', function() {

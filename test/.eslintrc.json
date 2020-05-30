@@ -1,12 +1,10 @@
 {
-	"extends": "@batterii/eslint-config-ts",
+	"extends": "@batterii/eslint-config-ts/test",
 	"rules": {
 		"multiline-comment-style": "off",
 		"sort-imports": "off",
 		"dot-notation": "off",
-		"multiline-ternary": "off",
-		"no-invalid-this": "off",
-		"max-len": ["error", { "code": 100 }],
+		"max-len": ["error", {"code": 100}],
 		"quotes": ["error", "single", {"avoidEscape": true}]
 	}
 }
