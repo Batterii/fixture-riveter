@@ -1,7 +1,7 @@
 import { T } from '../helpers';
 import { expect } from 'chai';
 
-import { Factory } from '../../lib/Factory';
+import { Factory } from '../../lib/factory';
 
 describe('Factory', function() {
 	it('has a name', function() {

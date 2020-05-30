@@ -1,4 +1,4 @@
-import { FactoryBuilder } from './FactoryBuilder';
+import { FactoryBuilder } from './factory-builder';
 
 const factory = new FactoryBuilder();
 
