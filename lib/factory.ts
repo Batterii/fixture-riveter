@@ -1,13 +1,5 @@
 import { isFunction, first, last } from 'lodash';
 
-export interface OptionsArgs {
-	options?: {
-		aliases?: string[];
-		traits?: any[];
-	};
-	block?: Function;
-}
-
 export class Factory {
 	name: string;
 	model: any;
@@ -19,7 +11,7 @@ export class Factory {
 	constructor(
 		name: string,
 		model: any,
-		rest?: OptionsArgs,
+		...rest: any[]
 	) {
 		this.name = name;
 		this.model = model;
@@ -27,7 +19,8 @@ export class Factory {
 		this.traits = [];
 		this._attributes = {};
 
-		const { options, block } = rest || {};
+		const options = first(rest);
+		const block = last(rest);
 
 		if (options && options.aliases) {
 			this.aliases = options.aliases;
@@ -36,14 +29,14 @@ export class Factory {
 			this.traits = options.traits;
 		}
 
-		if (block) {
+		if (block && isFunction(block)) {
 			this.block = block;
 		}
 	}
 
 	compile(): void {
 		if (this.block) {
-			this.block();
+			return this.block();
 		}
 	}
 
@@ -59,33 +52,21 @@ export class Factory {
 	// 	this.association(name, object);
 	// }
 
-	attr(name: string, ...rest: any): void {
-		const options: Record<string, any> | undefined = first(rest);
-		const block: Function | undefined = last(rest);
-
-		if ((rest.length === 1) && block && isFunction(block)) {
-			this.defineAttribute(name, block);
-		} else if (options && validOptions(options)) {
+	attr(name: string, block?: Function): void {
+		if (!block) {
 			// this.applyAttribute(name, options);
-			console.log(`applyAttribute ${options}`);
+		} else if (isFunction(block)) {
+			this.defineAttribute(name, block);
 		} else {
-			throw new Error(`wrong options, bruh: ${options}`);
+			throw new Error(`wrong options, bruh: ${name}, ${block}`);
 		}
 	}
 
 	attributes(attrs = {}): any {
 		const result = {};
 		for (const [ name, block ] of Object.entries(this._attributes)) {
-			result[name] = block();
+			result[name] = block.call(this);
 		}
 		return Object.assign(result, attrs);
 	}
-}
-
-function validOptions(options: Record<string, any>): boolean {
-	if (options) {
-		return true;
-	}
-
-	return false;
 }

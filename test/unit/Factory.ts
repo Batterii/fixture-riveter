@@ -1,5 +1,6 @@
 import { T } from '../helpers';
 import { expect } from 'chai';
+import { size } from 'lodash';
 
 import { Factory } from '../../lib/factory';
 
@@ -22,16 +23,22 @@ describe('Factory', function() {
 	});
 
 	it('accepts aliases', function() {
-		const aliases = [ 'alias1' ];
-		const options = { options: { aliases } };
-		const withAlias = new Factory('name', T, options);
+		const aliases = [ 'alias' ];
+		const withAlias = new Factory('name', T, { aliases });
 		expect(withAlias.aliases).to.equal(aliases);
 	});
 
 	it('accepts traits', function() {
-		const traits = [ 'trait1' ];
-		const options = { options: { traits } };
-		const withTrait = new Factory('name', T, options);
+		const traits = [ 'trait' ];
+		const withTrait = new Factory('name', T, { traits });
+		expect(withTrait.traits).to.equal(traits);
+	});
+
+	it('accepts both aliases and traits', function() {
+		const aliases = [ 'alias' ];
+		const traits = [ 'trait' ];
+		const withTrait = new Factory('name', T, { aliases, traits });
+		expect(withTrait.aliases).to.equal(aliases);
 		expect(withTrait.traits).to.equal(traits);
 	});
 
@@ -41,9 +48,9 @@ describe('Factory', function() {
 	});
 
 	it('can take a block', function() {
-		const withBlock = new Factory('name', T, { block() {
+		const withBlock = new Factory('name', T, function() {
 			return 1;
-		} });
+		});
 		expect(withBlock.block).to.exist;
 		expect(withBlock.block).to.be.a('function');
 		expect(withBlock.block()).to.equal(1);
@@ -62,7 +69,7 @@ describe('Factory', function() {
 		it('returns the aliases', function() {
 			const name = 'testFactory';
 			const aliases = [ 'factory1', 'factory2' ];
-			const factory = new Factory(name, T, { options: { aliases } });
+			const factory = new Factory(name, T, { aliases });
 			const names = factory.names();
 
 			expect(names).to.have.length(3);
@@ -72,36 +79,23 @@ describe('Factory', function() {
 		});
 	});
 
-	describe('block stuff', function() {
-		it('executes with the right "this"', function() {
+	describe('compile', function() {
+		it('executes the block with correct context', function() {
 			const name = 'name';
-			const factory = new Factory(name, T, { block() {
+			const factory = new Factory(name, T, function() {
 				return this.name;
-			} });
-			expect(factory.block()).to.equal(name);
+			});
+			expect(factory.compile()).to.equal(name);
 		});
 	});
 
-	describe('attrs', function() {
-		it('works', function() {
-			const factory = new Factory('name', T, { block() {
-				this.attr('email', () => 'a');
-				this.attr('password', () => 'batterii2020');
-				this.attr('passwordConfirmation', () => 'batterii2020');
-				this.attr('firstName', () => 'noah');
-				this.attr('lastName', () => 'bogart');
-				this.attr('role', () => 'guest');
-			} });
-			factory.compile();
-			const result = {
-				email: 'a',
-				password: 'batterii2020',
-				passwordConfirmation: 'batterii2020',
-				firstName: 'noah',
-				lastName: 'bogart',
-				role: 'guest',
-			};
-			expect(factory.attributes()).to.deep.equal(result);
+	describe('#attr', function() {
+		it('stores the function', function() {
+			const factory = new Factory('name', T);
+			factory.attr('email', () => 'a');
+
+			expect(size(factory._attributes)).to.equal(1);
+			expect(Object.keys(factory._attributes)).to.deep.equal([ 'email' ]);
 		});
 	});
 });

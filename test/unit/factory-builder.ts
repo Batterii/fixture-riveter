@@ -10,24 +10,24 @@ describe('experiment', function() {
 		const factoryBuilder = new FactoryBuilder();
 		factoryBuilder.define(function() {
 			this.factory('user', T, function() {
-				this.attr('email', 'a');
-				this.attr('password', 'batterii2020');
-				this.attr('passwordConfirmation', 'batterii2020');
-				this.attr('firstName', 'noah');
-				this.attr('lastName', 'bogart');
-				this.attr('role', 'guest');
+				this.attr('email', () => 'a');
+				this.attr('password', () => 'batterii2020');
+				this.attr('passwordConfirmation', () => 'batterii2020');
+				this.attr('firstName', () => 'noah');
+				this.attr('lastName', () => 'bogart');
+				this.attr('role', () => 'guest');
 
-				this.trait('batteriiUser', function() {
-					this.sequence('email', 'a', (e) => `testEmail${e}@batterii.com`);
-					this.attr('role', 'user');
-				});
+				// this.trait('batteriiUser', function() {
+				// 	this.sequence('email', 'a', (e) => `testEmail${e}@batterii.com`);
+				// 	this.attr('role', 'user');
+				// });
 
-				this.trait('admin', function() {
-					this.attr('batteriiUser');
-					this.attr('role', 'admin');
-				});
+				// this.trait('admin', function() {
+				// 	this.attr('batteriiUser');
+				// 	this.attr('role', 'admin');
+				// });
 
-				this.factory('adminUser', { traits: [ 'admin' ] });
+				// this.factory('adminUser', { traits: [ 'admin' ] });
 			});
 		});
 	});
@@ -67,7 +67,7 @@ describe('FactoryBuilder', function() {
 			const factoryBuilder = new FactoryBuilder();
 			const name = 'testFactory';
 			const aliases = [ 'factory1', 'factory2' ];
-			const factory = new Factory(name, T, { options: { aliases } });
+			const factory = new Factory(name, T, { aliases });
 
 			factoryBuilder.registerFactory(factory);
 
@@ -80,7 +80,7 @@ describe('FactoryBuilder', function() {
 			const name = 'factory1';
 			const alias = 'factory2';
 			const factory = new Factory(name, T, {
-				options: { aliases: [ alias ] },
+				aliases: [ alias ],
 			});
 
 			factoryBuilder.registerFactory(factory);
@@ -116,8 +116,7 @@ describe('FactoryBuilder', function() {
 			const factoryBuilder = new FactoryBuilder();
 			const name = 'testFactory';
 			const aliases = [ 'factory1', 'factory2' ];
-			const options = { options: { aliases } };
-			const factory = factoryBuilder.factory(name, T, options);
+			const factory = factoryBuilder.factory(name, T, { aliases });
 
 			expect(factory.aliases).to.deep.equal(aliases);
 		});
@@ -143,19 +142,20 @@ describe('FactoryBuilder', function() {
 		});
 	});
 
-	// describe('#getFactory', function() {
-	// 	beforeEach(function() {
-	// 		factory = new FactoryBuilder();
-	// 		factory.define('t', T);
-	// 	});
+	describe('#getFactory', function() {
+		it('returns the requested factory', function() {
+			const name = 'name';
+			const factory = new FactoryBuilder();
+			factory.factory(name, T);
+			const t = factory.getFactory(name);
+			const result = factory._factories[name];
+			expect(t).to.equal(result);
+		});
 
-	// 	it('returns the requested factory', function() {
-	// 		const t = factory.getFactory('t');
-	// 		expect(t).to.equal(T);
-	// 	});
-
-	// 	it('throws if a non-existant factory is requested', function() {
-	// 		expect(() => factory.getFactory('f')).to.throw();
-	// 	});
-	// });
+		it('throws if a non-existant factory is requested', function() {
+			const factory = new FactoryBuilder();
+			factory.factory('t', T);
+			expect(() => factory.getFactory('f')).to.throw();
+		});
+	});
 });
