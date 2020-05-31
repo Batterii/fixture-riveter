@@ -32,6 +32,8 @@ export class FactoryBuilder {
 
 		const factory = new Factory(name, model, rest);
 
+		factory.compile();
+
 		this.registerFactory(factory);
 
 		return factory;

@@ -81,4 +81,27 @@ describe('Factory', function() {
 			expect(factory.block()).to.equal(name);
 		});
 	});
+
+	describe('attrs', function() {
+		it('works', function() {
+			const factory = new Factory('name', T, { block() {
+				this.attr('email', () => 'a');
+				this.attr('password', () => 'batterii2020');
+				this.attr('passwordConfirmation', () => 'batterii2020');
+				this.attr('firstName', () => 'noah');
+				this.attr('lastName', () => 'bogart');
+				this.attr('role', () => 'guest');
+			} });
+			factory.compile();
+			const result = {
+				email: 'a',
+				password: 'batterii2020',
+				passwordConfirmation: 'batterii2020',
+				firstName: 'noah',
+				lastName: 'bogart',
+				role: 'guest',
+			};
+			expect(factory.attributes()).to.deep.equal(result);
+		});
+	});
 });
