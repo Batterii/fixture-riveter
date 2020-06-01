@@ -6,7 +6,7 @@ export class Factory {
 	aliases: string[];
 	traits: any[];
 	block: Function;
-	_attributes: Record<string, any>;
+	attributes: Record<string, any>;
 
 	constructor(
 		name: string,
@@ -17,7 +17,7 @@ export class Factory {
 		this.model = model;
 		this.aliases = [];
 		this.traits = [];
-		this._attributes = {};
+		this.attributes = {};
 
 		const options = first(rest);
 		const block = last(rest);
@@ -44,28 +44,22 @@ export class Factory {
 		return [ this.name, ...this.aliases ];
 	}
 
-	defineAttribute(name: string, block: Function): void {
-		this._attributes[name] = block;
+	defineAttribute(attrName: string, block: Function): void {
+		this.attributes[attrName] = block;
 	}
 
-	// applyAttribute(name: string, object: any): void {
-	// 	this.association(name, object);
-	// }
-
-	attr(name: string, block?: Function): void {
-		if (!block) {
-			// this.applyAttribute(name, options);
-		} else if (isFunction(block)) {
-			this.defineAttribute(name, block);
+	attr(attrName: string, block?: Function): void {
+		if (block && isFunction(block)) {
+			this.defineAttribute(attrName, block);
 		} else {
-			throw new Error(`wrong options, bruh: ${name}, ${block}`);
+			throw new Error(`wrong options, bruh: ${attrName}, ${block}`);
 		}
 	}
 
-	attributes(attrs = {}): any {
+	applyAttributes(attrs = {}): any {
 		const result = {};
-		for (const [ name, block ] of Object.entries(this._attributes)) {
-			result[name] = block.call(this);
+		for (const [ attrName, block ] of Object.entries(this.attributes)) {
+			result[attrName] = block.call(this);
 		}
 		return Object.assign(result, attrs);
 	}

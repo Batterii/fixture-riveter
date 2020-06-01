@@ -89,13 +89,15 @@ describe('Factory', function() {
 		});
 	});
 
-	describe('#attr', function() {
+	describe('#defineAttribute', function() {
 		it('stores the function', function() {
 			const factory = new Factory('name', T);
-			factory.attr('email', () => 'a');
+			const name = 'email';
+			factory.defineAttribute(name, () => 'a');
 
-			expect(size(factory._attributes)).to.equal(1);
-			expect(Object.keys(factory._attributes)).to.deep.equal([ 'email' ]);
+			expect(size(factory.attributes)).to.equal(1);
+			expect(Object.keys(factory.attributes)).to.deep.equal([ name ]);
+			expect(factory.attributes[name].call()).to.equal('a');
 		});
 	});
 });

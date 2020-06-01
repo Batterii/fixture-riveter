@@ -17,13 +17,9 @@ describe('experiment', function() {
 				this.attr('lastName', () => 'bogart');
 				this.attr('role', () => 'guest');
 
-				// this.trait('batteriiUser', function() {
-				// 	this.sequence('email', 'a', (e) => `testEmail${e}@batterii.com`);
-				// 	this.attr('role', 'user');
-				// });
+				// this.sequence('seq', 'a', (e) => `testEmail${e}@batterii.com`);
 
 				// this.trait('admin', function() {
-				// 	this.attr('batteriiUser');
 				// 	this.attr('role', 'admin');
 				// });
 
