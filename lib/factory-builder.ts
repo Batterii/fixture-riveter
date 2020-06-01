@@ -1,10 +1,10 @@
 import { Factory } from './Factory';
 
 export class FactoryBuilder {
-	_factories: Record<string, Factory>;
+	factories: Record<string, Factory>;
 
 	constructor() {
-		this._factories = {};
+		this.factories = {};
 	}
 
 	define(block: Function): void {
@@ -12,7 +12,7 @@ export class FactoryBuilder {
 	}
 
 	getFactory(name: string, throws = true): Factory {
-		const factory = this._factories[name];
+		const factory = this.factories[name];
 		if (throws && !factory) {
 			throw new Error(`${name} hasn't been defined yet`);
 		}
@@ -21,7 +21,7 @@ export class FactoryBuilder {
 
 	registerFactory(factory: any): any {
 		for (const name of factory.names()) {
-			this._factories[name] = factory;
+			this.factories[name] = factory;
 		}
 	}
 

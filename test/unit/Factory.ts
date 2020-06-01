@@ -82,7 +82,7 @@ describe('Factory', function() {
 	describe('#compile', function() {
 		it('executes the block with correct context', function() {
 			const name = 'name';
-			let result;
+			let result = '';
 			const factory = new Factory(name, T, function() {
 				result = this.name;
 			});

@@ -33,7 +33,7 @@ describe('FactoryBuilder', function() {
 	it('can be built', function() {
 		const factoryBuilder = new FactoryBuilder();
 		expect(factoryBuilder).to.exist;
-		expect(factoryBuilder._factories).to.exist.and.to.be.empty;
+		expect(factoryBuilder.factories).to.exist.and.to.be.empty;
 	});
 
 	describe('#define', function() {
@@ -41,10 +41,10 @@ describe('FactoryBuilder', function() {
 			const factoryBuilder = new FactoryBuilder();
 			const testArray = [ 'test' ];
 			factoryBuilder.define(function() {
-				this._factories = testArray;
+				this.factories = testArray;
 			});
 
-			expect(factoryBuilder._factories).to.deep.equal(testArray);
+			expect(factoryBuilder.factories).to.deep.equal(testArray);
 		});
 	});
 
@@ -56,7 +56,7 @@ describe('FactoryBuilder', function() {
 
 			factoryBuilder.registerFactory(factory);
 
-			expect(factoryBuilder._factories[name]).to.equal(factory);
+			expect(factoryBuilder.factories[name]).to.equal(factory);
 		});
 
 		it('adds the factory by alias', function() {
@@ -67,8 +67,8 @@ describe('FactoryBuilder', function() {
 
 			factoryBuilder.registerFactory(factory);
 
-			expect(factoryBuilder._factories[aliases[0]]).to.equal(factory);
-			expect(factoryBuilder._factories[aliases[1]]).to.equal(factory);
+			expect(factoryBuilder.factories[aliases[0]]).to.equal(factory);
+			expect(factoryBuilder.factories[aliases[1]]).to.equal(factory);
 		});
 
 		it('adds the same factory multiples times', function() {
@@ -81,7 +81,7 @@ describe('FactoryBuilder', function() {
 
 			factoryBuilder.registerFactory(factory);
 
-			const factories = factoryBuilder._factories;
+			const factories = factoryBuilder.factories;
 
 			expect(factories[name]).to.deep.equal(factories[alias]);
 		});
@@ -93,9 +93,9 @@ describe('FactoryBuilder', function() {
 			const name = 'testFactory';
 			factoryBuilder.factory(name, T);
 
-			const factory = factoryBuilder._factories[name];
+			const factory = factoryBuilder.factories[name];
 
-			expect(factoryBuilder._factories).to.not.be.empty;
+			expect(factoryBuilder.factories).to.not.be.empty;
 			expect(factory).to.exist;
 			expect(factory.name).to.equal(name);
 		});
@@ -144,7 +144,7 @@ describe('FactoryBuilder', function() {
 			const factory = new FactoryBuilder();
 			factory.factory(name, T);
 			const t = factory.getFactory(name);
-			const result = factory._factories[name];
+			const result = factory.factories[name];
 			expect(t).to.equal(result);
 		});
 
