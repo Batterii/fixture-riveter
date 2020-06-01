@@ -79,13 +79,26 @@ describe('Factory', function() {
 		});
 	});
 
-	describe('compile', function() {
+	describe('#compile', function() {
 		it('executes the block with correct context', function() {
 			const name = 'name';
+			let result;
 			const factory = new Factory(name, T, function() {
-				return this.name;
+				result = this.name;
 			});
-			expect(factory.compile()).to.equal(name);
+			factory.compile();
+			expect(result).to.equal(name);
+		});
+
+		it('is idempotent', function() {
+			const name = 'name';
+			let counter = 0;
+			const factory = new Factory(name, T, function() {
+				counter += 1;
+			});
+			factory.compile();
+			factory.compile();
+			expect(counter).to.equal(1);
 		});
 	});
 

@@ -7,6 +7,7 @@ export class Factory {
 	traits: any[];
 	block: Function;
 	attributes: Record<string, any>;
+	compiled: boolean;
 
 	constructor(
 		name: string,
@@ -18,6 +19,7 @@ export class Factory {
 		this.aliases = [];
 		this.traits = [];
 		this.attributes = {};
+		this.compiled = false;
 
 		const options = first(rest);
 		const block = last(rest);
@@ -35,8 +37,9 @@ export class Factory {
 	}
 
 	compile(): void {
-		if (this.block) {
-			return this.block();
+		if (this.block && !this.compiled) {
+			this.compiled = true;
+			this.block();
 		}
 	}
 
