@@ -59,11 +59,12 @@ export class Factory {
 		}
 	}
 
-	applyAttributes(attrs = {}): any {
-		const result = {};
+	async applyAttributes(extraAttributes = {}): Promise<any> {
+		const instance = {};
 		for (const [ attrName, block ] of Object.entries(this.attributes)) {
-			result[attrName] = block.call(this);
+			// eslint-disable-next-line no-await-in-loop
+			instance[attrName] = await block.call(this);
 		}
-		return Object.assign(result, attrs);
+		return Object.assign(instance, extraAttributes);
 	}
 }

@@ -1,10 +1,21 @@
-import { Factory } from './Factory';
+import { AdapterHandler } from './adapter-handler';
+import { Factory } from './factory';
 
 export class FactoryBuilder {
 	factories: Record<string, Factory>;
+	adapters: any;
 
 	constructor() {
 		this.factories = {};
+		this.adapters = new AdapterHandler();
+	}
+
+	getAdapter(factoryName?: string): any {
+		return this.adapters.getAdapter(factoryName);
+	}
+
+	setAdapter(adapter: any, factoryNames?: any): any {
+		return this.adapters.setAdapter(adapter, factoryNames);
 	}
 
 	define(block: Function): void {
