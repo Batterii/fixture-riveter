@@ -1,5 +1,5 @@
-import { AdapterHandler } from './adapter-handler';
-import { Factory } from './factory';
+import {AdapterHandler} from './adapter-handler';
+import {Factory} from './factory';
 
 export class FactoryBuilder {
 	factories: Record<string, Factory>;

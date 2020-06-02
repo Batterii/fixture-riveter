@@ -1,7 +1,9 @@
-export class T {
+export class DummyModel {
 	name: string;
+	age: number;
 
-	constructor(name: string) {
+	constructor(name: string, age: number) {
 		this.name = name;
+		this.age = age;
 	}
 }

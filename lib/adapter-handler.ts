@@ -1,4 +1,4 @@
-import { DefaultAdapter } from './adapters/default-adapter';
+import {DefaultAdapter} from './adapters/default-adapter';
 
 export class AdapterHandler {
 	adapters: Record<string, any>;
@@ -19,7 +19,7 @@ export class AdapterHandler {
 	}
 
 	setAdapters(adapter: any, factoryNames?: any): void {
-		const names = Array.isArray(factoryNames) ? factoryNames : [ factoryNames ];
+		const names = Array.isArray(factoryNames) ? factoryNames : [factoryNames];
 
 		names.forEach((name) => {
 			this.adapters[name] = adapter;

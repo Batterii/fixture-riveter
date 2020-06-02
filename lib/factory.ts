@@ -1,4 +1,4 @@
-import { isFunction, first, last } from 'lodash';
+import {isFunction, first, last} from 'lodash';
 
 export class Factory {
 	name: string;
@@ -38,13 +38,13 @@ export class Factory {
 
 	compile(): void {
 		if (this.block && !this.compiled) {
-			this.compiled = true;
 			this.block();
+			this.compiled = true;
 		}
 	}
 
 	names(): string[] {
-		return [ this.name, ...this.aliases ];
+		return [this.name, ...this.aliases];
 	}
 
 	defineAttribute(attrName: string, block: Function): void {
@@ -61,7 +61,7 @@ export class Factory {
 
 	async applyAttributes(extraAttributes = {}): Promise<any> {
 		const instance = {};
-		for (const [ attrName, block ] of Object.entries(this.attributes)) {
+		for (const [attrName, block] of Object.entries(this.attributes)) {
 			// eslint-disable-next-line no-await-in-loop
 			instance[attrName] = await block.call(this);
 		}

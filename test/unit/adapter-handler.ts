@@ -1,6 +1,6 @@
-import { AdapterHandler } from '../../lib/adapter-handler';
-import { DefaultAdapter } from '../../lib/adapters/default-adapter';
-import { expect } from 'chai';
+import {AdapterHandler} from '../../lib/adapter-handler';
+import {DefaultAdapter} from '../../lib/adapters/default-adapter';
+import {expect} from 'chai';
 import sinon from 'sinon';
 
 describe('Adapters', function() {

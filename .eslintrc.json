@@ -7,6 +7,8 @@
 		"multiline-ternary": "off",
 		"no-invalid-this": "off",
 		"max-len": ["error", { "code": 100 }],
+		"array-bracket-spacing": ["error", "never"],
+		"object-curly-spacing": ["error", "never"],
 		"quotes": ["error", "single", {"avoidEscape": true}]
 	}
 }

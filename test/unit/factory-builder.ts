@@ -1,15 +1,15 @@
-import { T } from '../helpers';
-import { expect } from 'chai';
+import {DummyModel} from '../helpers';
+import {expect} from 'chai';
 import sinon from 'sinon';
 
-import { Factory } from '../../lib/factory';
-import { FactoryBuilder } from '../../lib/factory-builder';
+import {Factory} from '../../lib/factory';
+import {FactoryBuilder} from '../../lib/factory-builder';
 
 describe('experiment', function() {
 	it('works', function() {
 		const factoryBuilder = new FactoryBuilder();
 		factoryBuilder.define(function() {
-			this.factory('user', T, function() {
+			this.factory('user', DummyModel, function() {
 				this.attr('email', () => 'a');
 				this.attr('password', () => 'batterii2020');
 				this.attr('passwordConfirmation', () => 'batterii2020');
@@ -39,7 +39,7 @@ describe('FactoryBuilder', function() {
 	describe('#define', function() {
 		it('binds function call correctly', function() {
 			const factoryBuilder = new FactoryBuilder();
-			const testArray = [ 'test' ];
+			const testArray = ['test'];
 			factoryBuilder.define(function() {
 				this.factories = testArray;
 			});
@@ -52,7 +52,7 @@ describe('FactoryBuilder', function() {
 		it('adds the factory by name', function() {
 			const factoryBuilder = new FactoryBuilder();
 			const name = 'testFactory';
-			const factory = new Factory(name, T);
+			const factory = new Factory(name, DummyModel);
 
 			factoryBuilder.registerFactory(factory);
 
@@ -62,8 +62,8 @@ describe('FactoryBuilder', function() {
 		it('adds the factory by alias', function() {
 			const factoryBuilder = new FactoryBuilder();
 			const name = 'testFactory';
-			const aliases = [ 'factory1', 'factory2' ];
-			const factory = new Factory(name, T, { aliases });
+			const aliases = ['factory1', 'factory2'];
+			const factory = new Factory(name, DummyModel, {aliases});
 
 			factoryBuilder.registerFactory(factory);
 
@@ -75,13 +75,13 @@ describe('FactoryBuilder', function() {
 			const factoryBuilder = new FactoryBuilder();
 			const name = 'factory1';
 			const alias = 'factory2';
-			const factory = new Factory(name, T, {
-				aliases: [ alias ],
+			const factory = new Factory(name, DummyModel, {
+				aliases: [alias],
 			});
 
 			factoryBuilder.registerFactory(factory);
 
-			const factories = factoryBuilder.factories;
+			const {factories} = factoryBuilder;
 
 			expect(factories[name]).to.deep.equal(factories[alias]);
 		});
@@ -91,7 +91,7 @@ describe('FactoryBuilder', function() {
 		it('creates a factory', function() {
 			const factoryBuilder = new FactoryBuilder();
 			const name = 'testFactory';
-			factoryBuilder.factory(name, T);
+			factoryBuilder.factory(name, DummyModel);
 
 			const factory = factoryBuilder.factories[name];
 
@@ -103,7 +103,7 @@ describe('FactoryBuilder', function() {
 		it('returns the created factory', function() {
 			const factoryBuilder = new FactoryBuilder();
 			const name = 'testFactory';
-			const factory = factoryBuilder.factory(name, T);
+			const factory = factoryBuilder.factory(name, DummyModel);
 
 			expect(factory.name).to.equal(name);
 		});
@@ -111,8 +111,8 @@ describe('FactoryBuilder', function() {
 		it('passes the options down to the factory', function() {
 			const factoryBuilder = new FactoryBuilder();
 			const name = 'testFactory';
-			const aliases = [ 'factory1', 'factory2' ];
-			const factory = factoryBuilder.factory(name, T, { aliases });
+			const aliases = ['factory1', 'factory2'];
+			const factory = factoryBuilder.factory(name, DummyModel, {aliases});
 
 			expect(factory.aliases).to.deep.equal(aliases);
 		});
@@ -121,7 +121,7 @@ describe('FactoryBuilder', function() {
 			const factoryBuilder = new FactoryBuilder();
 			const spy = sinon.spy(factoryBuilder as any, 'registerFactory');
 			sinon.stub(factoryBuilder, 'getFactory').returns(false as any);
-			factoryBuilder.factory('testFactory', T);
+			factoryBuilder.factory('testFactory', DummyModel);
 
 			expect(spy.calledOnce).to.be.true;
 		});
@@ -129,7 +129,7 @@ describe('FactoryBuilder', function() {
 		it("doesn't register a factory twice", function() {
 			const factoryBuilder = new FactoryBuilder();
 			const testFn = () => {
-				factoryBuilder.factory('testFactory', T);
+				factoryBuilder.factory('testFactory', DummyModel);
 			};
 
 			testFn();
@@ -142,7 +142,7 @@ describe('FactoryBuilder', function() {
 		it('returns the requested factory', function() {
 			const name = 'name';
 			const factory = new FactoryBuilder();
-			factory.factory(name, T);
+			factory.factory(name, DummyModel);
 			const t = factory.getFactory(name);
 			const result = factory.factories[name];
 			expect(t).to.equal(result);
@@ -150,7 +150,7 @@ describe('FactoryBuilder', function() {
 
 		it('throws if a non-existant factory is requested', function() {
 			const factory = new FactoryBuilder();
-			factory.factory('t', T);
+			factory.factory('t', DummyModel);
 			expect(() => factory.getFactory('f')).to.throw();
 		});
 	});
