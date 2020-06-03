@@ -1,3 +1,4 @@
+import {Adapter} from './adapters/default-adapter';
 import {AdapterHandler, FactoryNames} from './adapter-handler';
 import {ExtraAttributes, Factory} from './factory';
 
@@ -14,7 +15,7 @@ export class FactoryBuilder {
 		return this.adapters.getAdapter(factoryName);
 	}
 
-	setAdapter(adapter: any, factoryNames?: FactoryNames): any {
+	setAdapter(adapter: Adapter, factoryNames?: FactoryNames): any {
 		return this.adapters.setAdapter(adapter, factoryNames);
 	}
 
@@ -30,7 +31,7 @@ export class FactoryBuilder {
 		return factory;
 	}
 
-	registerFactory(factory: any): any {
+	registerFactory(factory: Factory): void {
 		for (const name of factory.names()) {
 			this.factories[name] = factory;
 		}
@@ -40,11 +41,8 @@ export class FactoryBuilder {
 		if (this.getFactory(name, false)) {
 			throw new Error(`${name} is already defined`);
 		}
-
 		const factory = new Factory(name, model, ...rest);
-
 		factory.compile();
-
 		this.registerFactory(factory);
 
 		return factory;
@@ -53,8 +51,6 @@ export class FactoryBuilder {
 	async build(name: string, extraAttributes?: ExtraAttributes): Promise<any> {
 		const adapter = this.getAdapter();
 		const factory = this.getFactory(name);
-		const instance = await factory.build(adapter, extraAttributes);
-
-		return instance;
+		return factory.build(adapter, extraAttributes);
 	}
 }

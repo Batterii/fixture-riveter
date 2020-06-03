@@ -5,6 +5,11 @@ export interface ExtraAttributes {
 	attrs?: any;
 }
 
+interface Options {
+	aliases?: string[];
+	traits?: string[];
+}
+
 export class Factory {
 	name: string;
 	model: any;
@@ -14,6 +19,7 @@ export class Factory {
 	attributes: Record<string, any>;
 	compiled: boolean;
 
+	constructor(name: string, model: any, rest?: Options | Function);
 	constructor(
 		name: string,
 		model: any,
