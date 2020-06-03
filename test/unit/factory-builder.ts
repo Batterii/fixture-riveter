@@ -1,4 +1,4 @@
-import {DummyModel} from '../helpers';
+import {DummyModel} from '../test-fixtures/dummy-model';
 import {expect} from 'chai';
 import sinon from 'sinon';
 

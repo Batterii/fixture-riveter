@@ -1,27 +1,18 @@
+/* eslint-disable class-methods-use-this */
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 export class DefaultAdapter {
-	name = 'default';
-
-	static build(Model: any, props = {}): any {
+	build(Model: any, props = {}): any {
 		return Object.assign(new Model(), props);
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	static async save(model: any, Model?: any): Promise<any> {
-		return Promise.resolve(model.save()).then(() => model);
+	async save(model: any, Model?: any): Promise<any> {
+		await model.save();
+		return model;
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	static async destroy(model: any, Model: any): Promise<any> {
-		return Promise.resolve(model.destroy()).then(() => model);
-	}
-
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	static get(model: any, attribute: any, Model: any): any {
-		return model[attribute];
-	}
-
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	static set(model: any, props: any, Model: any): any {
-		return model.set(props);
+	async destroy(model: any, Model?: any): Promise<any> {
+		await model.destroy();
+		return model;
 	}
 }
