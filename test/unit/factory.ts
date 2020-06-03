@@ -1,8 +1,11 @@
+import {Factory} from '../../lib/factory';
+import {DefaultAdapter} from '../../lib/adapters/default-adapter';
+
 import {DummyModel} from '../test-fixtures/dummy-model';
+
 import {expect} from 'chai';
 import {size} from 'lodash';
-
-import {Factory} from '../../lib/factory';
+import sinon from 'sinon';
 
 describe('Factory', function() {
 	it('has a name', function() {
@@ -111,6 +114,111 @@ describe('Factory', function() {
 			expect(size(factory.attributes)).to.equal(1);
 			expect(Object.keys(factory.attributes)).to.deep.equal([name]);
 			expect(factory.attributes[name].call()).to.equal('a');
+		});
+	});
+
+	describe('#applyAttributes', function() {
+		it('creates an object', async function() {
+			const factory = new Factory('dummy', DummyModel);
+			const result = await factory.applyAttributes();
+
+			expect(result).to.exist;
+			expect(result).to.be.instanceof(Object);
+		});
+
+		it('iterates over attributes', async function() {
+			const factory = new Factory('dummy', DummyModel);
+			factory.attributes = {
+				name: () => 'Noah',
+				age: () => 32,
+			};
+			const result = await factory.applyAttributes();
+
+			expect(result).to.deep.equal({name: 'Noah', age: 32});
+		});
+
+		it('awaits all attributes', async function() {
+			const factory = new Factory('dummy', DummyModel);
+			const result = new Set();
+
+			factory.attributes = {
+				name: async() => result.add('Noah'),
+				age: async() => result.add(32),
+			};
+			await factory.applyAttributes();
+
+			expect(result).to.deep.equal(new Set(['Noah', 32]));
+		});
+
+		it('returns a promise', function() {
+			const factory = new Factory('dummy', DummyModel);
+			const result = factory.applyAttributes();
+
+			expect(result.then).to.be.a('function');
+			expect(result).to.be.eventually.fulfilled;
+		});
+
+		it('applies attrs argument last', async function() {
+			const factory = new Factory('dummy', DummyModel);
+			factory.attributes = {
+				name: () => 'Noah',
+				age: () => 32,
+			};
+			const extraAttributes = {attrs: {name: 'Bogart'}};
+			const result = await factory.applyAttributes(extraAttributes);
+
+			expect(result).to.deep.equal({name: 'Bogart', age: 32});
+		});
+
+		it('applies traits properly');
+	});
+
+	describe.only('#build', function() {
+		it('creates an instance of the model', async function() {
+			const adapter = new DefaultAdapter();
+			const factory = new Factory('dummy', DummyModel);
+			const result = await factory.build(adapter);
+
+			expect(result).to.be.instanceof(DummyModel);
+		});
+
+		it('returns a promise', function() {
+			const adapter = new DefaultAdapter();
+			const factory = new Factory('dummy', DummyModel);
+			const result = factory.build(adapter);
+
+			expect(result.then).to.be.a('function');
+			expect(result).to.be.eventually.fulfilled;
+		});
+
+		it('creates an instance with the right values', async function() {
+			const adapter = new DefaultAdapter();
+			const factory = new Factory('dummy', DummyModel);
+			factory.attributes = {
+				name: () => 'Noah',
+				age: () => 32,
+			};
+			const result = await factory.build(adapter);
+
+			expect(result).to.deep.equal({name: 'Noah', age: 32});
+		});
+
+		it('calls applyAttributes', async function() {
+			const adapter = new DefaultAdapter();
+			const factory = new Factory('dummy', DummyModel);
+			sinon.stub(factory, 'applyAttributes').resolves({name: 'Noah', age: 32});
+			await factory.build(adapter);
+
+			expect(factory.applyAttributes).to.be.calledOnce;
+		});
+
+		it("calls the adapter's build method", async function() {
+			const adapter = new DefaultAdapter();
+			sinon.stub(adapter, 'build').resolves({name: 'Noah', age: 32});
+			const factory = new Factory('dummy', DummyModel);
+			await factory.build(adapter);
+
+			expect(adapter.build).to.be.calledOnce;
 		});
 	});
 });

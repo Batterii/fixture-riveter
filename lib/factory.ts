@@ -1,5 +1,10 @@
 import {isFunction, first, last} from 'lodash';
 
+interface ExtraAttributes {
+	traits?: string[];
+	attrs?: any;
+}
+
 export class Factory {
 	name: string;
 	model: any;
@@ -59,12 +64,29 @@ export class Factory {
 		}
 	}
 
-	async applyAttributes(extraAttributes = {}): Promise<any> {
+	async applyAttributes(extraAttributes?: ExtraAttributes): Promise<any> {
+		const {attrs} = mergeDefaults(extraAttributes);
 		const instance = {};
+
+		// eslint-disable-next-line no-warning-comments
+		// TODO: implement trait handling
+		// traits.filter((trait: string) => this.traits.includes(trait));
+
 		for (const [attrName, block] of Object.entries(this.attributes)) {
 			// eslint-disable-next-line no-await-in-loop
 			instance[attrName] = await block.call(this);
 		}
-		return Object.assign(instance, extraAttributes);
+		return {...instance, ...attrs};
 	}
+
+	async build(adapter: any, extraAttributes?: ExtraAttributes): Promise<any> {
+		const modelAttrs = await this.applyAttributes(extraAttributes);
+		return adapter.build(this.model, modelAttrs);
+	}
+}
+
+const defaultAttributes = {traits: [], attrs: {}};
+
+function mergeDefaults(extraAttributes?: ExtraAttributes): any {
+	return {...defaultAttributes, ...extraAttributes};
 }
