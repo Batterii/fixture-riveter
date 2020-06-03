@@ -1,33 +1,51 @@
 import {DummyModel} from '../test-fixtures/dummy-model';
-import {expect} from 'chai';
-import sinon from 'sinon';
 
+import {DefaultAdapter} from '../../lib/adapters/default-adapter';
+import {AdapterHandler} from '../../lib/adapter-handler';
 import {Factory} from '../../lib/factory';
 import {FactoryBuilder} from '../../lib/factory-builder';
 
-describe('experiment', function() {
-	it('works', function() {
-		const factoryBuilder = new FactoryBuilder();
-		factoryBuilder.define(function() {
-			this.factory('user', DummyModel, function() {
-				this.attr('email', () => 'a');
-				this.attr('password', () => 'batterii2020');
-				this.attr('passwordConfirmation', () => 'batterii2020');
-				this.attr('firstName', () => 'noah');
-				this.attr('lastName', () => 'bogart');
-				this.attr('role', () => 'guest');
+import {expect} from 'chai';
+import sinon from 'sinon';
 
-				// this.sequence('seq', 'a', (e) => `testEmail${e}@batterii.com`);
+// describe('experiment', function() {
+// 	it('works', async function() {
+// 		const fb = new FactoryBuilder();
+// 		fb.define(function() {
+// 			this.factory('user', DummyModel, function() {
+// 				this.attr('email', () => 'a');
+// 				this.attr('password', () => 'batterii2020');
+// 				this.attr('passwordConfirmation', () => 'batterii2020');
+// 				this.attr('firstName', () => 'noah');
+// 				this.attr('lastName', () => 'bogart');
+// 				this.attr('role', () => 'guest');
 
-				// this.trait('admin', function() {
-				// 	this.attr('role', 'admin');
-				// });
+// 				this.sequence('seq', 'a', (e) => `testEmail${e}@batterii.com`);
 
-				// this.factory('adminUser', { traits: [ 'admin' ] });
-			});
-		});
-	});
-});
+// 				this.trait('admin', function() {
+// 					this.attr('role', 'admin');
+// 				});
+
+// 				this.factory('adminUser', { traits: [ 'admin' ] });
+// 			});
+// 		});
+
+// 		const user1 = await fb.build('user');
+// 		const user2 = await fb.build('user', {traits: ['admin']});
+// 		const user3 = await fb.build('user', {attrs: {email: 'fake2@email.com'}});
+// 		const user4 = await fb.build('user', {
+// 			traits: ['admin'],
+// 			attrs: {
+// 				email: 'fake4@email.com',
+// 			},
+// 		});
+
+// 		expect(user1).to.exist;
+// 		expect(user2).to.exist;
+// 		expect(user3).to.exist;
+// 		expect(user4).to.exist;
+// 	});
+// });
 
 describe('FactoryBuilder', function() {
 	it('can be built', function() {
@@ -75,9 +93,7 @@ describe('FactoryBuilder', function() {
 			const factoryBuilder = new FactoryBuilder();
 			const name = 'factory1';
 			const alias = 'factory2';
-			const factory = new Factory(name, DummyModel, {
-				aliases: [alias],
-			});
+			const factory = new Factory(name, DummyModel, {aliases: [alias]});
 
 			factoryBuilder.registerFactory(factory);
 
@@ -152,6 +168,17 @@ describe('FactoryBuilder', function() {
 			const factory = new FactoryBuilder();
 			factory.factory('t', DummyModel);
 			expect(() => factory.getFactory('f')).to.throw();
+		});
+	});
+
+	describe('#build', function() {
+		it('returns an instance of the model', async function() {
+			const name = 'name';
+			const factory = new FactoryBuilder();
+			factory.factory(name, DummyModel);
+			const result = await factory.build(name);
+
+			expect(result).to.be.instanceof(DummyModel);
 		});
 	});
 });

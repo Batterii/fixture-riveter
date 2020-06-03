@@ -1,5 +1,5 @@
 import {AdapterHandler} from './adapter-handler';
-import {Factory} from './factory';
+import {ExtraAttributes, Factory} from './factory';
 
 export class FactoryBuilder {
 	factories: Record<string, Factory>;
@@ -48,5 +48,13 @@ export class FactoryBuilder {
 		this.registerFactory(factory);
 
 		return factory;
+	}
+
+	async build(name: string, extraAttributes?: ExtraAttributes): Promise<any> {
+		const adapter = this.getAdapter();
+		const factory = this.getFactory(name);
+		const instance = await factory.build(adapter, extraAttributes);
+
+		return instance;
 	}
 }

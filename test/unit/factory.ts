@@ -173,7 +173,7 @@ describe('Factory', function() {
 		it('applies traits properly');
 	});
 
-	describe.only('#build', function() {
+	describe('#build', function() {
 		it('creates an instance of the model', async function() {
 			const adapter = new DefaultAdapter();
 			const factory = new Factory('dummy', DummyModel);

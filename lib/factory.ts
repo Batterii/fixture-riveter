@@ -1,6 +1,6 @@
 import {isFunction, first, last} from 'lodash';
 
-interface ExtraAttributes {
+export interface ExtraAttributes {
 	traits?: string[];
 	attrs?: any;
 }
