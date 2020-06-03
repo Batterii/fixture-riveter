@@ -54,6 +54,33 @@ describe('FactoryBuilder', function() {
 		expect(factoryBuilder.factories).to.exist.and.to.be.empty;
 	});
 
+	describe('#getAdapter', function() {
+		it('passes the call down', function() {
+			const factoryBuilder = new FactoryBuilder();
+			sinon.stub(factoryBuilder.adapters, 'getAdapter').returns('test');
+			const result = factoryBuilder.getAdapter('value');
+			const {getAdapter} = factoryBuilder.adapters;
+
+			expect(result).to.deep.equal('test');
+			expect(getAdapter).to.be.calledOnce;
+			expect(getAdapter).to.be.calledWithExactly('value');
+		});
+	});
+
+	describe('#setAdapter', function() {
+		it('passes the call down', function() {
+			const factoryBuilder = new FactoryBuilder();
+			sinon.stub(factoryBuilder.adapters, 'setAdapter').returns('test');
+			const defaultAdapter = new DefaultAdapter();
+			const result = factoryBuilder.setAdapter(defaultAdapter, 'value');
+			const {setAdapter} = factoryBuilder.adapters;
+
+			expect(result).to.deep.equal('test');
+			expect(setAdapter).to.be.calledOnce;
+			expect(setAdapter).to.be.calledWithExactly(defaultAdapter, 'value');
+		});
+	});
+
 	describe('#define', function() {
 		it('binds function call correctly', function() {
 			const factoryBuilder = new FactoryBuilder();
