@@ -1,7 +1,7 @@
-import {DefaultAdapter} from './default-adapter';
+import {Adapter} from './default-adapter';
 
 /* eslint-disable class-methods-use-this */
-export class ObjectionAdapter extends DefaultAdapter {
+export class ObjectionAdapter implements Adapter {
 	build(Model: any, props = {}): any {
 		return Object.assign(new Model(), props);
 	}

@@ -1,4 +1,4 @@
-import {AdapterHandler} from './adapter-handler';
+import {AdapterHandler, FactoryNames} from './adapter-handler';
 import {ExtraAttributes, Factory} from './factory';
 
 export class FactoryBuilder {
@@ -14,7 +14,7 @@ export class FactoryBuilder {
 		return this.adapters.getAdapter(factoryName);
 	}
 
-	setAdapter(adapter: any, factoryNames?: any): any {
+	setAdapter(adapter: any, factoryNames?: FactoryNames): any {
 		return this.adapters.setAdapter(adapter, factoryNames);
 	}
 

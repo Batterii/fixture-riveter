@@ -1,5 +1,7 @@
 import {DefaultAdapter} from './adapters/default-adapter';
 
+export type FactoryNames = string | string[];
+
 export class AdapterHandler {
 	adapters: Record<string, any>;
 	defaultAdapter: any;
@@ -18,8 +20,8 @@ export class AdapterHandler {
 		return this.currentAdapter;
 	}
 
-	setAdapters(adapter: any, factoryNames?: any): void {
-		const names = Array.isArray(factoryNames) ? factoryNames : [factoryNames];
+	setAdapters(adapter: any, factoryNames?: FactoryNames): void {
+		const names = coerceNames(factoryNames);
 
 		names.forEach((name) => {
 			this.adapters[name] = adapter;
@@ -34,4 +36,11 @@ export class AdapterHandler {
 		}
 		return adapter;
 	}
+}
+
+function coerceNames(factoryNames?: FactoryNames): string[] {
+	if (factoryNames) {
+		return Array.isArray(factoryNames) ? factoryNames : [factoryNames];
+	}
+	return [];
 }

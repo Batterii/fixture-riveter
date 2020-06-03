@@ -35,21 +35,21 @@ describe('DefaultAdapter', function() {
 		it('calls save on the model', async function() {
 			const model = new DummyModel();
 			sinon.spy(model, 'save');
-			await adapter.save(model, DummyModel);
+			await adapter.save(model);
 			expect(model.save).to.be.calledOnce;
 		});
 
 		it('returns a promise', function() {
 			const model = new DummyModel();
 			sinon.spy(model, 'save');
-			const result = adapter.save(model, DummyModel);
+			const result = adapter.save(model);
 			expect(result.then).to.be.a('function');
 			return expect(result).to.be.eventually.fulfilled;
 		});
 
 		it('resolves to the object itself', async function() {
 			const model = new DummyModel();
-			const result = await adapter.save(model, DummyModel);
+			const result = await adapter.save(model);
 			expect(result).to.deep.equal(model);
 		});
 	});
@@ -58,21 +58,21 @@ describe('DefaultAdapter', function() {
 		it('calls destroy on the model', async function() {
 			const model = new DummyModel();
 			sinon.spy(model, 'destroy');
-			await adapter.destroy(model, DummyModel);
+			await adapter.destroy(model);
 			expect(model.destroy).to.be.calledOnce;
 		});
 
 		it('returns a promise', function() {
 			const model = new DummyModel();
 			sinon.spy(model, 'destroy');
-			const result = adapter.destroy(model, DummyModel);
+			const result = adapter.destroy(model);
 			expect(result.then).to.be.a('function');
 			return expect(result).to.be.eventually.fulfilled;
 		});
 
 		it('resolves to the object itself', async function() {
 			const model = new DummyModel();
-			const result = await adapter.destroy(model, DummyModel);
+			const result = await adapter.destroy(model);
 			expect(result).to.deep.equal(model);
 		});
 	});
