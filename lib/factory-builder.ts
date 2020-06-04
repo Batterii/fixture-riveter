@@ -49,9 +49,15 @@ export class FactoryBuilder {
 		return factory;
 	}
 
-	async build(name: string, extraAttributes?: ExtraAttributes): Promise<Adapter> {
+	async build(name: string, extraAttributes?: ExtraAttributes): Promise<any> {
 		const adapter = this.getAdapter();
 		const factory = this.getFactory(name);
 		return factory.build(adapter, extraAttributes);
+	}
+
+	async create(name: string, extraAttributes?: ExtraAttributes): Promise<any> {
+		const adapter = this.getAdapter();
+		const factory = this.getFactory(name);
+		return factory.create(adapter, extraAttributes);
 	}
 }

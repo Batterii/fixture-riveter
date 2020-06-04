@@ -1,7 +1,6 @@
 import {DummyModel} from '../test-fixtures/dummy-model';
 
 import {DefaultAdapter} from '../../lib/adapters/default-adapter';
-import {AdapterHandler} from '../../lib/adapter-handler';
 import {Factory} from '../../lib/factory';
 import {FactoryBuilder} from '../../lib/factory-builder';
 
@@ -206,6 +205,53 @@ describe('FactoryBuilder', function() {
 			const result = await factory.build(name);
 
 			expect(result).to.be.instanceof(DummyModel);
+		});
+
+		it('calls the right functions', async function() {
+			const name = 'name';
+			const adapter = new DefaultAdapter();
+			const factory = new Factory(name, DummyModel);
+			const fb = new FactoryBuilder();
+			fb.factory(name, DummyModel);
+			sinon.stub(fb, 'getAdapter').returns(adapter);
+			sinon.stub(fb, 'getFactory').returns(factory);
+			sinon.spy(factory, 'build');
+			await fb.build(name);
+
+			expect(fb.getAdapter).to.be.calledOnce;
+			expect(fb.getFactory).to.be.calledOnce;
+			expect(fb.getFactory).to.be.calledOnceWithExactly(name);
+			expect(factory.build).to.be.calledOnce;
+			expect(factory.build).to.be.calledOnceWith(adapter);
+		});
+	});
+
+	describe('#create', function() {
+		it('returns an instance of the model', async function() {
+			const name = 'name';
+			const factory = new FactoryBuilder();
+			factory.factory(name, DummyModel);
+			const result = await factory.create(name);
+
+			expect(result).to.be.instanceof(DummyModel);
+		});
+
+		it('calls the right functions', async function() {
+			const name = 'name';
+			const adapter = new DefaultAdapter();
+			const factory = new Factory(name, DummyModel);
+			const fb = new FactoryBuilder();
+			fb.factory(name, DummyModel);
+			sinon.stub(fb, 'getAdapter').returns(adapter);
+			sinon.stub(fb, 'getFactory').returns(factory);
+			sinon.spy(factory, 'create');
+			await fb.create(name);
+
+			expect(fb.getAdapter).to.be.calledOnce;
+			expect(fb.getFactory).to.be.calledOnce;
+			expect(fb.getFactory).to.be.calledOnceWithExactly(name);
+			expect(factory.create).to.be.calledOnce;
+			expect(factory.create).to.be.calledOnceWith(adapter);
 		});
 	});
 });
