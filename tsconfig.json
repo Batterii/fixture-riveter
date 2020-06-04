@@ -10,7 +10,8 @@
 		"incremental": true
 	},
 	"include": [
-		"test/**/*",
-		"lib/**/*"
+		"lib/**/*",
+		"./knexfile.ts",
+		"test/**/*"
 	]
 }
