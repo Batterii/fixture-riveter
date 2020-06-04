@@ -1,3 +1,4 @@
+import {Adapter} from './adapters/adapter';
 import {isFunction, first, last} from 'lodash';
 
 export interface ExtraAttributes {
@@ -5,7 +6,7 @@ export interface ExtraAttributes {
 	attrs?: any;
 }
 
-interface Options {
+export interface Options {
 	aliases?: string[];
 	traits?: string[];
 }
@@ -85,9 +86,14 @@ export class Factory {
 		return {...instance, ...attrs};
 	}
 
-	async build(adapter: any, extraAttributes?: ExtraAttributes): Promise<any> {
+	async build(adapter: Adapter, extraAttributes?: ExtraAttributes): Promise<any> {
 		const modelAttrs = await this.applyAttributes(extraAttributes);
 		return adapter.build(this.model, modelAttrs);
+	}
+
+	async create(adapter: Adapter, extraAttributes?: ExtraAttributes): Promise<any> {
+		const instance = await this.build(adapter, extraAttributes);
+		return adapter.save(instance, this.model);
 	}
 }
 

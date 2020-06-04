@@ -173,12 +173,12 @@ describe('Factory', function() {
 	});
 
 	describe('#build', function() {
-		it('creates an instance of the model', async function() {
+		it('builds an instance of the model', async function() {
 			const adapter = new DefaultAdapter();
 			const factory = new Factory('dummy', DummyModel);
 			const result = await factory.build(adapter);
 
-			expect(result).to.be.instanceof(DummyModel);
+			expect(result).to.be.an.instanceof(DummyModel);
 		});
 
 		it('returns a promise', function() {
@@ -190,7 +190,7 @@ describe('Factory', function() {
 			expect(result).to.be.eventually.fulfilled;
 		});
 
-		it('creates an instance with the right values', async function() {
+		it('builds an instance with the right values', async function() {
 			const adapter = new DefaultAdapter();
 			const factory = new Factory('dummy', DummyModel);
 			factory.attributes = {
@@ -205,7 +205,8 @@ describe('Factory', function() {
 		it('calls applyAttributes', async function() {
 			const adapter = new DefaultAdapter();
 			const factory = new Factory('dummy', DummyModel);
-			sinon.stub(factory, 'applyAttributes').resolves({name: 'Noah', age: 32});
+			const model = {name: 'Noah', age: 32};
+			sinon.stub(factory, 'applyAttributes').resolves(model);
 			await factory.build(adapter);
 
 			expect(factory.applyAttributes).to.be.calledOnce;
@@ -218,6 +219,47 @@ describe('Factory', function() {
 			await factory.build(adapter);
 
 			expect(adapter.build).to.be.calledOnce;
+		});
+	});
+
+	describe('#create', function() {
+		it('creates an instance of the model', async function() {
+			const adapter = new DefaultAdapter();
+			const factory = new Factory('dummy', DummyModel);
+			const result = await factory.create(adapter);
+
+			expect(result).to.be.an.instanceof(DummyModel);
+		});
+
+		it('returns a promise', function() {
+			const adapter = new DefaultAdapter();
+			const factory = new Factory('dummy', DummyModel);
+			const result = factory.create(adapter);
+
+			expect(result.then).to.be.a('function');
+			expect(result).to.be.eventually.fulfilled;
+		});
+
+		it('uses #build to build the instance', async function() {
+			const adapter = new DefaultAdapter();
+			const factory = new Factory('dummy', DummyModel);
+			const model = new DummyModel('Noah', 32);
+			sinon.stub(factory, 'build').resolves(model);
+			await factory.create(adapter);
+
+			expect(factory.build).to.be.calledOnce;
+			expect(factory.build).to.be.calledOnceWith(adapter);
+		});
+
+		it('calls save on the adapter', async function() {
+			const adapter = new DefaultAdapter();
+			const factory = new Factory('dummy', DummyModel);
+			const model = new DummyModel('Noah', 32);
+			sinon.stub(adapter, 'save').resolves(model);
+			await factory.create(adapter);
+
+			expect(adapter.save).to.be.calledOnce;
+			expect(adapter.save).to.be.calledOnceWithExactly(model, factory.model);
 		});
 	});
 });
