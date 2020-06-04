@@ -1,8 +1,15 @@
 {
 	"name": "@batterii/factory-builder",
 	"version": "0.0.0",
-	"description": "",
+	"description": "Fixture replacement inspired by thoughtbot's factory_bot",
 	"author": "Batterii, LLC",
+	"contributors": [
+		{
+			"name": "Noah Bogart",
+			"email": "nbtheduke@gmail.com",
+			"url": "https://github.com/noahtheduke"
+		}
+	],
 	"license": "MIT",
 	"repository": "github:Batterii/factory-builder",
 	"files": [
