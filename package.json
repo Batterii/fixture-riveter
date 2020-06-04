@@ -28,6 +28,9 @@
 		"test": "npm run build && mocha dist/test",
 		"test:unit": "npm run build && mocha dist/test/unit",
 		"test:integration": "npm run build && mocha dist/test/integration",
+		"migrate:make": "npm run build && knex migrate:make --knexfile dist/knexfile.js",
+		"migrate:latest": "npm run build && knex migrate:latest --knexfile dist/knexfile.js",
+		"migrate:rollback": "npm run build && knex migrate:rollback --knexfile dist/knexfile.js",
 		"preversion": "npm run lint && npm run clean && npm run test",
 		"prepublishOnly": "git push && git push --tags"
 	},

@@ -12,6 +12,7 @@
 	"include": [
 		"lib/**/*",
 		"./knexfile.ts",
+		"migrations/**/*",
 		"test/**/*"
 	]
 }
