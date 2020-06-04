@@ -95,13 +95,12 @@ describe('Factory', function() {
 
 		it('is idempotent', function() {
 			const name = 'name';
-			let counter = 0;
-			const factory = new Factory(name, DummyModel, function() {
-				counter += 1;
-			});
+			const factory = new Factory(name, DummyModel, () => true);
+			sinon.stub(factory, 'block');
 			factory.compile();
 			factory.compile();
-			expect(counter).to.equal(1);
+			expect(factory.block).to.be.calledOnce;
+			expect(factory.compiled).to.be.true;
 		});
 	});
 
