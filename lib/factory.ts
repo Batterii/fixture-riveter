@@ -93,6 +93,6 @@ export class Factory {
 
 const defaultAttributes = {traits: [], attrs: {}};
 
-function mergeDefaults(extraAttributes?: ExtraAttributes): any {
+export function mergeDefaults(extraAttributes?: ExtraAttributes): any {
 	return {...defaultAttributes, ...extraAttributes};
 }

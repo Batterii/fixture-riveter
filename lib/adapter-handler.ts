@@ -1,4 +1,5 @@
-import {Adapter, DefaultAdapter} from './adapters/default-adapter';
+import {Adapter} from './adapters/adapter';
+import {DefaultAdapter} from './adapters/default-adapter';
 
 export type FactoryNames = string | string[];
 

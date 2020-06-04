@@ -1,4 +1,4 @@
-import {Adapter} from './default-adapter';
+import {Adapter} from './adapter';
 
 /* eslint-disable class-methods-use-this */
 export class ObjectionAdapter implements Adapter {

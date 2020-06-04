@@ -1,4 +1,4 @@
-import {Adapter} from './adapters/default-adapter';
+import {Adapter} from './adapters/adapter';
 import {AdapterHandler, FactoryNames} from './adapter-handler';
 import {ExtraAttributes, Factory} from './factory';
 
