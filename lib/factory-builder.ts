@@ -60,4 +60,8 @@ export class FactoryBuilder {
 		const factory = this.getFactory(name);
 		return factory.create(adapter, extraAttributes);
 	}
+
+	attributesFor(name: string, extraAttributes?: ExtraAttributes): any {
+		return this.getFactory(name).applyAttributes(extraAttributes);
+	}
 }

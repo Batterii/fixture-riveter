@@ -3,7 +3,7 @@ import {isFunction, first, last} from 'lodash';
 
 export interface ExtraAttributes {
 	traits?: string[];
-	attrs?: any;
+	attrs?: Record<string, any>;
 }
 
 export interface Options {
@@ -71,7 +71,7 @@ export class Factory {
 		}
 	}
 
-	async applyAttributes(extraAttributes?: ExtraAttributes): Promise<any> {
+	applyAttributes(extraAttributes?: ExtraAttributes): any {
 		const {attrs} = mergeDefaults(extraAttributes);
 		const instance = {};
 
@@ -80,14 +80,13 @@ export class Factory {
 		// traits.filter((trait: string) => this.traits.includes(trait));
 
 		for (const [attrName, block] of Object.entries(this.attributes)) {
-			// eslint-disable-next-line no-await-in-loop
-			instance[attrName] = await block.call(this);
+			instance[attrName] = block.call(this);
 		}
 		return {...instance, ...attrs};
 	}
 
 	async build(adapter: Adapter, extraAttributes?: ExtraAttributes): Promise<any> {
-		const modelAttrs = await this.applyAttributes(extraAttributes);
+		const modelAttrs = this.applyAttributes(extraAttributes);
 		return adapter.build(this.model, modelAttrs);
 	}
 
@@ -99,6 +98,10 @@ export class Factory {
 
 const defaultAttributes = {traits: [], attrs: {}};
 
-export function mergeDefaults(extraAttributes?: ExtraAttributes): any {
+export function mergeDefaults(extraAttributes?: ExtraAttributes):
+{
+	traits: string[];
+	attrs: Record<string, any>;
+} {
 	return {...defaultAttributes, ...extraAttributes};
 }

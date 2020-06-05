@@ -207,6 +207,14 @@ describe('FactoryBuilder', function() {
 			expect(result).to.be.instanceof(DummyModel);
 		});
 
+		it('can build from an alias', async function() {
+			const factory = new FactoryBuilder();
+			factory.factory('dummy', DummyModel, {aliases: ['user']});
+			const result = await factory.build('user');
+
+			expect(result).to.be.instanceof(DummyModel);
+		});
+
 		it('calls the right functions', async function() {
 			const name = 'name';
 			const adapter = new DefaultAdapter();
@@ -236,6 +244,14 @@ describe('FactoryBuilder', function() {
 			expect(result).to.be.instanceof(DummyModel);
 		});
 
+		it('can create from an alias', async function() {
+			const factory = new FactoryBuilder();
+			factory.factory('dummy', DummyModel, {aliases: ['user']});
+			const result = await factory.create('user');
+
+			expect(result).to.be.instanceof(DummyModel);
+		});
+
 		it('calls the right functions', async function() {
 			const name = 'name';
 			const adapter = new DefaultAdapter();
@@ -252,6 +268,26 @@ describe('FactoryBuilder', function() {
 			expect(fb.getFactory).to.be.calledOnceWithExactly(name);
 			expect(factory.create).to.be.calledOnce;
 			expect(factory.create).to.be.calledOnceWith(adapter);
+		});
+	});
+
+	describe('#attributesFor', function() {
+		it('returns an object with the defined attributes', function() {
+			const name = 'Noah';
+			const age = 32;
+
+			const fb = new FactoryBuilder();
+			fb.define(function() {
+				this.factory('user', DummyModel, function() {
+					this.attr('name', () => name);
+					this.attr('age', () => age);
+				});
+			});
+			const result = fb.attributesFor('user');
+			const expected = new DummyModel(name, age);
+
+			expect(result).to.be.an('object');
+			expect(result).to.deep.equal(expected);
 		});
 	});
 });

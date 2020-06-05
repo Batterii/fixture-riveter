@@ -117,54 +117,33 @@ describe('Factory', function() {
 	});
 
 	describe('#applyAttributes', function() {
-		it('creates an object', async function() {
+		it('creates an object', function() {
 			const factory = new Factory('dummy', DummyModel);
-			const result = await factory.applyAttributes();
+			const result = factory.applyAttributes();
 
 			expect(result).to.exist;
 			expect(result).to.be.instanceof(Object);
 		});
 
-		it('iterates over attributes', async function() {
+		it('iterates over attributes', function() {
 			const factory = new Factory('dummy', DummyModel);
 			factory.attributes = {
 				name: () => 'Noah',
 				age: () => 32,
 			};
-			const result = await factory.applyAttributes();
+			const result = factory.applyAttributes();
 
 			expect(result).to.deep.equal({name: 'Noah', age: 32});
 		});
 
-		it('awaits all attributes', async function() {
-			const factory = new Factory('dummy', DummyModel);
-			const result = new Set();
-
-			factory.attributes = {
-				name: async() => result.add('Noah'),
-				age: async() => result.add(32),
-			};
-			await factory.applyAttributes();
-
-			expect(result).to.deep.equal(new Set(['Noah', 32]));
-		});
-
-		it('returns a promise', function() {
-			const factory = new Factory('dummy', DummyModel);
-			const result = factory.applyAttributes();
-
-			expect(result.then).to.be.a('function');
-			expect(result).to.be.eventually.fulfilled;
-		});
-
-		it('applies attrs argument last', async function() {
+		it('applies attrs argument last', function() {
 			const factory = new Factory('dummy', DummyModel);
 			factory.attributes = {
 				name: () => 'Noah',
 				age: () => 32,
 			};
 			const extraAttributes = {attrs: {name: 'Bogart'}};
-			const result = await factory.applyAttributes(extraAttributes);
+			const result = factory.applyAttributes(extraAttributes);
 
 			expect(result).to.deep.equal({name: 'Bogart', age: 32});
 		});
@@ -174,6 +153,14 @@ describe('Factory', function() {
 
 	describe('#build', function() {
 		it('builds an instance of the model', async function() {
+			const adapter = new DefaultAdapter();
+			const factory = new Factory('dummy', DummyModel);
+			const result = await factory.build(adapter);
+
+			expect(result).to.be.an.instanceof(DummyModel);
+		});
+
+		it('builds an instance from an alias', async function() {
 			const adapter = new DefaultAdapter();
 			const factory = new Factory('dummy', DummyModel);
 			const result = await factory.build(adapter);
@@ -206,7 +193,7 @@ describe('Factory', function() {
 			const adapter = new DefaultAdapter();
 			const factory = new Factory('dummy', DummyModel);
 			const model = {name: 'Noah', age: 32};
-			sinon.stub(factory, 'applyAttributes').resolves(model);
+			sinon.stub(factory, 'applyAttributes').returns(model);
 			await factory.build(adapter);
 
 			expect(factory.applyAttributes).to.be.calledOnce;
