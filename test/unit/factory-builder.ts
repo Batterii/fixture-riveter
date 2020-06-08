@@ -81,11 +81,11 @@ describe('FactoryBuilder', function() {
 	});
 
 	describe('#define', function() {
-		it('binds function call correctly', function() {
+		it('calls the block immediately', function() {
 			const factoryBuilder = new FactoryBuilder();
-			const testArray = ['test'];
+			const testArray = ['test'] as any;
 			factoryBuilder.define(function() {
-				this.factories = testArray;
+				factoryBuilder.factories = testArray;
 			});
 
 			expect(factoryBuilder.factories).to.deep.equal(testArray);
@@ -278,9 +278,9 @@ describe('FactoryBuilder', function() {
 
 			const fb = new FactoryBuilder();
 			fb.define(function() {
-				this.factory('user', DummyModel, function() {
-					this.attr('name', () => name);
-					this.attr('age', () => age);
+				fb.factory('user', DummyModel, (f) => {
+					f.attr('name', () => name);
+					f.attr('age', () => age);
 				});
 			});
 			const result = fb.attributesFor('user');

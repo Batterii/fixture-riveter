@@ -87,8 +87,8 @@ describe('Factory', function() {
 		it('executes the block with correct context', function() {
 			const name = 'name';
 			let result = '';
-			const factory = new Factory(name, DummyModel, function() {
-				result = this.name;
+			const factory = new Factory(name, DummyModel, (f) => {
+				result = f.name;
 			});
 			factory.compile();
 			expect(result).to.equal(name);

@@ -52,7 +52,7 @@ export class Factory {
 
 	compile(): void {
 		if (this.block && !this.compiled) {
-			this.block();
+			this.block(this);
 			this.compiled = true;
 		}
 	}

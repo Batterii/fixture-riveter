@@ -13,9 +13,9 @@ describe('#create', function() {
 		fb.setAdapter(new ObjectionAdapter());
 
 		fb.define(function() {
-			this.factory('user', User, function() {
-				this.attr('name', () => 'Noah');
-				this.attr('age', () => 32);
+			fb.factory('user', User, (f) => {
+				f.attr('name', () => 'Noah');
+				f.attr('age', () => 32);
 			});
 		});
 	});
