@@ -7,7 +7,7 @@ export class Attribute {
 		this.block = block;
 	}
 
-	execute(): any {
+	build(): any {
 		return this.block();
 	}
 }

@@ -113,7 +113,7 @@ describe('Factory', function() {
 
 			expect(size(factory.attributes)).to.equal(1);
 			expect(factory.attributes.map((a) => a.name)).to.deep.equal([name]);
-			expect(factory.attributes[0].execute()).to.equal('a');
+			expect(factory.attributes[0].build()).to.equal('a');
 		});
 	});
 
