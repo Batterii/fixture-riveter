@@ -1,3 +1,4 @@
+import {Attribute} from '../../lib/attribute';
 import {Factory} from '../../lib/factory';
 import {DefaultAdapter} from '../../lib/adapters/default-adapter';
 
@@ -111,8 +112,8 @@ describe('Factory', function() {
 			factory.defineAttribute(name, () => 'a');
 
 			expect(size(factory.attributes)).to.equal(1);
-			expect(Object.keys(factory.attributes)).to.deep.equal([name]);
-			expect(factory.attributes[name].call()).to.equal('a');
+			expect(factory.attributes.map((a) => a.name)).to.deep.equal([name]);
+			expect(factory.attributes[0].execute()).to.equal('a');
 		});
 	});
 
@@ -127,10 +128,10 @@ describe('Factory', function() {
 
 		it('iterates over attributes', function() {
 			const factory = new Factory('dummy', DummyModel);
-			factory.attributes = {
-				name: () => 'Noah',
-				age: () => 32,
-			};
+			factory.attributes = [
+				new Attribute('name', () => 'Noah'),
+				new Attribute('age', () => 32),
+			];
 			const result = factory.applyAttributes();
 
 			expect(result).to.deep.equal({name: 'Noah', age: 32});
@@ -138,10 +139,10 @@ describe('Factory', function() {
 
 		it('applies attrs argument last', function() {
 			const factory = new Factory('dummy', DummyModel);
-			factory.attributes = {
-				name: () => 'Noah',
-				age: () => 32,
-			};
+			factory.attributes = [
+				new Attribute('name', () => 'Noah'),
+				new Attribute('age', () => 32),
+			];
 			const extraAttributes = {attrs: {name: 'Bogart'}};
 			const result = factory.applyAttributes(extraAttributes);
 
@@ -180,10 +181,10 @@ describe('Factory', function() {
 		it('builds an instance with the right values', async function() {
 			const adapter = new DefaultAdapter();
 			const factory = new Factory('dummy', DummyModel);
-			factory.attributes = {
-				name: () => 'Noah',
-				age: () => 32,
-			};
+			factory.attributes = [
+				new Attribute('name', () => 'Noah'),
+				new Attribute('age', () => 32),
+			];
 			const result = await factory.build(adapter);
 
 			expect(result).to.deep.equal({name: 'Noah', age: 32});

@@ -1,4 +1,6 @@
 import {Adapter} from './adapters/adapter';
+import {Attribute} from './attribute';
+
 import {isFunction, first, last} from 'lodash';
 
 export interface ExtraAttributes {
@@ -17,7 +19,7 @@ export class Factory {
 	aliases: string[];
 	traits: any[];
 	block: Function;
-	attributes: Record<string, any>;
+	attributes: Attribute[];
 	compiled: boolean;
 
 	constructor(name: string, model: any, rest?: Options | Function);
@@ -30,7 +32,7 @@ export class Factory {
 		this.model = model;
 		this.aliases = [];
 		this.traits = [];
-		this.attributes = {};
+		this.attributes = [];
 		this.compiled = false;
 
 		const options = first(rest);
@@ -59,8 +61,8 @@ export class Factory {
 		return [this.name, ...this.aliases];
 	}
 
-	defineAttribute(attrName: string, block: Function): void {
-		this.attributes[attrName] = block;
+	defineAttribute(name: string, block: Function): void {
+		this.attributes.push(new Attribute(name, block));
 	}
 
 	attr(attrName: string, block?: Function): void {
@@ -79,8 +81,8 @@ export class Factory {
 		// TODO: implement trait handling
 		// traits.filter((trait: string) => this.traits.includes(trait));
 
-		for (const [attrName, block] of Object.entries(this.attributes)) {
-			instance[attrName] = block.call(this);
+		for (const {name, block} of this.attributes) {
+			instance[name] = block.call(this);
 		}
 		return {...instance, ...attrs};
 	}
