@@ -250,4 +250,36 @@ describe('Factory', function() {
 			expect(adapter.save).to.be.calledOnceWithExactly(model, factory.model);
 		});
 	});
+
+	describe('#sequence', function() {
+		it('adds the sequence as an attribute', function() {
+			const factory = new Factory('dummy', DummyModel);
+			sinon.spy(factory, 'defineAttribute');
+			const name = 'email';
+			factory.sequence(name);
+
+			expect(factory.attributes).to.be.length(1);
+			expect(factory.attributes[0].name).to.equal(name);
+			expect(factory.defineAttribute).to.be.calledOnce;
+			expect(factory.defineAttribute).to.be.calledOnceWith(name);
+		});
+
+		it('wraps newSequence.next as the attribute block', function() {
+			const factory = new Factory('dummy', DummyModel);
+			factory.sequence('name');
+
+			expect(factory.attributes[0].block()).to.equal(1);
+			expect(factory.attributes[0].block()).to.equal(2);
+		});
+
+		it('delegates sequence creation to sequenceHandler', function() {
+			const factory = new Factory('dummy', DummyModel);
+			sinon.spy(factory.sequenceHandler, 'registerSequence');
+			const name = 'email';
+			factory.sequence(name);
+
+			expect(factory.sequenceHandler.registerSequence).to.be.calledOnce;
+			expect(factory.sequenceHandler.registerSequence).to.be.calledOnceWithExactly(name);
+		});
+	});
 });

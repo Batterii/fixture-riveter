@@ -19,18 +19,18 @@ describe('StringSequence', function() {
 	describe('#generateInitialIndex', function() {
 		it('returns initialIndex when passed no arguments', function() {
 			const seq = new StringSequence('name');
-			seq.initialIndex = 10;
+			seq.initialChar = 'k';
 			const result = seq.generateInitialIndex();
-			expect(result).to.equal(10);
+			expect(result).to.deep.equal([10]);
 		});
 
 		it('calls indexOf to get new index', function() {
 			const seq = new StringSequence('name');
 			seq.alphabet = 'abcde';
-			expect(seq.generateInitialIndex('a')).to.equal(0);
-			expect(seq.generateInitialIndex('d')).to.equal(3);
-			expect(seq.generateInitialIndex('f')).to.equal(0);
-			expect(seq.generateInitialIndex('+')).to.equal(0);
+			expect(seq.generateInitialIndex('a')).to.deep.equal([0]);
+			expect(seq.generateInitialIndex('d')).to.deep.equal([3]);
+			expect(seq.generateInitialIndex('f')).to.deep.equal([0]);
+			expect(seq.generateInitialIndex('+')).to.deep.equal([0]);
 		});
 	});
 
@@ -51,7 +51,7 @@ describe('StringSequence', function() {
 
 		it('sets id correctly', function() {
 			const seq = new StringSequence('name');
-			sinon.stub(seq, 'generateInitialIndex').returns(0);
+			sinon.stub(seq, 'generateInitialIndex').returns([0]);
 			seq.reset();
 			expect(seq.indicies).to.deep.equal([0]);
 		});

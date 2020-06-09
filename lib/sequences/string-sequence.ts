@@ -3,7 +3,7 @@ import {Sequence} from './sequence';
 export class StringSequence extends Sequence {
 	// Adapted from Stack Overflow: https://stackoverflow.com/a/12504061/3023252
 
-	initialIndex: number;
+	initialChar: string;
 	indicies: number[];
 	alphabet: string;
 
@@ -12,21 +12,21 @@ export class StringSequence extends Sequence {
 		this.alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 		const initChar = (options && options.initial) || 'a';
-		const index = this.generateInitialIndex(initChar);
-		this.initialIndex = index;
-		this.indicies = [index];
+		this.initialChar = initChar;
+		this.indicies = this.generateInitialIndex(initChar);
 	}
 
-	generateInitialIndex(initChar?: string): number {
-		let index = initChar ? this.alphabet.indexOf(initChar) : this.initialIndex;
+	generateInitialIndex(initChar?: string): number[] {
+		const character = initChar || this.initialChar;
+		let index = this.alphabet.indexOf(character);
 		if (index === -1) {
 			index = 0;
 		}
-		return index;
+		return [index];
 	}
 
 	reset(character?: string): void {
-		this.indicies = [this.generateInitialIndex(character)];
+		this.indicies = this.generateInitialIndex(character);
 	}
 
 	increment(): void {

@@ -1,5 +1,6 @@
 import {Adapter} from './adapters/adapter';
 import {Attribute} from './attribute';
+import {SequenceHandler} from './sequence-handler';
 
 import {isFunction, first, last} from 'lodash';
 
@@ -21,6 +22,7 @@ export class Factory {
 	block: Function;
 	attributes: Attribute[];
 	compiled: boolean;
+	sequenceHandler: SequenceHandler;
 
 	constructor(name: string, model: any, rest?: FactoryOptions | Function);
 	constructor(
@@ -34,6 +36,7 @@ export class Factory {
 		this.traits = [];
 		this.attributes = [];
 		this.compiled = false;
+		this.sequenceHandler = new SequenceHandler();
 
 		const options = first(rest);
 		const block = last(rest);
@@ -95,6 +98,18 @@ export class Factory {
 	async create(adapter: Adapter, extraAttributes?: ExtraAttributes): Promise<any> {
 		const instance = await this.build(adapter, extraAttributes);
 		return adapter.save(instance, this.model);
+	}
+
+	sequence(
+		name: string,
+		initial?: string | number,
+		options?: {aliases: string[]},
+		callback?: Function,
+	): void;
+
+	sequence(name: string, ...rest: any[]): void {
+		const newSequence = this.sequenceHandler.registerSequence(name, ...rest);
+		this.defineAttribute(name, () => newSequence.next());
 	}
 }
 
