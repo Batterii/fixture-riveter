@@ -6,6 +6,7 @@
 		"dot-notation": "off",
 		"multiline-ternary": "off",
 		"max-len": ["error", { "code": 100 }],
+		"no-plusplus": "off",
 		"array-bracket-spacing": ["error", "never"],
 		"object-curly-spacing": ["error", "never"],
 		"quotes": ["error", "single", {"avoidEscape": true}]
