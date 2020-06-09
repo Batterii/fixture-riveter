@@ -56,9 +56,9 @@ describe('FactoryBuilder', function() {
 	describe('#getAdapter', function() {
 		it('passes the call down', function() {
 			const factoryBuilder = new FactoryBuilder();
-			sinon.stub(factoryBuilder.adapters, 'getAdapter').returns('test');
+			sinon.stub(factoryBuilder.adapterHandler, 'getAdapter').returns('test');
 			const result = factoryBuilder.getAdapter('value');
-			const {getAdapter} = factoryBuilder.adapters;
+			const {getAdapter} = factoryBuilder.adapterHandler;
 
 			expect(result).to.deep.equal('test');
 			expect(getAdapter).to.be.calledOnce;
@@ -69,10 +69,10 @@ describe('FactoryBuilder', function() {
 	describe('#setAdapter', function() {
 		it('passes the call down', function() {
 			const factoryBuilder = new FactoryBuilder();
-			sinon.stub(factoryBuilder.adapters, 'setAdapter').returns('test');
+			sinon.stub(factoryBuilder.adapterHandler, 'setAdapter').returns('test');
 			const defaultAdapter = new DefaultAdapter();
 			const result = factoryBuilder.setAdapter(defaultAdapter, 'value');
-			const {setAdapter} = factoryBuilder.adapters;
+			const {setAdapter} = factoryBuilder.adapterHandler;
 
 			expect(result).to.deep.equal('test');
 			expect(setAdapter).to.be.calledOnce;

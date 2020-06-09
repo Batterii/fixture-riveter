@@ -4,19 +4,19 @@ import {ExtraAttributes, Options, Factory} from './factory';
 
 export class FactoryBuilder {
 	factories: Record<string, Factory>;
-	adapters: any;
+	adapterHandler: any;
 
 	constructor() {
 		this.factories = {};
-		this.adapters = new AdapterHandler();
+		this.adapterHandler = new AdapterHandler();
 	}
 
 	getAdapter(factoryName?: string): Adapter {
-		return this.adapters.getAdapter(factoryName);
+		return this.adapterHandler.getAdapter(factoryName);
 	}
 
 	setAdapter(adapter: Adapter, factoryNames?: FactoryNames): Adapter {
-		return this.adapters.setAdapter(adapter, factoryNames);
+		return this.adapterHandler.setAdapter(adapter, factoryNames);
 	}
 
 	define(block: Function): void {
