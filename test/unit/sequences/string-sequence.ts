@@ -5,27 +5,27 @@ import sinon from 'sinon';
 
 describe('StringSequence', function() {
 	it('returns an instance', function() {
-		const seq = new StringSequence();
+		const seq = new StringSequence('name');
 		expect(seq).to.exist;
 		expect(seq).to.be.an.instanceof(StringSequence);
 	});
 
 	it('accepts an initial character', function() {
-		const seq = new StringSequence('x');
+		const seq = new StringSequence('name', {initial: 'x'});
 		const result = seq.next();
 		expect(result).to.equal('x');
 	});
 
 	describe('#generateInitialIndex', function() {
 		it('returns initialIndex when passed no arguments', function() {
-			const seq = new StringSequence();
+			const seq = new StringSequence('name');
 			seq.initialIndex = 10;
 			const result = seq.generateInitialIndex();
 			expect(result).to.equal(10);
 		});
 
 		it('calls indexOf to get new index', function() {
-			const seq = new StringSequence();
+			const seq = new StringSequence('name');
 			seq.alphabet = 'abcde';
 			expect(seq.generateInitialIndex('a')).to.equal(0);
 			expect(seq.generateInitialIndex('d')).to.equal(3);
@@ -36,21 +36,21 @@ describe('StringSequence', function() {
 
 	describe('#reset', function() {
 		it('calls generateInitialIndex', function() {
-			const seq = new StringSequence();
+			const seq = new StringSequence('name');
 			const spy = sinon.spy(seq, 'generateInitialIndex');
 			seq.reset();
 			expect(spy).to.be.calledOnce;
 		});
 
 		it('calls generateInitialIndex with given argument', function() {
-			const seq = new StringSequence();
+			const seq = new StringSequence('name');
 			const spy = sinon.spy(seq, 'generateInitialIndex');
 			seq.reset('a');
 			expect(spy).to.be.calledOnceWithExactly('a');
 		});
 
 		it('sets id correctly', function() {
-			const seq = new StringSequence();
+			const seq = new StringSequence('name');
 			sinon.stub(seq, 'generateInitialIndex').returns(0);
 			seq.reset();
 			expect(seq.indicies).to.deep.equal([0]);
@@ -61,7 +61,7 @@ describe('StringSequence', function() {
 		let seq: StringSequence;
 
 		beforeEach(function() {
-			seq = new StringSequence();
+			seq = new StringSequence('name');
 			seq.alphabet = 'abcde';
 		});
 
@@ -102,22 +102,11 @@ describe('StringSequence', function() {
 		});
 	});
 
-	// next(callback?: Function): string {
-	// 	const result = this.indicies
-	// 		.map((idx) => this.alphabet[idx])
-	// 		.reverse()
-	// 		.join('');
-
-	// 	this.increment();
-
-	// 	return callback ? callback(result) : result;
-	// }
-
 	describe('#next', function() {
 		let seq: StringSequence;
 
 		beforeEach(function() {
-			seq = new StringSequence();
+			seq = new StringSequence('name');
 			seq.alphabet = 'abcde';
 		});
 
@@ -155,16 +144,17 @@ describe('StringSequence', function() {
 			expect(seq.indicies).to.deep.equal([2, 0]);
 		});
 
-		it('accepts a callback', function() {
+		it('uses available callback', function() {
 			seq.indicies = [0, 0, 0];
-			const result = seq.next((x: string) => x.concat('foobar'));
+			seq.callback = (x: string) => x.concat('foobar');
+			const result = seq.next();
 			expect(result).to.equal('aaafoobar');
 		});
 	});
 
 	describe('iterator', function() {
 		it('acts like an iterator', function() {
-			const seq = new StringSequence();
+			const seq = new StringSequence('name');
 			const result = [] as any;
 			for (const char of seq) {
 				result.push(char);

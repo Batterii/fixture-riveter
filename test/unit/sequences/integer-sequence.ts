@@ -4,20 +4,20 @@ import {expect} from 'chai';
 
 describe('IntegerSequence', function() {
 	it('returns an instance', function() {
-		const seq = new IntegerSequence();
+		const seq = new IntegerSequence('name');
 		expect(seq).to.exist;
 		expect(seq).to.be.an.instanceof(IntegerSequence);
 	});
 
 	it('accepts an initial character', function() {
-		const seq = new IntegerSequence(5);
+		const seq = new IntegerSequence('name', {initial: 5});
 		const result = seq.next();
 		expect(result).to.equal(5);
 	});
 
 	describe('#reset', function() {
 		it('sets id correctly', function() {
-			const seq = new IntegerSequence();
+			const seq = new IntegerSequence('name');
 			seq.reset();
 			expect(seq.index).to.deep.equal(1);
 		});
@@ -27,7 +27,7 @@ describe('IntegerSequence', function() {
 		let seq: IntegerSequence;
 
 		beforeEach(function() {
-			seq = new IntegerSequence();
+			seq = new IntegerSequence('name');
 			seq.index = 1;
 		});
 
@@ -54,7 +54,7 @@ describe('IntegerSequence', function() {
 		let seq: IntegerSequence;
 
 		beforeEach(function() {
-			seq = new IntegerSequence();
+			seq = new IntegerSequence('name');
 			seq.index = 1;
 		});
 
@@ -85,15 +85,16 @@ describe('IntegerSequence', function() {
 			expect(seq.index).to.deep.equal(7);
 		});
 
-		it('accepts a callback', function() {
-			const result = seq.next((x: string) => x.toString());
+		it('uses available callback', function() {
+			seq.callback = (x: string) => x.toString();
+			const result = seq.next();
 			expect(result).to.equal('1');
 		});
 	});
 
 	describe('iterator', function() {
 		it('acts like an iterator', function() {
-			const seq = new IntegerSequence();
+			const seq = new IntegerSequence('name');
 			const result = [] as any;
 			for (const char of seq) {
 				result.push(char);

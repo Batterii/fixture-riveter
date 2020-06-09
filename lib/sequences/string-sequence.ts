@@ -1,5 +1,4 @@
-import {Sequence} from '../sequence';
-
+import {Sequence} from './sequence';
 
 export class StringSequence extends Sequence {
 	// Adapted from Stack Overflow: https://stackoverflow.com/a/12504061/3023252
@@ -8,10 +7,11 @@ export class StringSequence extends Sequence {
 	indicies: number[];
 	alphabet: string;
 
-	constructor(initChar = 'a') {
-		super();
+	constructor(name: string, options?: any) {
+		super(name, options);
 		this.alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
+		const initChar = (options && options.initial) || 'a';
 		const index = this.generateInitialIndex(initChar);
 		this.initialIndex = index;
 		this.indicies = [index];
@@ -45,7 +45,7 @@ export class StringSequence extends Sequence {
 		this.indicies.push(0);
 	}
 
-	next(callback?: Function): string {
+	next(): string {
 		const result = this.indicies
 			.map((idx) => this.alphabet[idx])
 			.reverse()
@@ -53,6 +53,6 @@ export class StringSequence extends Sequence {
 
 		this.increment();
 
-		return callback ? callback(result) : result;
+		return this.callback(result);
 	}
 }

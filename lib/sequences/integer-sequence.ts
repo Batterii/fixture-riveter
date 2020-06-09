@@ -1,13 +1,13 @@
-import {Sequence} from '../sequence';
+import {Sequence} from './sequence';
 
 export class IntegerSequence extends Sequence {
 	initialNumber: number;
 	index: number;
 
-	constructor(initialNumber = 1) {
-		super();
-		this.initialNumber = initialNumber;
-		this.index = initialNumber;
+	constructor(name: string, options?: any) {
+		super(name, options);
+		this.initialNumber = (options && options.initial) || 1;
+		this.index = this.initialNumber;
 	}
 
 	increment(): void {
@@ -18,9 +18,9 @@ export class IntegerSequence extends Sequence {
 		this.index = this.initialNumber;
 	}
 
-	next(callback?: Function): number {
+	next(): number {
 		const result = this.index;
 		this.increment();
-		return callback ? callback(result) : result;
+		return this.callback(result);
 	}
 }
