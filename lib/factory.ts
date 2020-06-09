@@ -8,7 +8,7 @@ export interface ExtraAttributes {
 	attrs?: Record<string, any>;
 }
 
-export interface Options {
+export interface FactoryOptions {
 	aliases?: string[];
 	traits?: string[];
 }
@@ -22,7 +22,7 @@ export class Factory {
 	attributes: Attribute[];
 	compiled: boolean;
 
-	constructor(name: string, model: any, rest?: Options | Function);
+	constructor(name: string, model: any, rest?: FactoryOptions | Function);
 	constructor(
 		name: string,
 		model: any,

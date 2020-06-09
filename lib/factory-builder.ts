@@ -1,6 +1,6 @@
 import {Adapter} from './adapters/adapter';
 import {AdapterHandler, FactoryNames} from './adapter-handler';
-import {ExtraAttributes, Options, Factory} from './factory';
+import {ExtraAttributes, FactoryOptions, Factory} from './factory';
 
 export class FactoryBuilder {
 	factories: Record<string, Factory>;
@@ -37,7 +37,7 @@ export class FactoryBuilder {
 		}
 	}
 
-	factory(name: string, model: object, rest?: Options | Function): Factory;
+	factory(name: string, model: object, rest?: FactoryOptions | Function): Factory;
 	factory(name: string, model: object, ...rest: any[]): Factory {
 		if (this.getFactory(name, false)) {
 			throw new Error(`${name} is already defined`);
