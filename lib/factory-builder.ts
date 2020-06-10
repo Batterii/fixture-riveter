@@ -1,7 +1,12 @@
 import {Adapter} from './adapters/adapter';
 import {AdapterHandler, FactoryNames} from './adapter-handler';
 import {DefinitionProxy} from './definition-proxy';
-import {ExtraAttributes, FactoryOptions, Factory} from './factory';
+import {
+	factoryOptionsParser,
+	ExtraAttributes,
+	FactoryOptions,
+	Factory,
+} from './factory';
 import {Sequence} from './sequences/sequence';
 import {SequenceHandler} from './sequence-handler';
 

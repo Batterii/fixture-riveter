@@ -13,6 +13,28 @@ export interface FactoryOptions {
 	aliases?: string[];
 	traits?: string[];
 }
+export function factoryOptionsParser(
+	option?: FactoryOptions | Function,
+): [Record<string, any>, Function | undefined];
+export function factoryOptionsParser(
+	objOption: FactoryOptions,
+	fnOption: Function,
+): [Record<string, any>, Function | undefined];
+export function factoryOptionsParser(
+	...rest: any[]
+): [Record<string, any>, Function | undefined] {
+	let options = first(rest);
+	if (!options) {
+		options = {};
+	}
+
+	let block = last(rest);
+	if (!isFunction(block)) {
+		block = undefined;
+	}
+
+	return [options, block];
+}
 
 export class Factory {
 	name: string;
@@ -36,13 +58,12 @@ export class Factory {
 		this.attributes = [];
 		this.sequenceHandler = new SequenceHandler();
 
-		const options = first(rest);
-		const block = last(rest);
+		const [options, block] = factoryOptionsParser(...rest);
 
-		if (options && options.aliases) {
+		if (options.aliases) {
 			this.aliases = options.aliases;
 		}
-		if (options && options.traits) {
+		if (options.traits) {
 			this.traits = options.traits;
 		}
 

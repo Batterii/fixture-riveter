@@ -285,7 +285,7 @@ describe('FactoryBuilder', function() {
 			const name = 'user';
 			const fb = new FactoryBuilder();
 			let sequenceInFactory = new IntegerSequence('temp');
-			fb.factory(name, DummyModel, (f) => {
+			fb.factory(name, DummyModel, (f: any) => {
 				sequenceInFactory = f.sequence('email') as IntegerSequence;
 			});
 			const globalSeq: any = fb.sequence('usernames');
