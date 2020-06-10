@@ -12,6 +12,7 @@ export interface ExtraAttributes {
 export interface FactoryOptions {
 	aliases?: string[];
 	traits?: string[];
+	parent?: string;
 }
 export function factoryOptionsParser(
 	option?: FactoryOptions | Function,
@@ -41,6 +42,7 @@ export class Factory {
 	model: any;
 	aliases: string[];
 	traits: any[];
+	parent: string;
 	block: Function;
 	attributes: Attribute[];
 	sequenceHandler: SequenceHandler;
@@ -55,6 +57,7 @@ export class Factory {
 		this.model = model;
 		this.aliases = [];
 		this.traits = [];
+		this.parent = '';
 		this.attributes = [];
 		this.sequenceHandler = new SequenceHandler();
 
@@ -65,6 +68,9 @@ export class Factory {
 		}
 		if (options.traits) {
 			this.traits = options.traits;
+		}
+		if (options.parent) {
+			this.parent = options.parent;
 		}
 
 		if (block && isFunction(block)) {

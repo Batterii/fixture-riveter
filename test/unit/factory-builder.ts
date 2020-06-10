@@ -141,6 +141,18 @@ describe('FactoryBuilder', function() {
 
 			expect(testFn).to.throw;
 		});
+
+		it('creates child factories', function() {
+			const factoryBuilder = new FactoryBuilder();
+			factoryBuilder.factory('user', DummyModel, (f: any) => {
+				f.factory('oldUser', DummyModel);
+			});
+			const result = Object
+				.keys(factoryBuilder.factories)
+				.map((name: string) => factoryBuilder.factories[name])
+				.map((f: Factory) => f.name);
+			expect(result).to.deep.equal(['user', 'oldUser']);
+		});
 	});
 
 	describe('#getFactory', function() {

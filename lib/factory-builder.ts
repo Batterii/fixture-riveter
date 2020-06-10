@@ -48,6 +48,7 @@ export class FactoryBuilder {
 	}
 
 	factory(name: string, model: object, rest?: FactoryOptions | Function): Factory;
+	factory(name: string, model: object, options?: FactoryOptions, block?: Function): Factory;
 	factory(name: string, model: object, ...rest: any[]): Factory {
 		if (this.getFactory(name, false)) {
 			throw new Error(`${name} is already defined`);
@@ -57,6 +58,13 @@ export class FactoryBuilder {
 
 		proxy.execute();
 		this.registerFactory(factory);
+
+		proxy.childFactories.forEach((child: any[]) => {
+			const [childName, childModel, ...childRest] = child;
+			const [options, block] = factoryOptionsParser(...childRest);
+			options.parent = options.parent || childName;
+			this.factory(childName, childModel, options, block);
+		});
 
 		return factory;
 	}
