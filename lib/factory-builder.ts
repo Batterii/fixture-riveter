@@ -1,7 +1,8 @@
 import {Adapter} from './adapters/adapter';
 import {AdapterHandler, FactoryNames} from './adapter-handler';
 import {ExtraAttributes, FactoryOptions, Factory} from './factory';
-import {SequenceHandler, SequenceOptions} from './sequence-handler';
+import {Sequence} from './sequences/sequence';
+import {SequenceHandler} from './sequence-handler';
 
 export class FactoryBuilder {
 	factories: Record<string, Factory>;
@@ -73,9 +74,16 @@ export class FactoryBuilder {
 		initial?: string | number,
 		options?: {aliases: string[]},
 		callback?: Function,
-	): void;
+	): Sequence;
 
-	sequence(name: string, ...rest: any[]): void {
-		this.sequenceHandler.registerSequence(name, ...rest);
+	sequence(name: string, ...rest: any[]): Sequence {
+		return this.sequenceHandler.registerSequence(name, ...rest);
+	}
+
+	resetSequences(): void {
+		this.sequenceHandler.resetSequences();
+		for (const [, factory] of Object.entries(this.factories)) {
+			factory.sequenceHandler.resetSequences();
+		}
 	}
 }

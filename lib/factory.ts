@@ -1,5 +1,6 @@
 import {Adapter} from './adapters/adapter';
 import {Attribute} from './attribute';
+import {Sequence} from './sequences/sequence';
 import {SequenceHandler} from './sequence-handler';
 
 import {isFunction, first, last} from 'lodash';
@@ -105,11 +106,12 @@ export class Factory {
 		initial?: string | number,
 		options?: {aliases: string[]},
 		callback?: Function,
-	): void;
+	): Sequence;
 
-	sequence(name: string, ...rest: any[]): void {
+	sequence(name: string, ...rest: any[]): Sequence {
 		const newSequence = this.sequenceHandler.registerSequence(name, ...rest);
 		this.defineAttribute(name, () => newSequence.next());
+		return newSequence;
 	}
 }
 

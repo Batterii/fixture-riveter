@@ -36,6 +36,10 @@ export class SequenceHandler {
 		this.sequences.push(newSequence);
 		return newSequence;
 	}
+
+	resetSequences(): void {
+		this.sequences.forEach((seq) => seq.reset());
+	}
 }
 
 type initial = string | number;

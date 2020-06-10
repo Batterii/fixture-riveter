@@ -38,6 +38,22 @@ describe('SequenceHandler', function() {
 			expect(result.name).to.equal(name);
 		});
 	});
+
+	describe('#resetSequences', function() {
+		it('resets all sequences', function() {
+			const sh = new SequenceHandler();
+			const seq1: any = sh.registerSequence('email');
+			const seq2: any = sh.registerSequence('password');
+			seq1.next();
+			seq2.next();
+			seq1.next();
+			seq2.next();
+			sh.resetSequences();
+
+			expect(seq1.index).to.equal(1);
+			expect(seq2.index).to.equal(1);
+		});
+	});
 });
 
 describe('optionsParser', function() {

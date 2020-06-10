@@ -1,6 +1,7 @@
 import {Attribute} from '../../lib/attribute';
 import {Factory} from '../../lib/factory';
 import {DefaultAdapter} from '../../lib/adapters/default-adapter';
+import {Sequence} from '../../lib/sequences/sequence';
 
 import {DummyModel} from '../test-fixtures/dummy-model';
 
@@ -284,16 +285,23 @@ describe('Factory', function() {
 	});
 
 	describe('#sequence', function() {
+		it('returns the created sequence', function() {
+			const factory = new Factory('dummy', DummyModel);
+			const result = factory.sequence('email');
+			expect(result).to.be.an.instanceof(Sequence);
+		});
+
 		it('adds the sequence as an attribute', function() {
 			const factory = new Factory('dummy', DummyModel);
 			sinon.spy(factory, 'defineAttribute');
 			const name = 'email';
-			factory.sequence(name);
+			const result = factory.sequence(name);
 
 			expect(factory.attributes).to.be.length(1);
 			expect(factory.attributes[0].name).to.equal(name);
 			expect(factory.defineAttribute).to.be.calledOnce;
 			expect(factory.defineAttribute).to.be.calledOnceWith(name);
+			expect(result.name).to.equal(factory.attributes[0].name);
 		});
 
 		it('wraps newSequence.next as the attribute block', function() {

@@ -3,6 +3,8 @@ import {DummyModel} from '../test-fixtures/dummy-model';
 import {DefaultAdapter} from '../../lib/adapters/default-adapter';
 import {Factory} from '../../lib/factory';
 import {FactoryBuilder} from '../../lib/factory-builder';
+import {Sequence} from '../../lib/sequences/sequence';
+import {IntegerSequence} from '../../lib/sequences/integer-sequence';
 
 import {expect} from 'chai';
 import sinon from 'sinon';
@@ -292,6 +294,12 @@ describe('FactoryBuilder', function() {
 	});
 
 	describe('#sequence', function() {
+		it('returns the created sequence', function() {
+			const fb = new FactoryBuilder();
+			const result = fb.sequence('email');
+			expect(result).to.be.an.instanceof(Sequence);
+		});
+
 		it('adds the sequence as an attribute', function() {
 			const fb = new FactoryBuilder();
 			const name = 'email';
@@ -308,6 +316,25 @@ describe('FactoryBuilder', function() {
 
 			expect(fb.sequenceHandler.registerSequence).to.be.calledOnce;
 			expect(fb.sequenceHandler.registerSequence).to.be.calledOnceWithExactly(name);
+		});
+	});
+
+	describe('#resetSequences', function() {
+		it('resets all sequences', function() {
+			const name = 'user';
+			const fb = new FactoryBuilder();
+			let sequenceInFactory = new IntegerSequence('temp');
+			fb.factory(name, DummyModel, (f: Factory) => {
+				sequenceInFactory = f.sequence('email') as IntegerSequence;
+			});
+			const globalSeq: any = fb.sequence('usernames');
+			globalSeq.next();
+			globalSeq.next();
+			sequenceInFactory.next();
+			sequenceInFactory.next();
+			fb.resetSequences();
+			expect(globalSeq.index).to.equal(1);
+			expect(sequenceInFactory.index).to.equal(1);
 		});
 	});
 });
