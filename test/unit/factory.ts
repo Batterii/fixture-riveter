@@ -84,10 +84,20 @@ describe('Factory', function() {
 	});
 
 	describe('#compile', function() {
-		it('executes the block with correct context', function() {
+		it('executes the block with the factory as context', function() {
 			const name = 'name';
 			let result = '';
-			const factory = new Factory(name, DummyModel, (f) => {
+			const factory = new Factory(name, DummyModel, function() {
+				result = this.name; // eslint-disable-line no-invalid-this
+			});
+			factory.compile();
+			expect(result).to.equal(name);
+		});
+
+		it('passes the factory into the block', function() {
+			const name = 'name';
+			let result = '';
+			const factory = new Factory(name, DummyModel, (f: Factory) => {
 				result = f.name;
 			});
 			factory.compile();
@@ -147,6 +157,28 @@ describe('Factory', function() {
 			const result = factory.applyAttributes(extraAttributes);
 
 			expect(result).to.deep.equal({name: 'Bogart', age: 32});
+		});
+
+		it('executes the attribute block with the factory as context', function() {
+			const factory = new Factory('dummy', DummyModel);
+			factory.attributes = [
+				new Attribute('self', function() {
+					return this.names(); // eslint-disable-line no-invalid-this
+				}),
+			];
+			const result = factory.applyAttributes();
+
+			expect(result).to.deep.equal({self: ['dummy']});
+		});
+
+		it('passes the factory into the attribute function', function() {
+			const factory = new Factory('dummy', DummyModel);
+			factory.attributes = [
+				new Attribute('self', (f: Factory) => f.names()),
+			];
+			const result = factory.applyAttributes();
+
+			expect(result).to.deep.equal({self: ['dummy']});
 		});
 
 		it('applies traits properly');

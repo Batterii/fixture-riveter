@@ -55,7 +55,7 @@ export class Factory {
 
 	compile(): void {
 		if (this.block && !this.compiled) {
-			this.block(this);
+			this.block.call(this, this);
 			this.compiled = true;
 		}
 	}
@@ -85,7 +85,7 @@ export class Factory {
 		// traits.filter((trait: string) => this.traits.includes(trait));
 
 		for (const {name, block} of this.attributes) {
-			instance[name] = block.call(this);
+			instance[name] = block.call(this, this);
 		}
 		return {...instance, ...attrs};
 	}
