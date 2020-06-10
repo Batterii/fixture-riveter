@@ -278,7 +278,7 @@ describe('FactoryBuilder', function() {
 
 			const fb = new FactoryBuilder();
 			fb.define(function() {
-				fb.factory('user', DummyModel, (f) => {
+				fb.factory('user', DummyModel, (f: any) => {
 					f.attr('name', () => name);
 					f.attr('age', () => age);
 				});
@@ -288,6 +288,26 @@ describe('FactoryBuilder', function() {
 
 			expect(result).to.be.an('object');
 			expect(result).to.deep.equal(expected);
+		});
+	});
+
+	describe('#sequence', function() {
+		it('adds the sequence as an attribute', function() {
+			const fb = new FactoryBuilder();
+			const name = 'email';
+			fb.sequence(name);
+			expect(fb.sequenceHandler.sequences).to.be.length(1);
+			expect(fb.sequenceHandler.sequences[0].name).to.equal(name);
+		});
+
+		it('delegates sequence creation to sequenceHandler', function() {
+			const fb = new FactoryBuilder();
+			sinon.spy(fb.sequenceHandler, 'registerSequence');
+			const name = 'email';
+			fb.sequence(name);
+
+			expect(fb.sequenceHandler.registerSequence).to.be.calledOnce;
+			expect(fb.sequenceHandler.registerSequence).to.be.calledOnceWithExactly(name);
 		});
 	});
 });

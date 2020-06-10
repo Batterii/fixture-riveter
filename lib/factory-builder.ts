@@ -1,14 +1,17 @@
 import {Adapter} from './adapters/adapter';
 import {AdapterHandler, FactoryNames} from './adapter-handler';
 import {ExtraAttributes, FactoryOptions, Factory} from './factory';
+import {SequenceHandler, SequenceOptions} from './sequence-handler';
 
 export class FactoryBuilder {
 	factories: Record<string, Factory>;
 	adapterHandler: any;
+	sequenceHandler: SequenceHandler;
 
 	constructor() {
 		this.factories = {};
 		this.adapterHandler = new AdapterHandler();
+		this.sequenceHandler = new SequenceHandler();
 	}
 
 	getAdapter(factoryName?: string): Adapter {
@@ -63,5 +66,16 @@ export class FactoryBuilder {
 
 	attributesFor(name: string, extraAttributes?: ExtraAttributes): any {
 		return this.getFactory(name).applyAttributes(extraAttributes);
+	}
+
+	sequence(
+		name: string,
+		initial?: string | number,
+		options?: {aliases: string[]},
+		callback?: Function,
+	): void;
+
+	sequence(name: string, ...rest: any[]): void {
+		this.sequenceHandler.registerSequence(name, ...rest);
 	}
 }
