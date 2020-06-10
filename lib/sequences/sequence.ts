@@ -1,4 +1,4 @@
-export class Sequence {
+export abstract class Sequence {
 	name: string;
 	aliases: string[];
 	callback: Function;
@@ -22,14 +22,13 @@ export class Sequence {
 		return [this.name, ...this.aliases];
 	}
 
-	// eslint-disable-next-line class-methods-use-this
-	next(): void {
-		throw new Error(`${this.name} needs an implementation of next`);
-	}
-
 	*[Symbol.iterator](): any {
 		while (true) {
 			yield this.next();
 		}
 	}
+
+	abstract increment(): void;
+	abstract next(): void;
+	abstract reset(): void;
 }
