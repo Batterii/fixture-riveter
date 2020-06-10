@@ -55,7 +55,7 @@ export class Factory {
 
 	compile(): void {
 		if (this.block && !this.compiled) {
-			this.block.call(this, this);
+			this.block(this);
 			this.compiled = true;
 		}
 	}

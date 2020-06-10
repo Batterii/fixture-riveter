@@ -29,21 +29,21 @@ describe('Factory', function() {
 	it('accepts aliases', function() {
 		const aliases = ['alias'];
 		const withAlias = new Factory('name', DummyModel, {aliases});
-		expect(withAlias.aliases).to.equal(aliases);
+		expect(withAlias.aliases).to.deep.equal(aliases);
 	});
 
 	it('accepts traits', function() {
 		const traits = ['trait'];
 		const withTrait = new Factory('name', DummyModel, {traits});
-		expect(withTrait.traits).to.equal(traits);
+		expect(withTrait.traits).to.deep.equal(traits);
 	});
 
 	it('accepts both aliases and traits', function() {
 		const aliases = ['alias'];
 		const traits = ['trait'];
 		const withTrait = new Factory('name', DummyModel, {aliases, traits});
-		expect(withTrait.aliases).to.equal(aliases);
-		expect(withTrait.traits).to.equal(traits);
+		expect(withTrait.aliases).to.deep.equal(aliases);
+		expect(withTrait.traits).to.deep.equal(traits);
 	});
 
 	it("doesn't define a default block", function() {
