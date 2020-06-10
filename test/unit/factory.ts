@@ -84,38 +84,6 @@ describe('Factory', function() {
 		});
 	});
 
-	describe('#compile', function() {
-		it('executes the block with the factory as context', function() {
-			const name = 'name';
-			let result = '';
-			const factory = new Factory(name, DummyModel, function() {
-				result = this.name; // eslint-disable-line no-invalid-this
-			});
-			factory.compile();
-			expect(result).to.equal(name);
-		});
-
-		it('passes the factory into the block', function() {
-			const name = 'name';
-			let result = '';
-			const factory = new Factory(name, DummyModel, (f: Factory) => {
-				result = f.name;
-			});
-			factory.compile();
-			expect(result).to.equal(name);
-		});
-
-		it('is idempotent', function() {
-			const name = 'name';
-			const factory = new Factory(name, DummyModel, () => true);
-			sinon.stub(factory, 'block');
-			factory.compile();
-			factory.compile();
-			expect(factory.block).to.be.calledOnce;
-			expect(factory.compiled).to.be.true;
-		});
-	});
-
 	describe('#defineAttribute', function() {
 		it('stores the function', function() {
 			const factory = new Factory('name', DummyModel);
@@ -281,45 +249,6 @@ describe('Factory', function() {
 
 			expect(adapter.save).to.be.calledOnce;
 			expect(adapter.save).to.be.calledOnceWithExactly(model, factory.model);
-		});
-	});
-
-	describe('#sequence', function() {
-		it('returns the created sequence', function() {
-			const factory = new Factory('dummy', DummyModel);
-			const result = factory.sequence('email');
-			expect(result).to.be.an.instanceof(Sequence);
-		});
-
-		it('adds the sequence as an attribute', function() {
-			const factory = new Factory('dummy', DummyModel);
-			sinon.spy(factory, 'defineAttribute');
-			const name = 'email';
-			const result = factory.sequence(name);
-
-			expect(factory.attributes).to.be.length(1);
-			expect(factory.attributes[0].name).to.equal(name);
-			expect(factory.defineAttribute).to.be.calledOnce;
-			expect(factory.defineAttribute).to.be.calledOnceWith(name);
-			expect(result.name).to.equal(factory.attributes[0].name);
-		});
-
-		it('wraps newSequence.next as the attribute block', function() {
-			const factory = new Factory('dummy', DummyModel);
-			factory.sequence('name');
-
-			expect(factory.attributes[0].block()).to.equal(1);
-			expect(factory.attributes[0].block()).to.equal(2);
-		});
-
-		it('delegates sequence creation to sequenceHandler', function() {
-			const factory = new Factory('dummy', DummyModel);
-			sinon.spy(factory.sequenceHandler, 'registerSequence');
-			const name = 'email';
-			factory.sequence(name);
-
-			expect(factory.sequenceHandler.registerSequence).to.be.calledOnce;
-			expect(factory.sequenceHandler.registerSequence).to.be.calledOnceWithExactly(name);
 		});
 	});
 });

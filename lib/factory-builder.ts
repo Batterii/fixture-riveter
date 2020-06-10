@@ -1,5 +1,6 @@
 import {Adapter} from './adapters/adapter';
 import {AdapterHandler, FactoryNames} from './adapter-handler';
+import {DefinitionProxy} from './definition-proxy';
 import {ExtraAttributes, FactoryOptions, Factory} from './factory';
 import {Sequence} from './sequences/sequence';
 import {SequenceHandler} from './sequence-handler';
@@ -47,7 +48,9 @@ export class FactoryBuilder {
 			throw new Error(`${name} is already defined`);
 		}
 		const factory = new Factory(name, model, ...rest);
-		factory.compile();
+		const proxy = new DefinitionProxy(factory);
+
+		proxy.execute();
 		this.registerFactory(factory);
 
 		return factory;

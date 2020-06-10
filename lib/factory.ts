@@ -1,6 +1,5 @@
 import {Adapter} from './adapters/adapter';
 import {Attribute} from './attribute';
-import {Sequence} from './sequences/sequence';
 import {SequenceHandler} from './sequence-handler';
 
 import {isFunction, first, last} from 'lodash';
@@ -22,7 +21,6 @@ export class Factory {
 	traits: any[];
 	block: Function;
 	attributes: Attribute[];
-	compiled: boolean;
 	sequenceHandler: SequenceHandler;
 
 	constructor(name: string, model: any, rest?: FactoryOptions | Function);
@@ -36,7 +34,6 @@ export class Factory {
 		this.aliases = [];
 		this.traits = [];
 		this.attributes = [];
-		this.compiled = false;
 		this.sequenceHandler = new SequenceHandler();
 
 		const options = first(rest);
@@ -54,27 +51,12 @@ export class Factory {
 		}
 	}
 
-	compile(): void {
-		if (this.block && !this.compiled) {
-			this.block(this);
-			this.compiled = true;
-		}
-	}
-
 	names(): string[] {
 		return [this.name, ...this.aliases];
 	}
 
 	defineAttribute(name: string, block: Function): void {
 		this.attributes.push(new Attribute(name, block));
-	}
-
-	attr(attrName: string, block?: Function): void {
-		if (block && isFunction(block)) {
-			this.defineAttribute(attrName, block);
-		} else {
-			throw new Error(`wrong options, bruh: ${attrName}, ${block}`);
-		}
 	}
 
 	applyAttributes(extraAttributes?: ExtraAttributes): any {
@@ -99,19 +81,6 @@ export class Factory {
 	async create(adapter: Adapter, extraAttributes?: ExtraAttributes): Promise<any> {
 		const instance = await this.build(adapter, extraAttributes);
 		return adapter.save(instance, this.model);
-	}
-
-	sequence(
-		name: string,
-		initial?: string | number,
-		options?: {aliases: string[]},
-		callback?: Function,
-	): Sequence;
-
-	sequence(name: string, ...rest: any[]): Sequence {
-		const newSequence = this.sequenceHandler.registerSequence(name, ...rest);
-		this.defineAttribute(name, () => newSequence.next());
-		return newSequence;
 	}
 }
 
