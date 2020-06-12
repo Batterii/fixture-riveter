@@ -26,7 +26,7 @@ export class FactoryBuilder {
 	}
 
 	define(block: Function): void {
-		block.call(this);
+		block.call(this, this);
 	}
 
 	getFactory(name: string, throws = true): Factory {
@@ -58,7 +58,7 @@ export class FactoryBuilder {
 		proxy.childFactories.forEach((child: any[]) => {
 			const [childName, childModel, ...childRest] = child;
 			const [childOptions, childBlock] = factoryOptionsParser(...childRest);
-			childOptions.parent = childOptions.parent || childName;
+			childOptions.parent = childOptions.parent || name;
 			this.factory(childName, childModel, childOptions, childBlock);
 		});
 

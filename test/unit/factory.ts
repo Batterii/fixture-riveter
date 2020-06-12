@@ -2,6 +2,8 @@ import {Attribute} from '../../lib/attribute';
 import {Factory} from '../../lib/factory';
 import {FactoryBuilder} from '../../lib/factory-builder';
 import {DefaultAdapter} from '../../lib/adapters/default-adapter';
+import {DefinitionProxy} from '../../lib/definition-proxy';
+import {NullFactory} from '../../lib/null-factory';
 
 import {DummyModel} from '../test-fixtures/dummy-model';
 
@@ -110,7 +112,14 @@ describe('Factory', function() {
 			factoryBuilder.registerFactory(parentFactory);
 			factoryBuilder.registerFactory(childFactory);
 			const result = childFactory.parentFactory();
+
 			expect(result).to.equal(parentFactory);
+		});
+
+		it("instantiates the NullFactory if there's no parent", function() {
+			const factory = new Factory(factoryBuilder, 'top', DummyModel);
+			const result = factory.parentFactory();
+			expect(result).to.be.an.instanceof(NullFactory);
 		});
 	});
 
@@ -124,6 +133,104 @@ describe('Factory', function() {
 			expect(size(factory.attributes)).to.equal(1);
 			expect(factory.attributes.map((a) => a.name)).to.deep.equal([name]);
 			expect(factory.attributes[0].build()).to.equal('a');
+		});
+	});
+
+	describe('#getParentAttributes', function() {
+		beforeEach(function() {
+			factoryBuilder = new FactoryBuilder();
+		});
+
+		it('calls attributeNames', function() {
+			const parentFactory = new Factory(factoryBuilder, 'parent', DummyModel);
+			const childFactory = new Factory(factoryBuilder, 'child', DummyModel);
+			sinon.stub(childFactory, 'parentFactory')
+				.returns(parentFactory);
+			sinon.spy(childFactory, 'attributeNames');
+
+			childFactory.getParentAttributes();
+			expect(childFactory.attributeNames).to.be.calledOnce;
+		});
+
+		it('calls parentFactory', function() {
+			const parentFactory = new Factory(factoryBuilder, 'parent', DummyModel);
+			const childFactory = new Factory(factoryBuilder, 'child', DummyModel);
+			sinon.stub(childFactory, 'parentFactory')
+				.returns(parentFactory);
+
+			childFactory.getParentAttributes();
+			expect(childFactory.parentFactory).to.be.calledOnce;
+		});
+
+		it('calls getAttributes on the parent', function() {
+			const parentFactory = new Factory(factoryBuilder, 'parent', DummyModel);
+			const attr = new Attribute('attr', () => true);
+			sinon.stub(parentFactory, 'getAttributes')
+				.returns([attr]);
+			const childFactory = new Factory(factoryBuilder, 'child', DummyModel);
+			sinon.stub(childFactory, 'parentFactory')
+				.returns(parentFactory);
+
+			childFactory.getParentAttributes();
+			expect(parentFactory.getAttributes).to.be.calledOnce;
+		});
+
+		it('returns all non-filtered attributes', function() {
+			const parentFactory = new Factory(factoryBuilder, 'parent', DummyModel);
+			const attr = new Attribute('attr', () => true);
+			sinon.stub(parentFactory, 'getAttributes')
+				.returns([attr]);
+
+			const childFactory = new Factory(factoryBuilder, 'child', DummyModel);
+			sinon.stub(childFactory, 'parentFactory')
+				.returns(parentFactory);
+			sinon.stub(childFactory, 'attributeNames')
+				.returns([]);
+
+			const result = childFactory.getParentAttributes();
+			expect(result).to.deep.equal([attr]);
+		});
+
+		it('filters existing attributes', function() {
+			const parentFactory = new Factory(factoryBuilder, 'parent', DummyModel);
+			const attr = new Attribute('attr', () => true);
+			sinon.stub(parentFactory, 'getAttributes')
+				.returns([attr]);
+
+			const childFactory = new Factory(factoryBuilder, 'child', DummyModel);
+			sinon.stub(childFactory, 'parentFactory')
+				.returns(parentFactory);
+			sinon.stub(childFactory, 'attributeNames')
+				.returns(['attr']);
+
+			const result = childFactory.getParentAttributes();
+			expect(result).to.deep.equal([]);
+		});
+	});
+
+	describe('#getAttributes', function() {
+		beforeEach(function() {
+			factoryBuilder = new FactoryBuilder();
+		});
+
+		it('calls getParentAttributes', function() {
+			const factory = new Factory(factoryBuilder, 'dummy', DummyModel);
+			sinon.spy(factory, 'getParentAttributes');
+			factory.getAttributes();
+
+			expect(factory.getParentAttributes).to.be.calledOnce;
+		});
+
+		it('concats child attributes to parent attributes', function() {
+			const factory = new Factory(factoryBuilder, 'dummy', DummyModel);
+			const childAttr = new Attribute('attr', () => true);
+			factory.attributes = [childAttr];
+
+			const parentAttr = new Attribute('parent', () => true);
+			sinon.stub(factory, 'getParentAttributes').returns([parentAttr]);
+
+			const result = factory.getAttributes();
+			expect(result).to.deep.equal([parentAttr, childAttr]);
 		});
 	});
 
@@ -183,6 +290,51 @@ describe('Factory', function() {
 			const result = factory.applyAttributes();
 
 			expect(result).to.deep.equal({self: ['dummy']});
+		});
+
+		it('applies attributes from parent attribute', async function() {
+			factoryBuilder.define((fb: FactoryBuilder) => {
+				fb.factory('parent', DummyModel, (f: DefinitionProxy) => {
+					f.attr('execute1', () => 1);
+					f.attr('execute2', () => 2);
+				});
+				fb.factory(
+					'child',
+					DummyModel,
+					{parent: 'parent'},
+					(f: DefinitionProxy) => {
+						f.attr('execute2', () => 20);
+						f.attr('execute3', () => 3);
+					},
+				);
+			});
+			const result = await factoryBuilder.attributesFor('child');
+
+			expect(result).to.deep.equal({execute1: 1, execute2: 20, execute3: 3});
+		});
+
+		it("doesn't call attributes that are overwritten", async function() {
+			let spy = false;
+			factoryBuilder.define((fb: FactoryBuilder) => {
+				fb.factory('parent', DummyModel, (f: DefinitionProxy) => {
+					f.attr('execute1', () => 1);
+					f.attr('execute2', () => {
+						spy = true;
+						return 2;
+					});
+				});
+				fb.factory(
+					'child',
+					DummyModel,
+					{parent: 'parent'},
+					(f: DefinitionProxy) => {
+						f.attr('execute2', () => 20);
+						f.attr('execute3', () => 3);
+					},
+				);
+			});
+			await factoryBuilder.attributesFor('child');
+			expect(spy).to.be.false;
 		});
 
 		it('applies traits properly');

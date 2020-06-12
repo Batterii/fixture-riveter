@@ -84,7 +84,7 @@ describe('DefinitionProxy', function() {
 			const proxy = new DefinitionProxy(factory);
 			proxy.factory('newFactory', DummyModel);
 
-			expect(proxy.childFactories).to.deep.equal([['newFactory', DummyModel, []]]);
+			expect(proxy.childFactories).to.deep.equal([['newFactory', DummyModel]]);
 		});
 	});
 

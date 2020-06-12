@@ -74,29 +74,48 @@ export class Factory implements Definition {
 		return [this.name, ...this.aliases];
 	}
 
-	parentFactory(): unknown {
+	parentFactory(): Factory {
 		if (this.parent) {
 			return this.factoryBuilder.getFactory(this.parent, false);
 		}
-		return new NullFactory();
+		return new NullFactory(this.factoryBuilder, this.model);
 	}
 
 	defineAttribute(name: string, block: Function): void {
 		this.attributes.push(new Attribute(name, block));
 	}
 
-	applyAttributes(extraAttributes?: ExtraAttributes): any {
+	attributeNames(): string[] {
+		return this.attributes.map((a) => a.name);
+	}
+
+	getParentAttributes(): Attribute[] {
+		const attributeNames = this.attributeNames();
+
+		return this.parentFactory()
+			.getAttributes()
+			.filter((attribute: Attribute) => !attributeNames.includes(attribute.name));
+	}
+
+	getAttributes(): Attribute[] {
+		const attributesToKeep = this.getParentAttributes();
+		return attributesToKeep.concat(this.attributes);
+	}
+
+	applyAttributes(extraAttributes?: ExtraAttributes): Record<string, any> {
 		const {attrs} = mergeDefaults(extraAttributes);
+		const attributesToApply = this.getAttributes();
 		const instance = {};
 
-		// eslint-disable-next-line no-warning-comments
-		// TODO: implement trait handling
-		// traits.filter((trait: string) => this.traits.includes(trait));
-
-		for (const {name, block} of this.attributes) {
-			instance[name] = block.call(this, this);
+		for (const {name, block} of attributesToApply) {
+			if (!Object.prototype.hasOwnProperty.call(attrs, name)) {
+				instance[name] = block.call(this, this);
+			}
 		}
-		return {...instance, ...attrs};
+		for (const [key, value] of Object.entries(attrs)) {
+			instance[key] = value;
+		}
+		return instance;
 	}
 
 	async build(adapter: Adapter, extraAttributes?: ExtraAttributes): Promise<any> {

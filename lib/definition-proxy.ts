@@ -29,7 +29,7 @@ export class DefinitionProxy {
 
 	factory(name: string, model: object, rest?: FactoryOptions | Function): void;
 	factory(name: string, model: object, ...rest: any[]): void {
-		this.childFactories.push([name, model, rest]);
+		this.childFactories.push([name, model, ...rest]);
 	}
 
 	sequence(
