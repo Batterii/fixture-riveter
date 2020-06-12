@@ -1,5 +1,6 @@
 import {Adapter} from './adapters/adapter';
 import {Attribute} from './attribute';
+import {Trait} from './trait';
 import {Definition} from './definition';
 import {FactoryBuilder} from './factory-builder';
 import {NullFactory} from './null-factory';
@@ -18,7 +19,7 @@ export class Factory implements Definition {
 	name: string;
 	model: any;
 	aliases: string[];
-	traits: any[];
+	traits: Set<Trait>;
 	parent?: string;
 	block: Function;
 	attributes: Attribute[];
@@ -49,7 +50,7 @@ export class Factory implements Definition {
 		this.name = name;
 		this.model = model;
 		this.aliases = [];
-		this.traits = [];
+		this.traits = new Set();
 		this.attributes = [];
 		this.sequenceHandler = new SequenceHandler();
 
@@ -81,8 +82,12 @@ export class Factory implements Definition {
 		return new NullFactory(this.factoryBuilder, this.model);
 	}
 
-	defineAttribute(name: string, block: Function): void {
-		this.attributes.push(new Attribute(name, block));
+	defineAttribute(attribute: Attribute): void {
+		this.attributes.push(attribute);
+	}
+
+	defineTrait(trait: Trait): void {
+		this.traits.add(trait);
 	}
 
 	attributeNames(): string[] {

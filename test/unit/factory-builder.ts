@@ -310,4 +310,8 @@ describe('FactoryBuilder', function() {
 			expect(sequenceInFactory.index).to.equal(1);
 		});
 	});
+
+	describe('#trait', function() {
+		it('works');
+	});
 });

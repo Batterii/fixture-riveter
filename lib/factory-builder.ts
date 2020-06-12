@@ -5,11 +5,13 @@ import {ExtraAttributes, Factory} from './factory';
 import {factoryOptionsParser, FactoryOptions} from './factory-options-parser';
 import {Sequence} from './sequences/sequence';
 import {SequenceHandler} from './sequence-handler';
+import {Trait} from './trait';
 
 export class FactoryBuilder {
 	factories: Record<string, Factory>;
 	adapterHandler: any;
 	sequenceHandler: SequenceHandler;
+	traits: Set<Trait>;
 
 	constructor() {
 		this.factories = {};
@@ -63,6 +65,26 @@ export class FactoryBuilder {
 		});
 
 		return factory;
+	}
+
+	getTrait(name: string, throws = true): Trait {
+		const trait = this.traits[name];
+		if (throws && !trait) {
+			throw new Error(`${name} hasn't been defined yet`);
+		}
+		return trait;
+	}
+
+	registerTrait(trait: Trait): void {
+		for (const name of trait.names()) {
+			this.traits[name] = trait;
+		}
+	}
+
+	trait(name: string, block?: Function): Trait {
+		const trait = new Trait(this, name, block);
+		this.registerTrait(trait);
+		return trait;
 	}
 
 	async build(name: string, extraAttributes?: ExtraAttributes): Promise<any> {

@@ -59,13 +59,13 @@ describe('DefinitionProxy', function() {
 			const factoryBuilder = new FactoryBuilder();
 			const factory = new Factory(factoryBuilder, 'dummy', DummyModel);
 			const proxy = new DefinitionProxy(factory);
-			const stub = sinon.stub(factory, 'defineAttribute');
 			const name = 'email';
 			const block = () => 1;
+
+			const stub = sinon.stub(factory, 'defineAttribute');
 			proxy.attr(name, block);
 
 			expect(stub).to.be.calledOnce;
-			expect(stub).to.be.calledOnceWithExactly(name, block);
 		});
 
 		it('throws when given no block', function() {
@@ -108,7 +108,6 @@ describe('DefinitionProxy', function() {
 			expect(factory.attributes).to.be.length(1);
 			expect(factory.attributes[0].name).to.equal(name);
 			expect(factory.defineAttribute).to.be.calledOnce;
-			expect(factory.defineAttribute).to.be.calledOnceWith(name);
 			expect(result.name).to.equal(factory.attributes[0].name);
 		});
 

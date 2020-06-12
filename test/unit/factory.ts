@@ -32,7 +32,7 @@ describe('Factory', function() {
 	it('defines default options', function() {
 		const noOptions = new Factory(factoryBuilder, 'name', DummyModel);
 		expect(noOptions.aliases).to.deep.equal([]);
-		expect(noOptions.traits).to.deep.equal([]);
+		expect(noOptions.traits).to.deep.equal(new Set());
 	});
 
 	it('accepts aliases', function() {
@@ -128,7 +128,8 @@ describe('Factory', function() {
 			factoryBuilder = new FactoryBuilder();
 			const factory = new Factory(factoryBuilder, 'name', DummyModel);
 			const name = 'email';
-			factory.defineAttribute(name, () => 'a');
+			const attribute = new Attribute(name, () => 'a');
+			factory.defineAttribute(attribute);
 
 			expect(size(factory.attributes)).to.equal(1);
 			expect(factory.attributes.map((a) => a.name)).to.deep.equal([name]);
