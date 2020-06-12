@@ -1,4 +1,5 @@
-import {Factory, FactoryOptions} from './factory';
+import {Factory} from './factory';
+import {FactoryOptions} from './factory-options-parser';
 import {Sequence} from './sequences/sequence';
 
 import {isFunction} from 'lodash';

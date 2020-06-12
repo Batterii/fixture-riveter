@@ -4,40 +4,13 @@ import {Definition} from './definition';
 import {FactoryBuilder} from './factory-builder';
 import {NullFactory} from './null-factory';
 import {SequenceHandler} from './sequence-handler';
+import {factoryOptionsParser, FactoryOptions} from './factory-options-parser';
 
-import {isFunction, first, last} from 'lodash';
+import {isFunction} from 'lodash';
 
 export interface ExtraAttributes {
 	traits?: string[];
 	attrs?: Record<string, any>;
-}
-
-export interface FactoryOptions {
-	aliases?: string[];
-	traits?: string[];
-	parent?: string;
-}
-export function factoryOptionsParser(
-	option?: FactoryOptions | Function,
-): [Record<string, any>, Function | undefined];
-export function factoryOptionsParser(
-	objOption: FactoryOptions,
-	fnOption: Function,
-): [Record<string, any>, Function | undefined];
-export function factoryOptionsParser(
-	...rest: any[]
-): [Record<string, any>, Function | undefined] {
-	let options = first(rest);
-	if (!options) {
-		options = {};
-	}
-
-	let block = last(rest);
-	if (!isFunction(block)) {
-		block = undefined;
-	}
-
-	return [options, block];
 }
 
 export class Factory implements Definition {
