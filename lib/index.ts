@@ -3,10 +3,10 @@ import {DefaultAdapter} from './adapters/default-adapter';
 import {ObjectionAdapter} from './adapters/objection-adapter';
 import {FactoryBuilder} from './factory-builder';
 
-const factory = new FactoryBuilder();
+const factoryBuilder = new FactoryBuilder();
 
 export {
-	factory,
+	factoryBuilder,
 	Adapter,
 	DefaultAdapter,
 	ObjectionAdapter,

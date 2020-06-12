@@ -1,5 +1,8 @@
 import {Adapter} from './adapters/adapter';
 import {Attribute} from './attribute';
+import {Definition} from './definition';
+import {FactoryBuilder} from './factory-builder';
+import {NullFactory} from './null-factory';
 import {SequenceHandler} from './sequence-handler';
 
 import {isFunction, first, last} from 'lodash';
@@ -37,27 +40,43 @@ export function factoryOptionsParser(
 	return [options, block];
 }
 
-export class Factory {
+export class Factory implements Definition {
+	factoryBuilder: FactoryBuilder;
 	name: string;
 	model: any;
 	aliases: string[];
 	traits: any[];
-	parent: string;
+	parent?: string;
 	block: Function;
 	attributes: Attribute[];
 	sequenceHandler: SequenceHandler;
 
-	constructor(name: string, model: any, rest?: FactoryOptions | Function);
 	constructor(
+		factoryBuilder: FactoryBuilder,
+		name: string,
+		model: any,
+		rest?: FactoryOptions | Function,
+	);
+
+	constructor(
+		factoryBuilder: FactoryBuilder,
+		name: string,
+		model: any,
+		options?: FactoryOptions,
+		block?: Function,
+	);
+
+	constructor(
+		factoryBuilder: FactoryBuilder,
 		name: string,
 		model: any,
 		...rest: any[]
 	) {
+		this.factoryBuilder = factoryBuilder;
 		this.name = name;
 		this.model = model;
 		this.aliases = [];
 		this.traits = [];
-		this.parent = '';
 		this.attributes = [];
 		this.sequenceHandler = new SequenceHandler();
 
@@ -80,6 +99,13 @@ export class Factory {
 
 	names(): string[] {
 		return [this.name, ...this.aliases];
+	}
+
+	parentFactory(): unknown {
+		if (this.parent) {
+			return this.factoryBuilder.getFactory(this.parent, false);
+		}
+		return new NullFactory();
 	}
 
 	defineAttribute(name: string, block: Function): void {

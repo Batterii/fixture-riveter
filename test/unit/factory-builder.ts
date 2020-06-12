@@ -59,7 +59,7 @@ describe('FactoryBuilder', function() {
 		it('adds the factory by name', function() {
 			const factoryBuilder = new FactoryBuilder();
 			const name = 'testFactory';
-			const factory = new Factory(name, DummyModel);
+			const factory = new Factory(factoryBuilder, name, DummyModel);
 
 			factoryBuilder.registerFactory(factory);
 
@@ -70,7 +70,7 @@ describe('FactoryBuilder', function() {
 			const factoryBuilder = new FactoryBuilder();
 			const name = 'testFactory';
 			const aliases = ['factory1', 'factory2'];
-			const factory = new Factory(name, DummyModel, {aliases});
+			const factory = new Factory(factoryBuilder, name, DummyModel, {aliases});
 
 			factoryBuilder.registerFactory(factory);
 
@@ -82,7 +82,7 @@ describe('FactoryBuilder', function() {
 			const factoryBuilder = new FactoryBuilder();
 			const name = 'factory1';
 			const alias = 'factory2';
-			const factory = new Factory(name, DummyModel, {aliases: [alias]});
+			const factory = new Factory(factoryBuilder, name, DummyModel, {aliases: [alias]});
 
 			factoryBuilder.registerFactory(factory);
 
@@ -191,10 +191,10 @@ describe('FactoryBuilder', function() {
 		});
 
 		it('calls the right functions', async function() {
+			const fb = new FactoryBuilder();
 			const name = 'name';
 			const adapter = new DefaultAdapter();
-			const factory = new Factory(name, DummyModel);
-			const fb = new FactoryBuilder();
+			const factory = new Factory(fb, name, DummyModel);
 			fb.factory(name, DummyModel);
 			sinon.stub(fb, 'getAdapter').returns(adapter);
 			sinon.stub(fb, 'getFactory').returns(factory);
@@ -228,10 +228,10 @@ describe('FactoryBuilder', function() {
 		});
 
 		it('calls the right functions', async function() {
+			const fb = new FactoryBuilder();
 			const name = 'name';
 			const adapter = new DefaultAdapter();
-			const factory = new Factory(name, DummyModel);
-			const fb = new FactoryBuilder();
+			const factory = new Factory(fb, name, DummyModel);
 			fb.factory(name, DummyModel);
 			sinon.stub(fb, 'getAdapter').returns(adapter);
 			sinon.stub(fb, 'getFactory').returns(factory);

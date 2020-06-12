@@ -1,5 +1,6 @@
 import {Attribute} from '../../lib/attribute';
 import {factoryOptionsParser, FactoryOptions, Factory} from '../../lib/factory';
+import {FactoryBuilder} from '../../lib/factory-builder';
 import {DefaultAdapter} from '../../lib/adapters/default-adapter';
 
 import {DummyModel} from '../test-fixtures/dummy-model';
@@ -43,50 +44,56 @@ describe('factoryOptionsParser', function() {
 });
 
 describe('Factory', function() {
+	let factoryBuilder: FactoryBuilder;
+
+	beforeEach(function() {
+		factoryBuilder = new FactoryBuilder();
+	});
+
 	it('has a name', function() {
 		const name = 'test';
-		const factory = new Factory(name, DummyModel);
+		const factory = new Factory(factoryBuilder, name, DummyModel);
 		expect(factory.name).to.equal(name);
 	});
 
 	it('has a model', function() {
-		const factory = new Factory('name', DummyModel);
+		const factory = new Factory(factoryBuilder, 'name', DummyModel);
 		expect(factory.model).to.equal(DummyModel);
 	});
 
 	it('defines default options', function() {
-		const noOptions = new Factory('name', DummyModel);
+		const noOptions = new Factory(factoryBuilder, 'name', DummyModel);
 		expect(noOptions.aliases).to.deep.equal([]);
 		expect(noOptions.traits).to.deep.equal([]);
 	});
 
 	it('accepts aliases', function() {
 		const aliases = ['alias'];
-		const withAlias = new Factory('name', DummyModel, {aliases});
+		const withAlias = new Factory(factoryBuilder, 'name', DummyModel, {aliases});
 		expect(withAlias.aliases).to.deep.equal(aliases);
 	});
 
 	it('accepts traits', function() {
 		const traits = ['trait'];
-		const withTrait = new Factory('name', DummyModel, {traits});
+		const withTrait = new Factory(factoryBuilder, 'name', DummyModel, {traits});
 		expect(withTrait.traits).to.deep.equal(traits);
 	});
 
 	it('accepts both aliases and traits', function() {
 		const aliases = ['alias'];
 		const traits = ['trait'];
-		const withTrait = new Factory('name', DummyModel, {aliases, traits});
+		const withTrait = new Factory(factoryBuilder, 'name', DummyModel, {aliases, traits});
 		expect(withTrait.aliases).to.deep.equal(aliases);
 		expect(withTrait.traits).to.deep.equal(traits);
 	});
 
 	it("doesn't define a default block", function() {
-		const noBlock = new Factory('name', DummyModel);
+		const noBlock = new Factory(factoryBuilder, 'name', DummyModel);
 		expect(noBlock.block).to.be.undefined;
 	});
 
 	it('can take a block', function() {
-		const withBlock = new Factory('name', DummyModel, function() {
+		const withBlock = new Factory(factoryBuilder, 'name', DummyModel, function() {
 			return 1;
 		});
 		expect(withBlock.block).to.exist;
@@ -95,9 +102,13 @@ describe('Factory', function() {
 	});
 
 	describe('#names', function() {
+		beforeEach(function() {
+			factoryBuilder = new FactoryBuilder();
+		});
+
 		it('returns the name', function() {
 			const name = 'testFactory';
-			const factory = new Factory(name, DummyModel);
+			const factory = new Factory(factoryBuilder, name, DummyModel);
 			const names = factory.names();
 
 			expect(names).to.have.length(1);
@@ -107,7 +118,7 @@ describe('Factory', function() {
 		it('returns the aliases', function() {
 			const name = 'testFactory';
 			const aliases = ['factory1', 'factory2'];
-			const factory = new Factory(name, DummyModel, {aliases});
+			const factory = new Factory(factoryBuilder, name, DummyModel, {aliases});
 			const names = factory.names();
 
 			expect(names).to.have.length(3);
@@ -117,9 +128,30 @@ describe('Factory', function() {
 		});
 	});
 
+	describe('#parentFactory', function() {
+		beforeEach(function() {
+			factoryBuilder = new FactoryBuilder();
+		});
+
+		it('properly finds the parent factory', function() {
+			const parentFactory = new Factory(factoryBuilder, 'parent', DummyModel);
+			const childFactory = new Factory(
+				factoryBuilder,
+				'child',
+				DummyModel,
+				{parent: 'parent'},
+			);
+			factoryBuilder.registerFactory(parentFactory);
+			factoryBuilder.registerFactory(childFactory);
+			const result = childFactory.parentFactory();
+			expect(result).to.equal(parentFactory);
+		});
+	});
+
 	describe('#defineAttribute', function() {
 		it('stores the function', function() {
-			const factory = new Factory('name', DummyModel);
+			factoryBuilder = new FactoryBuilder();
+			const factory = new Factory(factoryBuilder, 'name', DummyModel);
 			const name = 'email';
 			factory.defineAttribute(name, () => 'a');
 
@@ -130,8 +162,12 @@ describe('Factory', function() {
 	});
 
 	describe('#applyAttributes', function() {
+		beforeEach(function() {
+			factoryBuilder = new FactoryBuilder();
+		});
+
 		it('creates an object', function() {
-			const factory = new Factory('dummy', DummyModel);
+			const factory = new Factory(factoryBuilder, 'dummy', DummyModel);
 			const result = factory.applyAttributes();
 
 			expect(result).to.exist;
@@ -139,7 +175,7 @@ describe('Factory', function() {
 		});
 
 		it('iterates over attributes', function() {
-			const factory = new Factory('dummy', DummyModel);
+			const factory = new Factory(factoryBuilder, 'dummy', DummyModel);
 			factory.attributes = [
 				new Attribute('name', () => 'Noah'),
 				new Attribute('age', () => 32),
@@ -150,7 +186,7 @@ describe('Factory', function() {
 		});
 
 		it('applies attrs argument last', function() {
-			const factory = new Factory('dummy', DummyModel);
+			const factory = new Factory(factoryBuilder, 'dummy', DummyModel);
 			factory.attributes = [
 				new Attribute('name', () => 'Noah'),
 				new Attribute('age', () => 32),
@@ -162,7 +198,7 @@ describe('Factory', function() {
 		});
 
 		it('executes the attribute block with the factory as context', function() {
-			const factory = new Factory('dummy', DummyModel);
+			const factory = new Factory(factoryBuilder, 'dummy', DummyModel);
 			factory.attributes = [
 				new Attribute('self', function() {
 					return this.names(); // eslint-disable-line no-invalid-this
@@ -174,7 +210,7 @@ describe('Factory', function() {
 		});
 
 		it('passes the factory into the attribute function', function() {
-			const factory = new Factory('dummy', DummyModel);
+			const factory = new Factory(factoryBuilder, 'dummy', DummyModel);
 			factory.attributes = [
 				new Attribute('self', (f: Factory) => f.names()),
 			];
@@ -187,9 +223,13 @@ describe('Factory', function() {
 	});
 
 	describe('#build', function() {
+		beforeEach(function() {
+			factoryBuilder = new FactoryBuilder();
+		});
+
 		it('builds an instance of the model', async function() {
 			const adapter = new DefaultAdapter();
-			const factory = new Factory('dummy', DummyModel);
+			const factory = new Factory(factoryBuilder, 'dummy', DummyModel);
 			const result = await factory.build(adapter);
 
 			expect(result).to.be.an.instanceof(DummyModel);
@@ -197,7 +237,7 @@ describe('Factory', function() {
 
 		it('builds an instance from an alias', async function() {
 			const adapter = new DefaultAdapter();
-			const factory = new Factory('dummy', DummyModel);
+			const factory = new Factory(factoryBuilder, 'dummy', DummyModel);
 			const result = await factory.build(adapter);
 
 			expect(result).to.be.an.instanceof(DummyModel);
@@ -205,7 +245,7 @@ describe('Factory', function() {
 
 		it('returns a promise', function() {
 			const adapter = new DefaultAdapter();
-			const factory = new Factory('dummy', DummyModel);
+			const factory = new Factory(factoryBuilder, 'dummy', DummyModel);
 			const result = factory.build(adapter);
 
 			expect(result.then).to.be.a('function');
@@ -214,7 +254,7 @@ describe('Factory', function() {
 
 		it('builds an instance with the right values', async function() {
 			const adapter = new DefaultAdapter();
-			const factory = new Factory('dummy', DummyModel);
+			const factory = new Factory(factoryBuilder, 'dummy', DummyModel);
 			factory.attributes = [
 				new Attribute('name', () => 'Noah'),
 				new Attribute('age', () => 32),
@@ -226,7 +266,7 @@ describe('Factory', function() {
 
 		it('calls applyAttributes', async function() {
 			const adapter = new DefaultAdapter();
-			const factory = new Factory('dummy', DummyModel);
+			const factory = new Factory(factoryBuilder, 'dummy', DummyModel);
 			const model = {name: 'Noah', age: 32};
 			sinon.stub(factory, 'applyAttributes').returns(model);
 			await factory.build(adapter);
@@ -237,7 +277,7 @@ describe('Factory', function() {
 		it("calls the adapter's build method", async function() {
 			const adapter = new DefaultAdapter();
 			sinon.stub(adapter, 'build').resolves({name: 'Noah', age: 32});
-			const factory = new Factory('dummy', DummyModel);
+			const factory = new Factory(factoryBuilder, 'dummy', DummyModel);
 			await factory.build(adapter);
 
 			expect(adapter.build).to.be.calledOnce;
@@ -245,9 +285,13 @@ describe('Factory', function() {
 	});
 
 	describe('#create', function() {
+		beforeEach(function() {
+			factoryBuilder = new FactoryBuilder();
+		});
+
 		it('creates an instance of the model', async function() {
 			const adapter = new DefaultAdapter();
-			const factory = new Factory('dummy', DummyModel);
+			const factory = new Factory(factoryBuilder, 'dummy', DummyModel);
 			const result = await factory.create(adapter);
 
 			expect(result).to.be.an.instanceof(DummyModel);
@@ -255,7 +299,7 @@ describe('Factory', function() {
 
 		it('returns a promise', function() {
 			const adapter = new DefaultAdapter();
-			const factory = new Factory('dummy', DummyModel);
+			const factory = new Factory(factoryBuilder, 'dummy', DummyModel);
 			const result = factory.create(adapter);
 
 			expect(result.then).to.be.a('function');
@@ -264,7 +308,7 @@ describe('Factory', function() {
 
 		it('uses #build to build the instance', async function() {
 			const adapter = new DefaultAdapter();
-			const factory = new Factory('dummy', DummyModel);
+			const factory = new Factory(factoryBuilder, 'dummy', DummyModel);
 			const model = new DummyModel('Noah', 32);
 			sinon.stub(factory, 'build').resolves(model);
 			await factory.create(adapter);
@@ -275,7 +319,7 @@ describe('Factory', function() {
 
 		it('calls save on the adapter', async function() {
 			const adapter = new DefaultAdapter();
-			const factory = new Factory('dummy', DummyModel);
+			const factory = new Factory(factoryBuilder, 'dummy', DummyModel);
 			const model = new DummyModel('Noah', 32);
 			sinon.stub(adapter, 'save').resolves(model);
 			await factory.create(adapter);
