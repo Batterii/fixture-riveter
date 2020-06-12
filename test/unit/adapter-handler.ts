@@ -74,6 +74,32 @@ describe('Adapters', function() {
 		});
 	});
 
+	describe('#coerceNames', function() {
+		it('returns an array if given an array', function() {
+			const array = ['key'];
+			const handler = new AdapterHandler();
+			const result = handler.coerceNames(array);
+
+			expect(result).to.equal(array);
+			expect(result).to.deep.equal(array);
+		});
+
+		it('returns an array if not given an array', function() {
+			const key = 'key';
+			const handler = new AdapterHandler();
+			const result = handler.coerceNames(key);
+
+			expect(result).to.deep.equal([key]);
+		});
+
+		it('returns an empty array if not given anything', function() {
+			const handler = new AdapterHandler();
+			const result = handler.coerceNames();
+
+			expect(result).to.deep.equal([]);
+		});
+	});
+
 	describe('#setAdapters', function() {
 		it('coerces the name properly', function() {
 			const key = 'key';

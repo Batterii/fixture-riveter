@@ -139,7 +139,7 @@ describe('FactoryBuilder', function() {
 
 			testFn();
 
-			expect(testFn).to.throw;
+			expect(testFn).to.throw();
 		});
 
 		it('creates child factories', function() {

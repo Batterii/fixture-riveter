@@ -73,7 +73,7 @@ describe('DefinitionProxy', function() {
 			const factory = new Factory(factoryBuilder, 'dummy', DummyModel);
 			const proxy = new DefinitionProxy(factory);
 
-			expect(() => proxy.attr('email')).to.throw;
+			expect(() => proxy.attr('email')).to.throw();
 		});
 	});
 
