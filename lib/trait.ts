@@ -40,6 +40,6 @@ export class Trait implements Definition {
 	}
 
 	defineTrait(trait: Trait): void {
-		this.traits.add(trait);
+		throw new Error(`Can't define nested traits: ${trait.name}`);
 	}
 }

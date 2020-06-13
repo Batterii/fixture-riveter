@@ -7,6 +7,21 @@ import {Sequence} from './sequences/sequence';
 import {SequenceHandler} from './sequence-handler';
 import {Trait} from './trait';
 
+import {last, isPlainObject} from 'lodash';
+
+export function extractAttributes(traitsAndOptions: any[]): Record<string, any> {
+	const options = last(traitsAndOptions);
+	if (isPlainObject(options)) {
+		return traitsAndOptions.pop();
+	}
+	return {};
+}
+
+export function buildTraitsAndAttributes(traits: any[]): ExtraAttributes {
+	const attrs = extractAttributes(traits);
+	return {traits, attrs};
+}
+
 export class FactoryBuilder {
 	factories: Record<string, Factory>;
 	adapterHandler: any;
@@ -87,20 +102,24 @@ export class FactoryBuilder {
 		return trait;
 	}
 
-	async build(name: string, extraAttributes?: ExtraAttributes): Promise<any> {
-		const adapter = this.getAdapter();
+	attributesFor(name: string, ...traits: any[]): Record<string, any> {
+		const traitsAndAttributes = buildTraitsAndAttributes(traits);
 		const factory = this.getFactory(name);
-		return factory.build(adapter, extraAttributes);
+		return factory.applyAttributes(traitsAndAttributes);
 	}
 
-	async create(name: string, extraAttributes?: ExtraAttributes): Promise<any> {
+	async build(name: string, ...traits: any[]): Promise<Record<string, any>> {
+		const traitsAndAttributes = buildTraitsAndAttributes(traits);
 		const adapter = this.getAdapter();
 		const factory = this.getFactory(name);
-		return factory.create(adapter, extraAttributes);
+		return factory.build(adapter, traitsAndAttributes);
 	}
 
-	attributesFor(name: string, extraAttributes?: ExtraAttributes): any {
-		return this.getFactory(name).applyAttributes(extraAttributes);
+	async create(name: string, ...traits: any[]): Promise<Record<string, any>> {
+		const traitsAndAttributes = buildTraitsAndAttributes(traits);
+		const adapter = this.getAdapter();
+		const factory = this.getFactory(name);
+		return factory.create(adapter, traitsAndAttributes);
 	}
 
 	sequence(

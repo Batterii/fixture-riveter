@@ -2,12 +2,28 @@ import {DummyModel} from '../test-fixtures/dummy-model';
 
 import {DefaultAdapter} from '../../lib/adapters/default-adapter';
 import {Factory} from '../../lib/factory';
-import {FactoryBuilder} from '../../lib/factory-builder';
+import {extractAttributes, FactoryBuilder} from '../../lib/factory-builder';
 import {Sequence} from '../../lib/sequences/sequence';
 import {IntegerSequence} from '../../lib/sequences/integer-sequence';
 
 import {expect} from 'chai';
 import sinon from 'sinon';
+
+describe('extractAttributes', function() {
+	it('returns an empty object', function() {
+		const array = [1, 2, 3];
+		const result = extractAttributes(array);
+		expect(array).to.deep.equal([1, 2, 3]);
+		expect(result).to.deep.equal({});
+	});
+
+	it('returns the array at the end', function() {
+		const array = [1, 2, 3, {parent: 'parent'}];
+		const result = extractAttributes(array);
+		expect(array).to.deep.equal([1, 2, 3]);
+		expect(result).to.deep.equal({parent: 'parent'});
+	});
+});
 
 describe('FactoryBuilder', function() {
 	it('can be built', function() {
@@ -172,6 +188,26 @@ describe('FactoryBuilder', function() {
 		});
 	});
 
+	describe('#attributesFor', function() {
+		it('returns an object with the defined attributes', function() {
+			const name = 'Noah';
+			const age = 32;
+
+			const fb = new FactoryBuilder();
+			fb.define(function() {
+				fb.factory('user', DummyModel, (f: any) => {
+					f.attr('name', () => name);
+					f.attr('age', () => age);
+				});
+			});
+			const result = fb.attributesFor('user');
+			const expected = new DummyModel(name, age);
+
+			expect(result).to.be.an('object');
+			expect(result).to.deep.equal(expected);
+		});
+	});
+
 	describe('#build', function() {
 		it('returns an instance of the model', async function() {
 			const name = 'name';
@@ -243,26 +279,6 @@ describe('FactoryBuilder', function() {
 			expect(fb.getFactory).to.be.calledOnceWithExactly(name);
 			expect(factory.create).to.be.calledOnce;
 			expect(factory.create).to.be.calledOnceWith(adapter);
-		});
-	});
-
-	describe('#attributesFor', function() {
-		it('returns an object with the defined attributes', function() {
-			const name = 'Noah';
-			const age = 32;
-
-			const fb = new FactoryBuilder();
-			fb.define(function() {
-				fb.factory('user', DummyModel, (f: any) => {
-					f.attr('name', () => name);
-					f.attr('age', () => age);
-				});
-			});
-			const result = fb.attributesFor('user');
-			const expected = new DummyModel(name, age);
-
-			expect(result).to.be.an('object');
-			expect(result).to.deep.equal(expected);
 		});
 	});
 

@@ -1,9 +1,10 @@
+import {Attribute} from '../../lib/attribute';
 import {FactoryBuilder} from '../../lib/factory-builder';
 import {Trait} from '../../lib/trait';
 
 import {expect} from 'chai';
 
-describe.only('Trait', function() {
+describe('Trait', function() {
 	let factoryBuilder: FactoryBuilder;
 
 	beforeEach(function() {
@@ -48,10 +49,25 @@ describe.only('Trait', function() {
 	});
 
 	describe('#defineAttribute', function() {
-		it('adds the attribute to the list');
+		it('stores the function', function() {
+			factoryBuilder = new FactoryBuilder();
+			const trait = new Trait(factoryBuilder, 'trait', () => true);
+			const name = 'email';
+			const attribute = new Attribute(name, () => 'a');
+			trait.defineAttribute(attribute);
+
+			expect(trait.attributes).to.have.length(1);
+			expect(trait.attributes.map((a) => a.name)).to.deep.equal([name]);
+			expect(trait.attributes[0].build()).to.equal('a');
+		});
 	});
 
 	describe('#defineTrait', function() {
-		it('adds the trait to the set');
+		it('throws an error', function() {
+			factoryBuilder = new FactoryBuilder();
+			const trait = new Trait(factoryBuilder, 'trait', () => true);
+			const trait2 = new Trait(factoryBuilder, 'trait2', () => false);
+			expect(() => trait.defineTrait(trait2)).to.throw();
+		});
 	});
 });

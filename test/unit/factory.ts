@@ -8,7 +8,6 @@ import {NullFactory} from '../../lib/null-factory';
 import {DummyModel} from '../test-fixtures/dummy-model';
 
 import {expect} from 'chai';
-import {size} from 'lodash';
 import sinon from 'sinon';
 
 describe('Factory', function() {
@@ -131,7 +130,7 @@ describe('Factory', function() {
 			const attribute = new Attribute(name, () => 'a');
 			factory.defineAttribute(attribute);
 
-			expect(size(factory.attributes)).to.equal(1);
+			expect(factory.attributes).to.have.length(1);
 			expect(factory.attributes.map((a) => a.name)).to.deep.equal([name]);
 			expect(factory.attributes[0].build()).to.equal('a');
 		});
@@ -293,7 +292,7 @@ describe('Factory', function() {
 			expect(result).to.deep.equal({self: ['dummy']});
 		});
 
-		it('applies attributes from parent attribute', async function() {
+		it('applies attributes from parent attribute', function() {
 			factoryBuilder.define((fb: FactoryBuilder) => {
 				fb.factory('parent', DummyModel, (f: DefinitionProxy) => {
 					f.attr('execute1', () => 1);
@@ -309,12 +308,12 @@ describe('Factory', function() {
 					},
 				);
 			});
-			const result = await factoryBuilder.attributesFor('child');
+			const result = factoryBuilder.attributesFor('child');
 
 			expect(result).to.deep.equal({execute1: 1, execute2: 20, execute3: 3});
 		});
 
-		it("doesn't call attributes that are overwritten", async function() {
+		it("doesn't call attributes that are overwritten", function() {
 			let spy = false;
 			factoryBuilder.define((fb: FactoryBuilder) => {
 				fb.factory('parent', DummyModel, (f: DefinitionProxy) => {
@@ -334,11 +333,9 @@ describe('Factory', function() {
 					},
 				);
 			});
-			await factoryBuilder.attributesFor('child');
+			factoryBuilder.attributesFor('child');
 			expect(spy).to.be.false;
 		});
-
-		it('applies traits properly');
 	});
 
 	describe('#build', function() {

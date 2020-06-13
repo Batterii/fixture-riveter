@@ -23,19 +23,14 @@ import {expect} from 'chai';
 // 					this.attr('role', 'admin');
 // 				});
 
-// 				this.factory('adminUser', { traits: [ 'admin' ] });
+// 				this.factory('adminUser', {traits: ['admin']});
 // 			});
 // 		});
 
 // 		const user1 = await fb.build('user');
-// 		const user2 = await fb.build('user', {traits: ['admin']});
-// 		const user3 = await fb.build('user', {attrs: {email: 'fake2@email.com'}});
-// 		const user4 = await fb.build('user', {
-// 			traits: ['admin'],
-// 			attrs: {
-// 				email: 'fake4@email.com',
-// 			},
-// 		});
+// 		const user2 = await fb.build('user', 'admin');
+// 		const user3 = await fb.build('user', {email: 'fake2@email.com'});
+//		const user4 = await fb.build('user', 'admin', {email: 'fake4@email.com'});
 
 // 		expect(user1).to.exist;
 // 		expect(user2).to.exist;
@@ -61,7 +56,7 @@ describe('#create', function() {
 	});
 
 	it('inserts into the database', async function() {
-		const model = await fb.create('user', {attrs: {name: 'Bogart'}});
+		const model = await fb.create('user', {name: 'Bogart'});
 		const model2 = await fb.create('user');
 
 		expect(model.id).to.exist;

@@ -46,6 +46,18 @@ export class NullFactory implements Definition {
 		return [];
 	}
 
+	traitNames(): string[] {
+		return [];
+	}
+
+	getParentTraits(): Trait[] {
+		return [];
+	}
+
+	getTraits(): Trait[] {
+		return [];
+	}
+
 	applyAttributes(): Record<string, any> {
 		return {};
 	}

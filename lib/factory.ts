@@ -107,6 +107,24 @@ export class Factory implements Definition {
 		return attributesToKeep.concat(this.attributes);
 	}
 
+	traitNames(): string[] {
+		const traits = Array.from(this.traits.values());
+		return traits.map((t: Trait) => t.name);
+	}
+
+	getParentTraits(): Trait[] {
+		const traitNames = this.traitNames();
+
+		return this.parentFactory()
+			.getTraits()
+			.filter((trait: Trait) => !traitNames.includes(trait.name));
+	}
+
+	getTraits(): Trait[] {
+		const traitsToKeep = this.getParentTraits();
+		return traitsToKeep.concat(Array.from(this.traits.values()));
+	}
+
 	applyAttributes(extraAttributes?: ExtraAttributes): Record<string, any> {
 		const {attrs} = mergeDefaults(extraAttributes);
 		const attributesToApply = this.getAttributes();
@@ -117,6 +135,16 @@ export class Factory implements Definition {
 				instance[name] = block.call(this, this);
 			}
 		}
+
+		const traitsToApply = this.getTraits();
+		for (const trait of traitsToApply) {
+			for (const {name, block} of trait.attributes) {
+				if (!Object.prototype.hasOwnProperty.call(attrs, name)) {
+					instance[name] = block.call(this, this);
+				}
+			}
+		}
+
 		for (const [key, value] of Object.entries(attrs)) {
 			instance[key] = value;
 		}
