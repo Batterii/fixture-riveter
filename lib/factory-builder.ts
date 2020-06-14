@@ -24,12 +24,13 @@ export function buildTraitsAndAttributes(traits: any[]): ExtraAttributes {
 
 export class FactoryBuilder {
 	factories: Record<string, Factory>;
+	traits: Record<string, Trait>;
 	adapterHandler: any;
 	sequenceHandler: SequenceHandler;
-	traits: Set<Trait>;
 
 	constructor() {
 		this.factories = {};
+		this.traits = {};
 		this.adapterHandler = new AdapterHandler();
 		this.sequenceHandler = new SequenceHandler();
 	}
@@ -97,7 +98,7 @@ export class FactoryBuilder {
 	}
 
 	trait(name: string, block?: Function): Trait {
-		const trait = new Trait(this, name, block);
+		const trait = new Trait(name, this, block);
 		this.registerTrait(trait);
 		return trait;
 	}
@@ -138,5 +139,9 @@ export class FactoryBuilder {
 		for (const [, factory] of Object.entries(this.factories)) {
 			factory.sequenceHandler.resetSequences();
 		}
+	}
+
+	findSequence(name: string): Sequence | undefined {
+		return this.sequenceHandler.findSequence(name);
 	}
 }

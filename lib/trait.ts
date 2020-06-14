@@ -1,8 +1,10 @@
 import {Attribute} from './attribute';
+import {Declaration} from './declaration';
 import {Definition} from './definition';
 import {DefinitionProxy} from './definition-proxy';
 import {FactoryBuilder} from './factory-builder';
 import {SequenceHandler} from './sequence-handler';
+import {DeclarationHandler} from './declaration-handler';
 
 export class Trait implements Definition {
 	factoryBuilder: FactoryBuilder;
@@ -12,10 +14,11 @@ export class Trait implements Definition {
 	block: Function;
 	attributes: Attribute[];
 	sequenceHandler: SequenceHandler;
+	declarationHandler: DeclarationHandler;
 
 	constructor(
-		factoryBuilder: FactoryBuilder,
 		name: string,
+		factoryBuilder: FactoryBuilder,
 		block?: Function,
 	) {
 		this.factoryBuilder = factoryBuilder;
@@ -23,6 +26,8 @@ export class Trait implements Definition {
 		this.traits = new Set();
 		this.attributes = [];
 		this.sequenceHandler = new SequenceHandler();
+		this.declarationHandler = new DeclarationHandler(name);
+
 		if (block) {
 			this.block = block;
 		}
@@ -35,8 +40,8 @@ export class Trait implements Definition {
 		return [this.name];
 	}
 
-	defineAttribute(attribute: Attribute): void {
-		this.attributes.push(attribute);
+	declareAttribute(declaration: Declaration): void {
+		this.declarationHandler.declareAttribute(declaration);
 	}
 
 	defineTrait(trait: Trait): void {

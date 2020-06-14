@@ -1,4 +1,4 @@
-import {Attribute} from '../../lib/attribute';
+import {DynamicDeclaration} from '../../lib/declarations/dynamic-declaration';
 import {FactoryBuilder} from '../../lib/factory-builder';
 import {Trait} from '../../lib/trait';
 
@@ -12,19 +12,19 @@ describe('Trait', function() {
 	});
 
 	it('creates an instance', function() {
-		const result = new Trait(factoryBuilder, 'trait');
+		const result = new Trait('trait', factoryBuilder);
 		expect(result).to.be.an.instanceof(Trait);
 	});
 
 	it('creates an instance with the correct initial values', function() {
-		const result = new Trait(factoryBuilder, 'trait');
+		const result = new Trait('trait', factoryBuilder);
 		expect(result.attributes).to.deep.equal([]);
 		expect(result.traits).to.deep.equal(new Set());
 	});
 
 	it('executes the given block immediately', function() {
 		let result = false;
-		const trait = new Trait(factoryBuilder, 'trait', (t: any) => {
+		const trait = new Trait('trait', factoryBuilder, (t: any) => {
 			result = true;
 			t.definition.name = 'traitor';
 		});
@@ -40,33 +40,33 @@ describe('Trait', function() {
 
 		it('returns the name', function() {
 			const name = 'trait';
-			const factory = new Trait(factoryBuilder, name);
+			const factory = new Trait(name, factoryBuilder);
 			const names = factory.names();
 
 			expect(names).to.have.length(1);
-			expect(names[0]).to.equal(name);
+			expect(names).to.deep.equal([name]);
 		});
 	});
 
-	describe('#defineAttribute', function() {
+	describe('#declareAttribute', function() {
 		it('stores the function', function() {
 			factoryBuilder = new FactoryBuilder();
-			const trait = new Trait(factoryBuilder, 'trait', () => true);
+			const trait = new Trait('trait', factoryBuilder, () => true);
 			const name = 'email';
-			const attribute = new Attribute(name, () => 'a');
-			trait.defineAttribute(attribute);
+			const declaration = new DynamicDeclaration(name, () => 'a');
+			trait.declareAttribute(declaration);
+			const {declarations} = trait.declarationHandler;
 
-			expect(trait.attributes).to.have.length(1);
-			expect(trait.attributes.map((a) => a.name)).to.deep.equal([name]);
-			expect(trait.attributes[0].build()).to.equal('a');
+			expect(declarations).to.have.length(1);
+			expect(declarations.map((a) => a.name)).to.deep.equal([name]);
 		});
 	});
 
 	describe('#defineTrait', function() {
 		it('throws an error', function() {
 			factoryBuilder = new FactoryBuilder();
-			const trait = new Trait(factoryBuilder, 'trait', () => true);
-			const trait2 = new Trait(factoryBuilder, 'trait2', () => false);
+			const trait = new Trait('trait', factoryBuilder, () => true);
+			const trait2 = new Trait('trait2', factoryBuilder, () => false);
 			expect(() => trait.defineTrait(trait2)).to.throw();
 		});
 	});

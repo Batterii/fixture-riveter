@@ -1,4 +1,5 @@
-import {Attribute} from '../../lib/attribute';
+import {DynamicAttribute} from '../../lib/attributes/dynamic-attribute';
+import {DynamicDeclaration} from '../../lib/declarations/dynamic-declaration';
 import {Factory} from '../../lib/factory';
 import {FactoryBuilder} from '../../lib/factory-builder';
 import {DefaultAdapter} from '../../lib/adapters/default-adapter';
@@ -43,7 +44,7 @@ describe('Factory', function() {
 	it('accepts traits', function() {
 		const traits = ['trait'];
 		const withTrait = new Factory(factoryBuilder, 'name', DummyModel, {traits});
-		expect(withTrait.traits).to.deep.equal(traits);
+		expect(withTrait.baseTraits).to.deep.equal(traits);
 	});
 
 	it('accepts both aliases and traits', function() {
@@ -51,7 +52,7 @@ describe('Factory', function() {
 		const traits = ['trait'];
 		const withTrait = new Factory(factoryBuilder, 'name', DummyModel, {aliases, traits});
 		expect(withTrait.aliases).to.deep.equal(aliases);
-		expect(withTrait.traits).to.deep.equal(traits);
+		expect(withTrait.baseTraits).to.deep.equal(traits);
 	});
 
 	it("doesn't define a default block", function() {
@@ -122,17 +123,17 @@ describe('Factory', function() {
 		});
 	});
 
-	describe('#defineAttribute', function() {
-		it('stores the function', function() {
+	describe('#declareAttribute', function() {
+		it('stores the declaration', function() {
 			factoryBuilder = new FactoryBuilder();
 			const factory = new Factory(factoryBuilder, 'name', DummyModel);
 			const name = 'email';
-			const attribute = new Attribute(name, () => 'a');
-			factory.defineAttribute(attribute);
+			const attribute = new DynamicDeclaration(name, () => 'a');
+			factory.declareAttribute(attribute);
+			const {declarations} = factory.declarationHandler;
 
-			expect(factory.attributes).to.have.length(1);
-			expect(factory.attributes.map((a) => a.name)).to.deep.equal([name]);
-			expect(factory.attributes[0].build()).to.equal('a');
+			expect(declarations).to.have.length(1);
+			expect(declarations.map((a) => a.name)).to.deep.equal([name]);
 		});
 	});
 
@@ -164,7 +165,7 @@ describe('Factory', function() {
 
 		it('calls getAttributes on the parent', function() {
 			const parentFactory = new Factory(factoryBuilder, 'parent', DummyModel);
-			const attr = new Attribute('attr', () => true);
+			const attr = new DynamicAttribute('attr', () => true);
 			sinon.stub(parentFactory, 'getAttributes')
 				.returns([attr]);
 			const childFactory = new Factory(factoryBuilder, 'child', DummyModel);
@@ -177,7 +178,7 @@ describe('Factory', function() {
 
 		it('returns all non-filtered attributes', function() {
 			const parentFactory = new Factory(factoryBuilder, 'parent', DummyModel);
-			const attr = new Attribute('attr', () => true);
+			const attr = new DynamicAttribute('attr', () => true);
 			sinon.stub(parentFactory, 'getAttributes')
 				.returns([attr]);
 
@@ -193,7 +194,7 @@ describe('Factory', function() {
 
 		it('filters existing attributes', function() {
 			const parentFactory = new Factory(factoryBuilder, 'parent', DummyModel);
-			const attr = new Attribute('attr', () => true);
+			const attr = new DynamicAttribute('attr', () => true);
 			sinon.stub(parentFactory, 'getAttributes')
 				.returns([attr]);
 
@@ -223,10 +224,11 @@ describe('Factory', function() {
 
 		it('concats child attributes to parent attributes', function() {
 			const factory = new Factory(factoryBuilder, 'dummy', DummyModel);
-			const childAttr = new Attribute('attr', () => true);
+			const childAttr = new DynamicAttribute('attr', () => true);
 			factory.attributes = [childAttr];
+			factory.compiled = true;
 
-			const parentAttr = new Attribute('parent', () => true);
+			const parentAttr = new DynamicAttribute('parent', () => true);
 			sinon.stub(factory, 'getParentAttributes').returns([parentAttr]);
 
 			const result = factory.getAttributes();
@@ -249,9 +251,10 @@ describe('Factory', function() {
 
 		it('iterates over attributes', function() {
 			const factory = new Factory(factoryBuilder, 'dummy', DummyModel);
+			factory.compiled = true;
 			factory.attributes = [
-				new Attribute('name', () => 'Noah'),
-				new Attribute('age', () => 32),
+				new DynamicAttribute('name', () => 'Noah'),
+				new DynamicAttribute('age', () => 32),
 			];
 			const result = factory.applyAttributes();
 
@@ -260,9 +263,10 @@ describe('Factory', function() {
 
 		it('applies attrs argument last', function() {
 			const factory = new Factory(factoryBuilder, 'dummy', DummyModel);
+			factory.compiled = true;
 			factory.attributes = [
-				new Attribute('name', () => 'Noah'),
-				new Attribute('age', () => 32),
+				new DynamicAttribute('name', () => 'Noah'),
+				new DynamicAttribute('age', () => 32),
 			];
 			const extraAttributes = {attrs: {name: 'Bogart'}};
 			const result = factory.applyAttributes(extraAttributes);
@@ -272,8 +276,9 @@ describe('Factory', function() {
 
 		it('executes the attribute block with the factory as context', function() {
 			const factory = new Factory(factoryBuilder, 'dummy', DummyModel);
+			factory.compiled = true;
 			factory.attributes = [
-				new Attribute('self', function() {
+				new DynamicAttribute('self', function() {
 					return this.names(); // eslint-disable-line no-invalid-this
 				}),
 			];
@@ -284,8 +289,9 @@ describe('Factory', function() {
 
 		it('passes the factory into the attribute function', function() {
 			const factory = new Factory(factoryBuilder, 'dummy', DummyModel);
+			factory.compiled = true;
 			factory.attributes = [
-				new Attribute('self', (f: Factory) => f.names()),
+				new DynamicAttribute('self', (f: Factory) => f.names()),
 			];
 			const result = factory.applyAttributes();
 
@@ -371,9 +377,10 @@ describe('Factory', function() {
 		it('builds an instance with the right values', async function() {
 			const adapter = new DefaultAdapter();
 			const factory = new Factory(factoryBuilder, 'dummy', DummyModel);
+			factory.compiled = true;
 			factory.attributes = [
-				new Attribute('name', () => 'Noah'),
-				new Attribute('age', () => 32),
+				new DynamicAttribute('name', () => 'Noah'),
+				new DynamicAttribute('age', () => 32),
 			];
 			const result = await factory.build(adapter);
 

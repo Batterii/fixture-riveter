@@ -1,13 +1,11 @@
-export class Attribute {
+export abstract class Attribute {
 	name: string;
-	block: Function;
 
-	constructor(name: string, block: Function) {
+	constructor(name: string) {
 		this.name = name;
-		this.block = block;
 	}
 
-	build(): any {
-		return this.block();
+	build(): Function {
+		return function() {}; // eslint-disable-line @typescript-eslint/no-empty-function
 	}
 }

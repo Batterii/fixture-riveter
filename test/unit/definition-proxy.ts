@@ -62,18 +62,10 @@ describe('DefinitionProxy', function() {
 			const name = 'email';
 			const block = () => 1;
 
-			const stub = sinon.stub(factory, 'defineAttribute');
+			const stub = sinon.stub(factory, 'declareAttribute');
 			proxy.attr(name, block);
 
 			expect(stub).to.be.calledOnce;
-		});
-
-		it('throws when given no block', function() {
-			const factoryBuilder = new FactoryBuilder();
-			const factory = new Factory(factoryBuilder, 'dummy', DummyModel);
-			const proxy = new DefinitionProxy(factory);
-
-			expect(() => proxy.attr('email')).to.throw();
 		});
 	});
 
@@ -101,24 +93,15 @@ describe('DefinitionProxy', function() {
 			const factoryBuilder = new FactoryBuilder();
 			const factory = new Factory(factoryBuilder, 'dummy', DummyModel);
 			const proxy = new DefinitionProxy(factory);
-			sinon.spy(factory, 'defineAttribute');
+			sinon.spy(factory, 'declareAttribute');
 			const name = 'email';
 			const result = proxy.sequence(name);
+			const {declarations} = factory.declarationHandler;
 
-			expect(factory.attributes).to.be.length(1);
-			expect(factory.attributes[0].name).to.equal(name);
-			expect(factory.defineAttribute).to.be.calledOnce;
-			expect(result.name).to.equal(factory.attributes[0].name);
-		});
-
-		it('wraps newSequence.next as the attribute block', function() {
-			const factoryBuilder = new FactoryBuilder();
-			const factory = new Factory(factoryBuilder, 'dummy', DummyModel);
-			const proxy = new DefinitionProxy(factory);
-			proxy.sequence('name');
-
-			expect(factory.attributes[0].block()).to.equal(1);
-			expect(factory.attributes[0].block()).to.equal(2);
+			expect(declarations).to.be.length(1);
+			expect(declarations[0].name).to.equal(name);
+			expect(factory.declareAttribute).to.be.calledOnce;
+			expect(declarations[0].name).to.equal(result.name);
 		});
 
 		it('delegates sequence creation to sequenceHandler', function() {

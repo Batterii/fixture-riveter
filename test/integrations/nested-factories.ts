@@ -13,7 +13,7 @@ describe('Nested factories', function() {
 		factoryBuilder = new FactoryBuilder();
 	});
 
-	it('applies attributes from parent attribute', async function() {
+	it('applies attributes from parent attribute', function() {
 		factoryBuilder.define((fb: FactoryBuilder) => {
 			fb.factory(
 				'great-grand-parent',
@@ -51,7 +51,7 @@ describe('Nested factories', function() {
 				},
 			);
 		});
-		const result = await factoryBuilder.attributesFor('child');
+		const result = factoryBuilder.attributesFor('child');
 
 		expect(result).to.deep.equal({
 			execute1: 1,

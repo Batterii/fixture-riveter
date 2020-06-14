@@ -40,6 +40,10 @@ export class SequenceHandler {
 	resetSequences(): void {
 		this.sequences.forEach((seq) => seq.reset());
 	}
+
+	findSequence(name: string): Sequence | undefined {
+		return this.sequences.find((s: Sequence) => s.name === name);
+	}
 }
 
 type initial = string | number;

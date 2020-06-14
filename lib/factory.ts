@@ -1,5 +1,7 @@
 import {Adapter} from './adapters/adapter';
 import {Attribute} from './attribute';
+import {Declaration} from './declaration';
+import {DeclarationHandler} from './declaration-handler';
 import {Trait} from './trait';
 import {Definition} from './definition';
 import {FactoryBuilder} from './factory-builder';
@@ -20,10 +22,15 @@ export class Factory implements Definition {
 	model: any;
 	aliases: string[];
 	traits: Set<Trait>;
+	baseTraits: string[];
+	traitsCache?: Record<string, Trait>;
 	parent?: string;
 	block: Function;
+	declarationHandler: DeclarationHandler;
 	attributes: Attribute[];
 	sequenceHandler: SequenceHandler;
+
+	compiled: boolean;
 
 	constructor(
 		factoryBuilder: FactoryBuilder,
@@ -51,8 +58,12 @@ export class Factory implements Definition {
 		this.model = model;
 		this.aliases = [];
 		this.traits = new Set();
+		this.baseTraits = [];
 		this.attributes = [];
 		this.sequenceHandler = new SequenceHandler();
+		this.declarationHandler = new DeclarationHandler(name);
+
+		this.compiled = false;
 
 		const [options, block] = factoryOptionsParser(...rest);
 
@@ -60,7 +71,7 @@ export class Factory implements Definition {
 			this.aliases = options.aliases;
 		}
 		if (options.traits) {
-			this.traits = options.traits;
+			this.baseTraits = options.traits;
 		}
 		if (options.parent) {
 			this.parent = options.parent;
@@ -79,15 +90,22 @@ export class Factory implements Definition {
 		if (this.parent) {
 			return this.factoryBuilder.getFactory(this.parent, false);
 		}
-		return new NullFactory(this.factoryBuilder, this.model);
+		return new NullFactory(this.factoryBuilder, this.model) as any;
 	}
 
-	defineAttribute(attribute: Attribute): void {
-		this.attributes.push(attribute);
+	declareAttribute(declaration: Declaration): void {
+		this.declarationHandler.declareAttribute(declaration);
 	}
 
 	defineTrait(trait: Trait): void {
 		this.traits.add(trait);
+	}
+
+	compile(): void {
+		if (!this.compiled) {
+			this.attributes = this.declarationHandler.convertToAttributes();
+			this.compiled = true;
+		}
 	}
 
 	attributeNames(): string[] {
@@ -103,6 +121,8 @@ export class Factory implements Definition {
 	}
 
 	getAttributes(): Attribute[] {
+		this.compile();
+
 		const attributesToKeep = this.getParentAttributes();
 		return attributesToKeep.concat(this.attributes);
 	}
@@ -125,25 +145,57 @@ export class Factory implements Definition {
 		return traitsToKeep.concat(Array.from(this.traits.values()));
 	}
 
+	inheritTraits(traits: string[]): void {
+		this.baseTraits = this.baseTraits.concat(traits);
+	}
+
+	traitByName(name: string): Trait | undefined {
+		return this.traitFor(name) || this.factoryBuilder.getTrait(name, false);
+	}
+
+	traitFor(name: string): Trait | undefined {
+		if (!this.traitsCache) {
+			const cache = {};
+			this.traits.forEach((trait: Trait) => {
+				cache[trait.name] = trait;
+			});
+			this.traitsCache = cache;
+		}
+
+		return this.traitsCache[name];
+	}
+
+	getBaseTraits(): Trait[] {
+		const traits: Trait[] = [];
+		this.baseTraits.forEach((name: string) => {
+			const result = this.traitByName(name);
+			if (result) {
+				traits.push(result);
+			}
+		});
+		return traits;
+	}
+
 	applyAttributes(extraAttributes?: ExtraAttributes): Record<string, any> {
 		const {attrs} = mergeDefaults(extraAttributes);
 		const attributesToApply = this.getAttributes();
-		const instance = {};
+		const instance: Record<string, any> = {};
 
-		for (const {name, block} of attributesToApply) {
+		for (const attribute of attributesToApply) {
+			const {name} = attribute;
 			if (!Object.prototype.hasOwnProperty.call(attrs, name)) {
-				instance[name] = block.call(this, this);
+				instance[name] = attribute.build().call(this, this);
 			}
 		}
 
-		const traitsToApply = this.getTraits();
-		for (const trait of traitsToApply) {
-			for (const {name, block} of trait.attributes) {
-				if (!Object.prototype.hasOwnProperty.call(attrs, name)) {
-					instance[name] = block.call(this, this);
-				}
-			}
-		}
+		// const traitsToApply = this.getTraits();
+		// for (const trait of traitsToApply) {
+		// 	for (const {name, block} of trait.attributes) {
+		// 		if (!Object.prototype.hasOwnProperty.call(attrs, name)) {
+		// 			instance[name] = block.call(this, this);
+		// 		}
+		// 	}
+		// }
 
 		for (const [key, value] of Object.entries(attrs)) {
 			instance[key] = value;

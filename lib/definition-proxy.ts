@@ -1,6 +1,8 @@
-import {Attribute} from './attribute';
+import {DynamicDeclaration} from './declarations/dynamic-declaration';
+import {ImplicitDeclaration} from './declarations/implicit-declaration';
 import {Trait} from './trait';
 import {Definition} from './definition';
+import {Factory} from './factory';
 import {FactoryOptions} from './factory-options-parser';
 import {FactoryBuilder} from './factory-builder';
 import {Sequence} from './sequences/sequence';
@@ -32,8 +34,15 @@ export class DefinitionProxy {
 	}
 
 	attr(name: string, block?: Function): void {
-		if (block && isFunction(block)) {
-			this.definition.defineAttribute(new Attribute(name, block));
+		if (!block) {
+			const declaration = new ImplicitDeclaration(
+				name,
+				this.factoryBuilder,
+				this.definition as Factory,
+			);
+			this.definition.declareAttribute(declaration);
+		} else if (isFunction(block)) {
+			this.definition.declareAttribute(new DynamicDeclaration(name, block));
 		} else {
 			throw new Error(`wrong options, bruh: ${name}, ${block}`);
 		}
@@ -53,13 +62,13 @@ export class DefinitionProxy {
 
 	sequence(name: string, ...rest: any[]): Sequence {
 		const newSequence = this.sequenceHandler.registerSequence(name, ...rest);
-		this.definition.defineAttribute(new Attribute(name, () => newSequence.next()));
+		this.definition.declareAttribute(new DynamicDeclaration(name, () => newSequence.next()));
 		return newSequence;
 	}
 
 	trait(name: string, block?: Function): void {
 		if (block && isFunction(block)) {
-			this.definition.defineTrait(new Trait(this.factoryBuilder, name, block));
+			this.definition.defineTrait(new Trait(name, this.factoryBuilder, block));
 		} else {
 			throw new Error(`wrong options, bruh: ${name}, ${block}`);
 		}

@@ -1,4 +1,5 @@
 import {Attribute} from './attribute';
+import {Declaration} from './declaration';
 import {Trait} from './trait';
 import {FactoryBuilder} from './factory-builder';
 import {SequenceHandler} from './sequence-handler';
@@ -10,7 +11,7 @@ export interface Definition {
 	attributes: Attribute[];
 	traits: Set<Trait>;
 	block: Function;
-	defineAttribute: (attribute: Attribute) => void;
+	declareAttribute: (declaration: Declaration) => void;
 	defineTrait: (trait: Trait) => void;
 	sequenceHandler: SequenceHandler;
 }

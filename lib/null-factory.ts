@@ -1,4 +1,5 @@
 import {Attribute} from './attribute';
+import {Declaration} from './declaration';
 import {Trait} from './trait';
 import {Definition} from './definition';
 import {FactoryBuilder} from './factory-builder';
@@ -15,6 +16,7 @@ export class NullFactory implements Definition {
 	parent?: string;
 	block: Function;
 	attributes: Attribute[];
+	declarations: Declaration[];
 	sequenceHandler: SequenceHandler;
 
 	constructor(
@@ -27,6 +29,7 @@ export class NullFactory implements Definition {
 		this.aliases = [];
 		this.traits = new Set();
 		this.attributes = [];
+		this.declarations = [];
 		this.sequenceHandler = new SequenceHandler();
 	}
 
@@ -63,7 +66,7 @@ export class NullFactory implements Definition {
 	}
 
 	parentFactory(): any { }
-	defineAttribute(): void { }
+	declareAttribute(): void { }
 	defineTrait(): void { }
 	build(): any { }
 	create(): any { }
