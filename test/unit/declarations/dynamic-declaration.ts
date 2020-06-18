@@ -1,12 +1,12 @@
-import {DynamicAttribute} from '../../../lib/attributes/dynamic-attribute';
-import {DynamicDeclaration} from '../../../lib/declarations/dynamic-declaration';
+import {DynamicAttribute} from "../../../lib/attributes/dynamic-attribute";
+import {DynamicDeclaration} from "../../../lib/declarations/dynamic-declaration";
 
-import {identity} from 'lodash';
-import {expect} from 'chai';
+import {identity} from "lodash";
+import {expect} from "chai";
 
-describe('DynamicDeclaration', function() {
-	it('creates an instance of DynamicDeclaration', function() {
-		const name = 'email';
+describe("DynamicDeclaration", function() {
+	it("creates an instance of DynamicDeclaration", function() {
+		const name = "email";
 		const result = new DynamicDeclaration(name, identity);
 
 		expect(result).to.be.an.instanceof(DynamicDeclaration);
@@ -14,9 +14,9 @@ describe('DynamicDeclaration', function() {
 		expect(result.block).to.equal(identity);
 	});
 
-	describe('#build', function() {
-		it('returns a list', function() {
-			const name = 'email';
+	describe("#build", function() {
+		it("returns a list", function() {
+			const name = "email";
 			const declaration = new DynamicDeclaration(name, identity);
 			const result = declaration.build();
 
@@ -24,8 +24,8 @@ describe('DynamicDeclaration', function() {
 			expect(result).to.have.length(1);
 		});
 
-		it('returns a list with a new DynamicAttribute', function() {
-			const name = 'email';
+		it("returns a list with a new DynamicAttribute", function() {
+			const name = "email";
 			const declaration = new DynamicDeclaration(name, identity);
 			const [result] = declaration.build();
 

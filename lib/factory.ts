@@ -1,15 +1,15 @@
-import {Adapter} from './adapters/adapter';
-import {Attribute} from './attribute';
-import {Declaration} from './declaration';
-import {DeclarationHandler} from './declaration-handler';
-import {Trait} from './trait';
-import {Definition} from './definition';
-import {FactoryBuilder} from './factory-builder';
-import {NullFactory} from './null-factory';
-import {SequenceHandler} from './sequence-handler';
-import {factoryOptionsParser, FactoryOptions} from './factory-options-parser';
+import {Adapter} from "./adapters/adapter";
+import {Attribute} from "./attribute";
+import {Declaration} from "./declaration";
+import {DeclarationHandler} from "./declaration-handler";
+import {Trait} from "./trait";
+import {Definition} from "./definition";
+import {FactoryBuilder} from "./factory-builder";
+import {NullFactory} from "./null-factory";
+import {SequenceHandler} from "./sequence-handler";
+import {FactoryOptions, factoryOptionsParser} from "./factory-options-parser";
 
-import {isFunction} from 'lodash';
+import {isFunction} from "lodash";
 
 export interface ExtraAttributes {
 	traits?: string[];

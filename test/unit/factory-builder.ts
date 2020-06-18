@@ -1,68 +1,68 @@
-import {DummyModel} from '../test-fixtures/dummy-model';
+import {DummyModel} from "../test-fixtures/dummy-model";
 
-import {DefaultAdapter} from '../../lib/adapters/default-adapter';
-import {Factory} from '../../lib/factory';
-import {extractAttributes, FactoryBuilder} from '../../lib/factory-builder';
-import {Sequence} from '../../lib/sequences/sequence';
-import {IntegerSequence} from '../../lib/sequences/integer-sequence';
+import {DefaultAdapter} from "../../lib/adapters/default-adapter";
+import {Factory} from "../../lib/factory";
+import {extractAttributes, FactoryBuilder} from "../../lib/factory-builder";
+import {Sequence} from "../../lib/sequences/sequence";
+import {IntegerSequence} from "../../lib/sequences/integer-sequence";
 
-import {expect} from 'chai';
-import sinon from 'sinon';
+import {expect} from "chai";
+import sinon from "sinon";
 
-describe('extractAttributes', function() {
-	it('returns an empty object', function() {
+describe("extractAttributes", function() {
+	it("returns an empty object", function() {
 		const array = [1, 2, 3];
 		const result = extractAttributes(array);
 		expect(array).to.deep.equal([1, 2, 3]);
 		expect(result).to.deep.equal({});
 	});
 
-	it('returns the array at the end', function() {
-		const array = [1, 2, 3, {parent: 'parent'}];
+	it("returns the array at the end", function() {
+		const array = [1, 2, 3, {parent: "parent"}];
 		const result = extractAttributes(array);
 		expect(array).to.deep.equal([1, 2, 3]);
-		expect(result).to.deep.equal({parent: 'parent'});
+		expect(result).to.deep.equal({parent: "parent"});
 	});
 });
 
-describe('FactoryBuilder', function() {
-	it('can be built', function() {
+describe("FactoryBuilder", function() {
+	it("can be built", function() {
 		const factoryBuilder = new FactoryBuilder();
 		expect(factoryBuilder).to.exist;
 		expect(factoryBuilder.factories).to.exist.and.to.be.empty;
 	});
 
-	describe('#getAdapter', function() {
-		it('passes the call down', function() {
+	describe("#getAdapter", function() {
+		it("passes the call down", function() {
 			const factoryBuilder = new FactoryBuilder();
-			sinon.stub(factoryBuilder.adapterHandler, 'getAdapter').returns('test');
-			const result = factoryBuilder.getAdapter('value');
+			sinon.stub(factoryBuilder.adapterHandler, "getAdapter").returns("test");
+			const result = factoryBuilder.getAdapter("value");
 			const {getAdapter} = factoryBuilder.adapterHandler;
 
-			expect(result).to.deep.equal('test');
+			expect(result).to.deep.equal("test");
 			expect(getAdapter).to.be.calledOnce;
-			expect(getAdapter).to.be.calledWithExactly('value');
+			expect(getAdapter).to.be.calledWithExactly("value");
 		});
 	});
 
-	describe('#setAdapter', function() {
-		it('passes the call down', function() {
+	describe("#setAdapter", function() {
+		it("passes the call down", function() {
 			const factoryBuilder = new FactoryBuilder();
-			sinon.stub(factoryBuilder.adapterHandler, 'setAdapter').returns('test');
+			sinon.stub(factoryBuilder.adapterHandler, "setAdapter").returns("test");
 			const defaultAdapter = new DefaultAdapter();
-			const result = factoryBuilder.setAdapter(defaultAdapter, 'value');
+			const result = factoryBuilder.setAdapter(defaultAdapter, "value");
 			const {setAdapter} = factoryBuilder.adapterHandler;
 
-			expect(result).to.deep.equal('test');
+			expect(result).to.deep.equal("test");
 			expect(setAdapter).to.be.calledOnce;
-			expect(setAdapter).to.be.calledWithExactly(defaultAdapter, 'value');
+			expect(setAdapter).to.be.calledWithExactly(defaultAdapter, "value");
 		});
 	});
 
-	describe('#define', function() {
-		it('calls the block immediately', function() {
+	describe("#define", function() {
+		it("calls the block immediately", function() {
 			const factoryBuilder = new FactoryBuilder();
-			const testArray = ['test'] as any;
+			const testArray = ["test"] as any;
 			factoryBuilder.define(function() {
 				factoryBuilder.factories = testArray;
 			});
@@ -71,10 +71,10 @@ describe('FactoryBuilder', function() {
 		});
 	});
 
-	describe('#registerFactory', function() {
-		it('adds the factory by name', function() {
+	describe("#registerFactory", function() {
+		it("adds the factory by name", function() {
 			const factoryBuilder = new FactoryBuilder();
-			const name = 'testFactory';
+			const name = "testFactory";
 			const factory = new Factory(factoryBuilder, name, DummyModel);
 
 			factoryBuilder.registerFactory(factory);
@@ -82,10 +82,10 @@ describe('FactoryBuilder', function() {
 			expect(factoryBuilder.factories[name]).to.equal(factory);
 		});
 
-		it('adds the factory by alias', function() {
+		it("adds the factory by alias", function() {
 			const factoryBuilder = new FactoryBuilder();
-			const name = 'testFactory';
-			const aliases = ['factory1', 'factory2'];
+			const name = "testFactory";
+			const aliases = ["factory1", "factory2"];
 			const factory = new Factory(factoryBuilder, name, DummyModel, {aliases});
 
 			factoryBuilder.registerFactory(factory);
@@ -94,10 +94,10 @@ describe('FactoryBuilder', function() {
 			expect(factoryBuilder.factories[aliases[1]]).to.equal(factory);
 		});
 
-		it('adds the same factory multiples times', function() {
+		it("adds the same factory multiples times", function() {
 			const factoryBuilder = new FactoryBuilder();
-			const name = 'factory1';
-			const alias = 'factory2';
+			const name = "factory1";
+			const alias = "factory2";
 			const factory = new Factory(factoryBuilder, name, DummyModel, {aliases: [alias]});
 
 			factoryBuilder.registerFactory(factory);
@@ -108,10 +108,10 @@ describe('FactoryBuilder', function() {
 		});
 	});
 
-	describe('#factory', function() {
-		it('creates a factory', function() {
+	describe("#factory", function() {
+		it("creates a factory", function() {
 			const factoryBuilder = new FactoryBuilder();
-			const name = 'testFactory';
+			const name = "testFactory";
 			factoryBuilder.factory(name, DummyModel);
 
 			const factory = factoryBuilder.factories[name];
@@ -121,28 +121,28 @@ describe('FactoryBuilder', function() {
 			expect(factory.name).to.equal(name);
 		});
 
-		it('returns the created factory', function() {
+		it("returns the created factory", function() {
 			const factoryBuilder = new FactoryBuilder();
-			const name = 'testFactory';
+			const name = "testFactory";
 			const factory = factoryBuilder.factory(name, DummyModel);
 
 			expect(factory.name).to.equal(name);
 		});
 
-		it('passes the options down to the factory', function() {
+		it("passes the options down to the factory", function() {
 			const factoryBuilder = new FactoryBuilder();
-			const name = 'testFactory';
-			const aliases = ['factory1', 'factory2'];
+			const name = "testFactory";
+			const aliases = ["factory1", "factory2"];
 			const factory = factoryBuilder.factory(name, DummyModel, {aliases});
 
 			expect(factory.aliases).to.deep.equal(aliases);
 		});
 
-		it('registers the factory', function() {
+		it("registers the factory", function() {
 			const factoryBuilder = new FactoryBuilder();
-			const spy = sinon.spy(factoryBuilder as any, 'registerFactory');
-			sinon.stub(factoryBuilder, 'getFactory').returns(false as any);
-			factoryBuilder.factory('testFactory', DummyModel);
+			const spy = sinon.spy(factoryBuilder as any, "registerFactory");
+			sinon.stub(factoryBuilder, "getFactory").returns(false as any);
+			factoryBuilder.factory("testFactory", DummyModel);
 
 			expect(spy.calledOnce).to.be.true;
 		});
@@ -150,7 +150,7 @@ describe('FactoryBuilder', function() {
 		it("doesn't register a factory twice", function() {
 			const factoryBuilder = new FactoryBuilder();
 			const testFn = () => {
-				factoryBuilder.factory('testFactory', DummyModel);
+				factoryBuilder.factory("testFactory", DummyModel);
 			};
 
 			testFn();
@@ -158,22 +158,22 @@ describe('FactoryBuilder', function() {
 			expect(testFn).to.throw();
 		});
 
-		it('creates child factories', function() {
+		it("creates child factories", function() {
 			const factoryBuilder = new FactoryBuilder();
-			factoryBuilder.factory('user', DummyModel, (f: any) => {
-				f.factory('oldUser', DummyModel);
+			factoryBuilder.factory("user", DummyModel, (f: any) => {
+				f.factory("oldUser", DummyModel);
 			});
 			const result = Object
 				.keys(factoryBuilder.factories)
 				.map((name: string) => factoryBuilder.factories[name])
 				.map((f: Factory) => f.name);
-			expect(result).to.deep.equal(['user', 'oldUser']);
+			expect(result).to.deep.equal(["user", "oldUser"]);
 		});
 	});
 
-	describe('#getFactory', function() {
-		it('returns the requested factory', function() {
-			const name = 'name';
+	describe("#getFactory", function() {
+		it("returns the requested factory", function() {
+			const name = "name";
 			const factory = new FactoryBuilder();
 			factory.factory(name, DummyModel);
 			const t = factory.getFactory(name);
@@ -181,36 +181,36 @@ describe('FactoryBuilder', function() {
 			expect(t).to.equal(result);
 		});
 
-		it('throws if a non-existant factory is requested', function() {
+		it("throws if a non-existant factory is requested", function() {
 			const factory = new FactoryBuilder();
-			factory.factory('t', DummyModel);
-			expect(() => factory.getFactory('f')).to.throw();
+			factory.factory("t", DummyModel);
+			expect(() => factory.getFactory("f")).to.throw();
 		});
 	});
 
-	describe('#attributesFor', function() {
-		it('returns an object with the defined attributes', function() {
-			const name = 'Noah';
+	describe("#attributesFor", function() {
+		it("returns an object with the defined attributes", function() {
+			const name = "Noah";
 			const age = 32;
 
 			const fb = new FactoryBuilder();
 			fb.define(function() {
-				fb.factory('user', DummyModel, (f: any) => {
-					f.attr('name', () => name);
-					f.attr('age', () => age);
+				fb.factory("user", DummyModel, (f: any) => {
+					f.attr("name", () => name);
+					f.attr("age", () => age);
 				});
 			});
-			const result = fb.attributesFor('user');
+			const result = fb.attributesFor("user");
 			const expected = new DummyModel(name, age);
 
-			expect(result).to.be.an('object');
+			expect(result).to.be.an("object");
 			expect(result).to.deep.equal(expected);
 		});
 	});
 
-	describe('#build', function() {
-		it('returns an instance of the model', async function() {
-			const name = 'name';
+	describe("#build", function() {
+		it("returns an instance of the model", async function() {
+			const name = "name";
 			const factory = new FactoryBuilder();
 			factory.factory(name, DummyModel);
 			const result = await factory.build(name);
@@ -218,23 +218,23 @@ describe('FactoryBuilder', function() {
 			expect(result).to.be.instanceof(DummyModel);
 		});
 
-		it('can build from an alias', async function() {
+		it("can build from an alias", async function() {
 			const factory = new FactoryBuilder();
-			factory.factory('dummy', DummyModel, {aliases: ['user']});
-			const result = await factory.build('user');
+			factory.factory("dummy", DummyModel, {aliases: ["user"]});
+			const result = await factory.build("user");
 
 			expect(result).to.be.instanceof(DummyModel);
 		});
 
-		it('calls the right functions', async function() {
+		it("calls the right functions", async function() {
 			const fb = new FactoryBuilder();
-			const name = 'name';
+			const name = "name";
 			const adapter = new DefaultAdapter();
 			const factory = new Factory(fb, name, DummyModel);
 			fb.factory(name, DummyModel);
-			sinon.stub(fb, 'getAdapter').returns(adapter);
-			sinon.stub(fb, 'getFactory').returns(factory);
-			sinon.spy(factory, 'build');
+			sinon.stub(fb, "getAdapter").returns(adapter);
+			sinon.stub(fb, "getFactory").returns(factory);
+			sinon.spy(factory, "build");
 			await fb.build(name);
 
 			expect(fb.getAdapter).to.be.calledOnce;
@@ -245,9 +245,9 @@ describe('FactoryBuilder', function() {
 		});
 	});
 
-	describe('#create', function() {
-		it('returns an instance of the model', async function() {
-			const name = 'name';
+	describe("#create", function() {
+		it("returns an instance of the model", async function() {
+			const name = "name";
 			const factory = new FactoryBuilder();
 			factory.factory(name, DummyModel);
 			const result = await factory.create(name);
@@ -255,23 +255,23 @@ describe('FactoryBuilder', function() {
 			expect(result).to.be.instanceof(DummyModel);
 		});
 
-		it('can create from an alias', async function() {
+		it("can create from an alias", async function() {
 			const factory = new FactoryBuilder();
-			factory.factory('dummy', DummyModel, {aliases: ['user']});
-			const result = await factory.create('user');
+			factory.factory("dummy", DummyModel, {aliases: ["user"]});
+			const result = await factory.create("user");
 
 			expect(result).to.be.instanceof(DummyModel);
 		});
 
-		it('calls the right functions', async function() {
+		it("calls the right functions", async function() {
 			const fb = new FactoryBuilder();
-			const name = 'name';
+			const name = "name";
 			const adapter = new DefaultAdapter();
 			const factory = new Factory(fb, name, DummyModel);
 			fb.factory(name, DummyModel);
-			sinon.stub(fb, 'getAdapter').returns(adapter);
-			sinon.stub(fb, 'getFactory').returns(factory);
-			sinon.spy(factory, 'create');
+			sinon.stub(fb, "getAdapter").returns(adapter);
+			sinon.stub(fb, "getFactory").returns(factory);
+			sinon.spy(factory, "create");
 			await fb.create(name);
 
 			expect(fb.getAdapter).to.be.calledOnce;
@@ -282,25 +282,25 @@ describe('FactoryBuilder', function() {
 		});
 	});
 
-	describe('#sequence', function() {
-		it('returns the created sequence', function() {
+	describe("#sequence", function() {
+		it("returns the created sequence", function() {
 			const fb = new FactoryBuilder();
-			const result = fb.sequence('email');
+			const result = fb.sequence("email");
 			expect(result).to.be.an.instanceof(Sequence);
 		});
 
-		it('adds the sequence as an attribute', function() {
+		it("adds the sequence as an attribute", function() {
 			const fb = new FactoryBuilder();
-			const name = 'email';
+			const name = "email";
 			fb.sequence(name);
 			expect(fb.sequenceHandler.sequences).to.be.length(1);
 			expect(fb.sequenceHandler.sequences[0].name).to.equal(name);
 		});
 
-		it('delegates sequence creation to sequenceHandler', function() {
+		it("delegates sequence creation to sequenceHandler", function() {
 			const fb = new FactoryBuilder();
-			sinon.spy(fb.sequenceHandler, 'registerSequence');
-			const name = 'email';
+			sinon.spy(fb.sequenceHandler, "registerSequence");
+			const name = "email";
 			fb.sequence(name);
 
 			expect(fb.sequenceHandler.registerSequence).to.be.calledOnce;
@@ -308,15 +308,15 @@ describe('FactoryBuilder', function() {
 		});
 	});
 
-	describe('#resetSequences', function() {
-		it('resets all sequences', function() {
-			const name = 'user';
+	describe("#resetSequences", function() {
+		it("resets all sequences", function() {
+			const name = "user";
 			const fb = new FactoryBuilder();
-			let sequenceInFactory = new IntegerSequence('temp');
+			let sequenceInFactory = new IntegerSequence("temp");
 			fb.factory(name, DummyModel, (f: any) => {
-				sequenceInFactory = f.sequence('email') as IntegerSequence;
+				sequenceInFactory = f.sequence("email") as IntegerSequence;
 			});
-			const globalSeq: any = fb.sequence('usernames');
+			const globalSeq: any = fb.sequence("usernames");
 			globalSeq.next();
 			globalSeq.next();
 			sequenceInFactory.next();
@@ -327,7 +327,7 @@ describe('FactoryBuilder', function() {
 		});
 	});
 
-	describe('#trait', function() {
-		it('works');
+	describe("#trait", function() {
+		it("works");
 	});
 });

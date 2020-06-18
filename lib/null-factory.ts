@@ -1,9 +1,9 @@
-import {Attribute} from './attribute';
-import {Declaration} from './declaration';
-import {Trait} from './trait';
-import {Definition} from './definition';
-import {FactoryBuilder} from './factory-builder';
-import {SequenceHandler} from './sequence-handler';
+import {Attribute} from "./attribute";
+import {Declaration} from "./declaration";
+import {Trait} from "./trait";
+import {Definition} from "./definition";
+import {FactoryBuilder} from "./factory-builder";
+import {SequenceHandler} from "./sequence-handler";
 
 /* eslint-disable class-methods-use-this */
 /* eslint-disable @typescript-eslint/no-empty-function */
@@ -24,7 +24,7 @@ export class NullFactory implements Definition {
 		model: any,
 	) {
 		this.factoryBuilder = factoryBuilder;
-		this.name = 'nullFactory';
+		this.name = "nullFactory";
 		this.model = model;
 		this.aliases = [];
 		this.traits = new Set();

@@ -1,18 +1,18 @@
-import {AdapterHandler} from '../../lib/adapter-handler';
-import {DefaultAdapter} from '../../lib/adapters/default-adapter';
-import {expect} from 'chai';
-import sinon from 'sinon';
+import {AdapterHandler} from "../../lib/adapter-handler";
+import {DefaultAdapter} from "../../lib/adapters/default-adapter";
+import {expect} from "chai";
+import sinon from "sinon";
 
-describe('Adapters', function() {
-	describe('creation', function() {
-		it('can be instanced', function() {
+describe("Adapters", function() {
+	describe("creation", function() {
+		it("can be instanced", function() {
 			const handler = new AdapterHandler();
 
 			expect(handler).to.exist;
 			expect(handler).to.be.an.instanceOf(AdapterHandler);
 		});
 
-		it('sets the defaults correctly', function() {
+		it("sets the defaults correctly", function() {
 			const handler = new AdapterHandler();
 
 			expect(handler.adapters).to.deep.equal({});
@@ -20,7 +20,7 @@ describe('Adapters', function() {
 			expect(handler.currentAdapter).to.be.an.instanceOf(DefaultAdapter);
 		});
 
-		it('can set the currentAdapter', function() {
+		it("can set the currentAdapter", function() {
 			const adapter = new DefaultAdapter();
 			const handler = new AdapterHandler(adapter);
 
@@ -29,23 +29,23 @@ describe('Adapters', function() {
 		});
 	});
 
-	describe('#getAdapter', function() {
-		it('returns the current adapter', function() {
+	describe("#getAdapter", function() {
+		it("returns the current adapter", function() {
 			const adapter = new DefaultAdapter();
 			const handler = new AdapterHandler(adapter);
 
 			expect(handler.getAdapter()).to.equal(adapter);
 		});
 
-		it('returns the current adapter with no match', function() {
+		it("returns the current adapter with no match", function() {
 			const adapter = new DefaultAdapter();
 			const handler = new AdapterHandler(adapter);
 
-			expect(handler.getAdapter('does not exist')).to.equal(adapter);
+			expect(handler.getAdapter("does not exist")).to.equal(adapter);
 		});
 
-		it('returns the chosen adapter', function() {
-			const key = 'key';
+		it("returns the chosen adapter", function() {
+			const key = "key";
 			const value = new DefaultAdapter();
 			const handler = new AdapterHandler();
 			handler.adapters[key] = value;
@@ -54,18 +54,18 @@ describe('Adapters', function() {
 		});
 	});
 
-	describe('#setAdapter', function() {
-		it('returns the given adapter', function() {
+	describe("#setAdapter", function() {
+		it("returns the given adapter", function() {
 			const adapter = new DefaultAdapter();
 			const handler = new AdapterHandler();
 			expect(handler.setAdapter(adapter)).to.equal(adapter);
 		});
 
-		it('calls setAdapters', function() {
-			const key = 'key';
+		it("calls setAdapters", function() {
+			const key = "key";
 			const adapter = new DefaultAdapter();
 			const handler = new AdapterHandler();
-			const stub = sinon.stub(handler, 'setAdapters');
+			const stub = sinon.stub(handler, "setAdapters");
 
 			handler.setAdapter(adapter, key);
 
@@ -74,9 +74,9 @@ describe('Adapters', function() {
 		});
 	});
 
-	describe('#coerceNames', function() {
-		it('returns an array if given an array', function() {
-			const array = ['key'];
+	describe("#coerceNames", function() {
+		it("returns an array if given an array", function() {
+			const array = ["key"];
 			const handler = new AdapterHandler();
 			const result = handler.coerceNames(array);
 
@@ -84,15 +84,15 @@ describe('Adapters', function() {
 			expect(result).to.deep.equal(array);
 		});
 
-		it('returns an array if not given an array', function() {
-			const key = 'key';
+		it("returns an array if not given an array", function() {
+			const key = "key";
 			const handler = new AdapterHandler();
 			const result = handler.coerceNames(key);
 
 			expect(result).to.deep.equal([key]);
 		});
 
-		it('returns an empty array if not given anything', function() {
+		it("returns an empty array if not given anything", function() {
 			const handler = new AdapterHandler();
 			const result = handler.coerceNames();
 
@@ -100,32 +100,32 @@ describe('Adapters', function() {
 		});
 	});
 
-	describe('#setAdapters', function() {
-		it('coerces the name properly', function() {
-			const key = 'key';
+	describe("#setAdapters", function() {
+		it("coerces the name properly", function() {
+			const key = "key";
 			const adapter = new DefaultAdapter();
 			const handler = new AdapterHandler();
-			sinon.stub(handler, 'coerceNames').returns([key]);
+			sinon.stub(handler, "coerceNames").returns([key]);
 			handler.setAdapters(adapter, key);
 
 			expect(handler.coerceNames).to.be.calledOnce;
 			expect(handler.coerceNames).to.be.calledOnceWithExactly(key);
 		});
 
-		it('assigns to all given names', function() {
-			const key = 'key';
+		it("assigns to all given names", function() {
+			const key = "key";
 			const adapter = new DefaultAdapter();
 			const handler = new AdapterHandler();
-			sinon.stub(handler, 'assignMultiple');
+			sinon.stub(handler, "assignMultiple");
 			handler.setAdapters(adapter, key);
 
 			expect(handler.assignMultiple).to.be.calledOnce;
 			expect(handler.assignMultiple).to.be.calledOnceWithExactly(adapter, [key]);
 		});
 
-		it('works with both single strings and lists of strings', function() {
-			const key = 'key';
-			const listOfKeys = ['key1', 'key2'];
+		it("works with both single strings and lists of strings", function() {
+			const key = "key";
+			const listOfKeys = ["key1", "key2"];
 			const adapter = new DefaultAdapter();
 			const handler = new AdapterHandler();
 			handler.setAdapters(adapter, key);

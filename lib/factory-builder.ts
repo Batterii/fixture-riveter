@@ -1,13 +1,13 @@
-import {Adapter} from './adapters/adapter';
-import {AdapterHandler, FactoryNames} from './adapter-handler';
-import {DefinitionProxy} from './definition-proxy';
-import {ExtraAttributes, Factory} from './factory';
-import {factoryOptionsParser, FactoryOptions} from './factory-options-parser';
-import {Sequence} from './sequences/sequence';
-import {SequenceHandler} from './sequence-handler';
-import {Trait} from './trait';
+import {Adapter} from "./adapters/adapter";
+import {AdapterHandler, FactoryNames} from "./adapter-handler";
+import {DefinitionProxy} from "./definition-proxy";
+import {ExtraAttributes, Factory} from "./factory";
+import {FactoryOptions, factoryOptionsParser} from "./factory-options-parser";
+import {Sequence} from "./sequences/sequence";
+import {SequenceHandler} from "./sequence-handler";
+import {Trait} from "./trait";
 
-import {last, isPlainObject} from 'lodash';
+import {isPlainObject, last} from "lodash";
 
 export function extractAttributes(traitsAndOptions: any[]): Record<string, any> {
 	const options = last(traitsAndOptions);

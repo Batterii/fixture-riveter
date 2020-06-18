@@ -1,8 +1,8 @@
-import {Attribute} from './attribute';
-import {Declaration} from './declaration';
-import {Trait} from './trait';
-import {FactoryBuilder} from './factory-builder';
-import {SequenceHandler} from './sequence-handler';
+import {Attribute} from "./attribute";
+import {Declaration} from "./declaration";
+import {Trait} from "./trait";
+import {FactoryBuilder} from "./factory-builder";
+import {SequenceHandler} from "./sequence-handler";
 
 export interface Definition {
 	factoryBuilder: FactoryBuilder;

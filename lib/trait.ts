@@ -1,11 +1,12 @@
-import {Attribute} from './attribute';
-import {Declaration} from './declaration';
-import {Definition} from './definition';
-import {DefinitionProxy} from './definition-proxy';
-import {FactoryBuilder} from './factory-builder';
-import {SequenceHandler} from './sequence-handler';
-import {DeclarationHandler} from './declaration-handler';
+import {Attribute} from "./attribute";
+import {Declaration} from "./declaration";
+import {Definition} from "./definition";
+import {DefinitionProxy} from "./definition-proxy";
+import {FactoryBuilder} from "./factory-builder";
+import {SequenceHandler} from "./sequence-handler";
+import {DeclarationHandler} from "./declaration-handler";
 
+/* eslint-disable class-methods-use-this */
 export class Trait implements Definition {
 	factoryBuilder: FactoryBuilder;
 	name: string;

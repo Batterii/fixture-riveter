@@ -1,9 +1,9 @@
 const config = {
-	client: 'pg',
+	client: "pg",
 	connection: {
-		user: 'fb_user',
-		password: 'password',
-		database: 'fb',
+		user: "fb_user",
+		password: "password",
+		database: "fb",
 	},
 };
 

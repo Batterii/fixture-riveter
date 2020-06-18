@@ -1,4 +1,4 @@
-import {Sequence} from './sequence';
+import {Sequence} from "./sequence";
 
 export class IntegerSequence extends Sequence {
 	initialNumber: number;

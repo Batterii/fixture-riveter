@@ -1,15 +1,15 @@
-import {FactoryBuilder} from '../../../lib/factory-builder';
-import {Factory} from '../../../lib/factory';
-import {ImplicitDeclaration} from '../../../lib/declarations/implicit-declaration';
-import {SequenceAttribute} from '../../../lib/attributes/sequence-attribute';
+import {FactoryBuilder} from "../../../lib/factory-builder";
+import {Factory} from "../../../lib/factory";
+import {ImplicitDeclaration} from "../../../lib/declarations/implicit-declaration";
+import {SequenceAttribute} from "../../../lib/attributes/sequence-attribute";
 
-import {expect} from 'chai';
-import sinon from 'sinon';
+import {expect} from "chai";
+import sinon from "sinon";
 
-describe('ImplicitDeclaration', function() {
-	const name = 'email';
+describe("ImplicitDeclaration", function() {
+	const name = "email";
 
-	it('creates an instance of ImplicitDeclaration', function() {
+	it("creates an instance of ImplicitDeclaration", function() {
 		const factoryBuilder = {} as FactoryBuilder;
 		const factory = {} as Factory;
 		const result = new ImplicitDeclaration(name, factoryBuilder, factory);
@@ -20,11 +20,11 @@ describe('ImplicitDeclaration', function() {
 		expect(result.factory).to.equal(factory);
 	});
 
-	describe('#build', function() {
-		context('with a known association', function() {
-			it('calls getFactory', function() {
+	describe("#build", function() {
+		context("with a known association", function() {
+			it("calls getFactory", function() {
 				const factoryBuilder = new FactoryBuilder();
-				sinon.stub(factoryBuilder, 'getFactory').returns(true as any);
+				sinon.stub(factoryBuilder, "getFactory").returns(true as any);
 				const factory = {} as Factory;
 				const declaration = new ImplicitDeclaration(name, factoryBuilder, factory);
 				declaration.build();
@@ -33,18 +33,18 @@ describe('ImplicitDeclaration', function() {
 				expect(factoryBuilder.getFactory).to.be.calledWithExactly(name, false);
 			});
 
-			it('returns an AssociationAttribute');
+			it("returns an AssociationAttribute");
 
-			it('does not call later functions', function() {
+			it("does not call later functions", function() {
 				const factoryBuilder = new FactoryBuilder();
-				sinon.stub(factoryBuilder, 'getFactory').returns(true as any);
-				sinon.stub(factoryBuilder, 'findSequence').returns(false as any);
+				sinon.stub(factoryBuilder, "getFactory").returns(true as any);
+				sinon.stub(factoryBuilder, "findSequence").returns(false as any);
 
-				const factory = new Factory(factoryBuilder, 'name', {});
-				sinon.stub(factory, 'inheritTraits');
+				const factory = new Factory(factoryBuilder, "name", {});
+				sinon.stub(factory, "inheritTraits");
 
 				const declaration = new ImplicitDeclaration(name, factoryBuilder, factory);
-				sinon.stub(declaration, 'checkSelfReference').returns(false);
+				sinon.stub(declaration, "checkSelfReference").returns(false);
 				declaration.build();
 
 				expect(factoryBuilder.findSequence).to.not.be.called;
@@ -53,11 +53,11 @@ describe('ImplicitDeclaration', function() {
 			});
 		});
 
-		context('with no known associations', function() {
-			it('calls findSequence', function() {
+		context("with no known associations", function() {
+			it("calls findSequence", function() {
 				const factoryBuilder = new FactoryBuilder();
-				sinon.stub(factoryBuilder, 'getFactory').returns(false as any);
-				sinon.stub(factoryBuilder, 'findSequence').returns(true as any);
+				sinon.stub(factoryBuilder, "getFactory").returns(false as any);
+				sinon.stub(factoryBuilder, "findSequence").returns(true as any);
 				const factory = {} as Factory;
 				const declaration = new ImplicitDeclaration(name, factoryBuilder, factory);
 				declaration.build();
@@ -67,10 +67,10 @@ describe('ImplicitDeclaration', function() {
 			});
 		});
 
-		context('with a known sequence', function() {
-			it('creates a sequence attribute', function() {
+		context("with a known sequence", function() {
+			it("creates a sequence attribute", function() {
 				const factoryBuilder = new FactoryBuilder();
-				sinon.stub(factoryBuilder, 'getFactory').returns(false as any);
+				sinon.stub(factoryBuilder, "getFactory").returns(false as any);
 				factoryBuilder.sequence(name, (n: number) => `Name ${n}`);
 
 				const factory = {} as Factory;
@@ -84,16 +84,16 @@ describe('ImplicitDeclaration', function() {
 				expect(result.name).to.equal(name);
 			});
 
-			it('does not call later functions', function() {
+			it("does not call later functions", function() {
 				const factoryBuilder = new FactoryBuilder();
-				sinon.stub(factoryBuilder, 'getFactory').returns(false as any);
-				sinon.stub(factoryBuilder, 'findSequence').returns(true as any);
+				sinon.stub(factoryBuilder, "getFactory").returns(false as any);
+				sinon.stub(factoryBuilder, "findSequence").returns(true as any);
 
-				const factory = new Factory(factoryBuilder, 'name', {});
-				sinon.stub(factory, 'inheritTraits');
+				const factory = new Factory(factoryBuilder, "name", {});
+				sinon.stub(factory, "inheritTraits");
 
 				const declaration = new ImplicitDeclaration(name, factoryBuilder, factory);
-				sinon.stub(declaration, 'checkSelfReference').returns(false);
+				sinon.stub(declaration, "checkSelfReference").returns(false);
 				declaration.build();
 
 				expect(declaration.checkSelfReference).to.not.be.called;
@@ -101,45 +101,45 @@ describe('ImplicitDeclaration', function() {
 			});
 		});
 
-		context('with no known sequences', function() {
-			it('calls checkSelfReference', function() {
+		context("with no known sequences", function() {
+			it("calls checkSelfReference", function() {
 				const factoryBuilder = new FactoryBuilder();
-				sinon.stub(factoryBuilder, 'getFactory').returns(false as any);
-				sinon.stub(factoryBuilder, 'findSequence').returns(false as any);
+				sinon.stub(factoryBuilder, "getFactory").returns(false as any);
+				sinon.stub(factoryBuilder, "findSequence").returns(false as any);
 
-				const factory = new Factory(factoryBuilder, 'name', {});
-				sinon.stub(factory, 'inheritTraits');
+				const factory = new Factory(factoryBuilder, "name", {});
+				sinon.stub(factory, "inheritTraits");
 
 				const declaration = new ImplicitDeclaration(name, factoryBuilder, factory);
-				sinon.stub(declaration, 'checkSelfReference');
+				sinon.stub(declaration, "checkSelfReference");
 
 				declaration.build();
 
 				expect(declaration.checkSelfReference).to.be.called;
 			});
 
-			it('throws if checkSelfReference is true', function() {
+			it("throws if checkSelfReference is true", function() {
 				const factoryBuilder = new FactoryBuilder();
-				sinon.stub(factoryBuilder, 'getFactory').returns(false as any);
-				sinon.stub(factoryBuilder, 'findSequence').returns(false as any);
+				sinon.stub(factoryBuilder, "getFactory").returns(false as any);
+				sinon.stub(factoryBuilder, "findSequence").returns(false as any);
 				const factory = {} as Factory;
 				const declaration = new ImplicitDeclaration(name, factoryBuilder, factory);
-				sinon.stub(declaration, 'checkSelfReference').returns(true);
+				sinon.stub(declaration, "checkSelfReference").returns(true);
 				const fn = () => declaration.build();
 
 				expect(fn).to.throw(`Self-referencing trait '${name}'`);
 			});
 
-			it('does not call later functions', function() {
+			it("does not call later functions", function() {
 				const factoryBuilder = new FactoryBuilder();
-				sinon.stub(factoryBuilder, 'getFactory').returns(false as any);
-				sinon.stub(factoryBuilder, 'findSequence').returns(false as any);
+				sinon.stub(factoryBuilder, "getFactory").returns(false as any);
+				sinon.stub(factoryBuilder, "findSequence").returns(false as any);
 
-				const factory = new Factory(factoryBuilder, 'name', {});
-				sinon.stub(factory, 'inheritTraits');
+				const factory = new Factory(factoryBuilder, "name", {});
+				sinon.stub(factory, "inheritTraits");
 
 				const declaration = new ImplicitDeclaration(name, factoryBuilder, factory);
-				sinon.stub(declaration, 'checkSelfReference').returns(true);
+				sinon.stub(declaration, "checkSelfReference").returns(true);
 				const fn = () => declaration.build();
 
 				expect(fn).to.throw;
@@ -147,17 +147,17 @@ describe('ImplicitDeclaration', function() {
 			});
 		});
 
-		context('when not self-referencing', function() {
-			it('inherits the name as a trait', function() {
+		context("when not self-referencing", function() {
+			it("inherits the name as a trait", function() {
 				const factoryBuilder = new FactoryBuilder();
-				sinon.stub(factoryBuilder, 'getFactory').returns(false as any);
-				sinon.stub(factoryBuilder, 'findSequence').returns(false as any);
+				sinon.stub(factoryBuilder, "getFactory").returns(false as any);
+				sinon.stub(factoryBuilder, "findSequence").returns(false as any);
 
-				const factory = new Factory(factoryBuilder, 'name', {});
-				sinon.stub(factory, 'inheritTraits');
+				const factory = new Factory(factoryBuilder, "name", {});
+				sinon.stub(factory, "inheritTraits");
 
 				const declaration = new ImplicitDeclaration(name, factoryBuilder, factory);
-				sinon.stub(declaration, 'checkSelfReference').returns(false);
+				sinon.stub(declaration, "checkSelfReference").returns(false);
 
 				declaration.build();
 
@@ -165,16 +165,16 @@ describe('ImplicitDeclaration', function() {
 				expect(factory.inheritTraits).to.be.calledWith([name]);
 			});
 
-			it('returns an empty array', function() {
+			it("returns an empty array", function() {
 				const factoryBuilder = new FactoryBuilder();
-				sinon.stub(factoryBuilder, 'getFactory').returns(false as any);
-				sinon.stub(factoryBuilder, 'findSequence').returns(false as any);
+				sinon.stub(factoryBuilder, "getFactory").returns(false as any);
+				sinon.stub(factoryBuilder, "findSequence").returns(false as any);
 
-				const factory = new Factory(factoryBuilder, 'name', {});
-				sinon.stub(factory, 'inheritTraits');
+				const factory = new Factory(factoryBuilder, "name", {});
+				sinon.stub(factory, "inheritTraits");
 
 				const declaration = new ImplicitDeclaration(name, factoryBuilder, factory);
-				sinon.stub(declaration, 'checkSelfReference').returns(false);
+				sinon.stub(declaration, "checkSelfReference").returns(false);
 
 				const result = declaration.build();
 

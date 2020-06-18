@@ -1,14 +1,14 @@
-import {DynamicDeclaration} from './declarations/dynamic-declaration';
-import {ImplicitDeclaration} from './declarations/implicit-declaration';
-import {Trait} from './trait';
-import {Definition} from './definition';
-import {Factory} from './factory';
-import {FactoryOptions} from './factory-options-parser';
-import {FactoryBuilder} from './factory-builder';
-import {Sequence} from './sequences/sequence';
-import {SequenceHandler} from './sequence-handler';
+import {DynamicDeclaration} from "./declarations/dynamic-declaration";
+import {ImplicitDeclaration} from "./declarations/implicit-declaration";
+import {Trait} from "./trait";
+import {Definition} from "./definition";
+import {Factory} from "./factory";
+import {FactoryOptions} from "./factory-options-parser";
+import {FactoryBuilder} from "./factory-builder";
+import {Sequence} from "./sequences/sequence";
+import {SequenceHandler} from "./sequence-handler";
 
-import {isFunction} from 'lodash';
+import {isFunction} from "lodash";
 
 export class DefinitionProxy {
 	definition: Definition;

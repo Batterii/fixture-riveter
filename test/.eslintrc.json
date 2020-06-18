@@ -3,8 +3,7 @@
 	"rules": {
 		"multiline-comment-style": "off",
 		"sort-imports": "off",
-		"dot-notation": "off",
 		"max-len": ["error", {"code": 100}],
-		"quotes": ["error", "single", {"avoidEscape": true}]
+		"quotes": ["error", "double"]
 	}
 }

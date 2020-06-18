@@ -1,4 +1,4 @@
-import {Adapter} from './adapter';
+import {Adapter} from "./adapter";
 
 /* eslint-disable class-methods-use-this */
 export class DefaultAdapter implements Adapter {

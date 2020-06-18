@@ -1,3 +1,5 @@
+/* eslint-disable class-methods-use-this */
+/* eslint-disable @typescript-eslint/no-empty-function */
 export abstract class Attribute {
 	name: string;
 
@@ -6,6 +8,6 @@ export abstract class Attribute {
 	}
 
 	build(): Function {
-		return function() {}; // eslint-disable-line @typescript-eslint/no-empty-function
+		return function() {};
 	}
 }

@@ -1,4 +1,4 @@
-import {isFunction, isPlainObject, first, last} from 'lodash';
+import {first, isFunction, isPlainObject, last} from "lodash";
 
 export interface FactoryOptions {
 	aliases?: string[];

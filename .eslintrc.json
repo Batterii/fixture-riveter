@@ -1,14 +1,6 @@
 {
 	"extends": "@batterii/eslint-config-ts",
 	"rules": {
-		"multiline-comment-style": "off",
-		"sort-imports": "off",
-		"dot-notation": "off",
-		"multiline-ternary": "off",
-		"max-len": ["error", { "code": 100 }],
-		"class-methods-use-this": "off",
-		"array-bracket-spacing": ["error", "never"],
-		"object-curly-spacing": ["error", "never"],
-		"quotes": ["error", "single", {"avoidEscape": true}]
+		"sort-imports": "off"
 	}
 }

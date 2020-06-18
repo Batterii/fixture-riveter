@@ -1,13 +1,13 @@
-import {Sequence} from './sequences/sequence';
-import {IntegerSequence} from './sequences/integer-sequence';
-import {StringSequence} from './sequences/string-sequence';
+import {Sequence} from "./sequences/sequence";
+import {IntegerSequence} from "./sequences/integer-sequence";
+import {StringSequence} from "./sequences/string-sequence";
 
 import {
 	isFunction,
 	isNumber,
 	isPlainObject,
 	isString,
-} from 'lodash';
+} from "lodash";
 
 export interface SequenceOptions {
 	initial?: string | number;

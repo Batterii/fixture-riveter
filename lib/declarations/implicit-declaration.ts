@@ -1,8 +1,8 @@
-import {Attribute} from '../attribute';
-import {Declaration} from '../declaration';
-import {Factory} from '../factory';
-import {FactoryBuilder} from '../factory-builder';
-import {SequenceAttribute} from '../attributes/sequence-attribute';
+import {Attribute} from "../attribute";
+import {Declaration} from "../declaration";
+import {Factory} from "../factory";
+import {FactoryBuilder} from "../factory-builder";
+import {SequenceAttribute} from "../attributes/sequence-attribute";
 
 export class ImplicitDeclaration extends Declaration {
 	factoryBuilder: FactoryBuilder;

@@ -1,5 +1,5 @@
-import {Declaration} from '../declaration';
-import {DynamicAttribute} from '../attributes/dynamic-attribute';
+import {Declaration} from "../declaration";
+import {DynamicAttribute} from "../attributes/dynamic-attribute";
 
 export class DynamicDeclaration extends Declaration {
 	block: Function;
