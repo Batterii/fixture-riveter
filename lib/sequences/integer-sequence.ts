@@ -11,7 +11,7 @@ export class IntegerSequence extends Sequence {
 	}
 
 	increment(): void {
-		this.index++;
+		this.index += 1;
 	}
 
 	reset(): void {

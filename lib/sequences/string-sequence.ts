@@ -34,8 +34,8 @@ export class StringSequence extends Sequence {
 		// [0] becomes [1]
 		// [4] becomes [5] becomes [0, 0]
 		// [5, 5] becomes [0, 0, 0]
-		for (let i = 0; i < this.indicies.length; i++) {
-			this.indicies[i]++;
+		for (let i = 0; i < this.indicies.length; i += 1) {
+			this.indicies[i] += 1;
 			if (this.indicies[i] >= this.alphabet.length) {
 				this.indicies[i] = 0;
 			} else {
