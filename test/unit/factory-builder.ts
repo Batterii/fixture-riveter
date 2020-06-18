@@ -5,7 +5,9 @@ import {Factory} from "../../lib/factory";
 import {extractAttributes, FactoryBuilder} from "../../lib/factory-builder";
 import {Sequence} from "../../lib/sequences/sequence";
 import {IntegerSequence} from "../../lib/sequences/integer-sequence";
+import {Trait} from "../../lib/trait";
 
+import {identity} from "lodash";
 import {expect} from "chai";
 import sinon from "sinon";
 
@@ -328,6 +330,60 @@ describe("FactoryBuilder", function() {
 	});
 
 	describe("#trait", function() {
-		it("works");
+		it("returns a new trait", function() {
+			const fb = new FactoryBuilder();
+			const result = fb.trait("email");
+
+			expect(result).to.be.an.instanceof(Trait);
+		});
+
+		it("passes both arguments through to Trait", function() {
+			const fb = new FactoryBuilder();
+			const name = "email";
+			const block = identity;
+			const result = fb.trait(name, block);
+
+			expect(result.name).to.equal(name);
+			expect(result.block).to.equal(block);
+		});
+
+		it("calls registerTrait", function() {
+			const fb = new FactoryBuilder();
+			sinon.stub(fb, "registerTrait");
+			fb.trait("email");
+
+			expect(fb.registerTrait).to.be.called;
+		});
+	});
+
+	describe("#registerTrait", function() {
+		it("adds the trait for all names", function() {
+			const fb = new FactoryBuilder();
+			const name = "email";
+			const trait = new Trait(name, fb, identity);
+			sinon.stub(trait, "names").returns(["temp", name]);
+			fb.registerTrait(trait);
+
+			expect(Object.keys(fb.traits)).to.have.length(2);
+			expect(fb.traits.temp).to.equal(trait);
+			expect(fb.traits[name]).to.equal(trait);
+		});
+	});
+
+	describe("#getTrait", function() {
+		it("returns the requested factory", function() {
+			const name = "name";
+			const factory = new FactoryBuilder();
+			factory.trait(name, identity);
+			const t = factory.getTrait(name);
+			const result = factory.traits[name];
+			expect(t).to.equal(result);
+		});
+
+		it("throws if a non-existant factory is requested", function() {
+			const factory = new FactoryBuilder();
+			factory.trait("t", identity);
+			expect(() => factory.getTrait("f")).to.throw();
+		});
 	});
 });

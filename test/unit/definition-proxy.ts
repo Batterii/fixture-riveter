@@ -130,12 +130,40 @@ describe("DefinitionProxy", function() {
 			const factoryBuilder = new FactoryBuilder();
 			const factory = new Factory(factoryBuilder, "dummy", DummyModel);
 			const proxy = new DefinitionProxy(factory);
-			sinon.spy(factory.sequenceHandler, "registerSequence");
+			sinon.stub(factory.sequenceHandler, "registerSequence");
 			const name = "email";
 			proxy.sequence(name);
 
 			expect(factory.sequenceHandler.registerSequence).to.be.calledOnce;
 			expect(factory.sequenceHandler.registerSequence).to.be.calledOnceWithExactly(name);
+		});
+	});
+
+	describe("#trait", function() {
+		context("when given a block function", function() {
+			it("calls defineTrait", function() {
+				const factoryBuilder = new FactoryBuilder();
+				const factory = new Factory(factoryBuilder, "dummy", DummyModel);
+				const proxy = new DefinitionProxy(factory);
+				sinon.stub(factory, "defineTrait");
+				const name = "email";
+				const block = () => 1;
+				proxy.trait(name, block);
+
+				expect(factory.defineTrait).to.be.calledOnce;
+			});
+		});
+
+		context("when given no block", function() {
+			it("throws an error", function() {
+				const factoryBuilder = new FactoryBuilder();
+				const factory = new Factory(factoryBuilder, "dummy", DummyModel);
+				const proxy = new DefinitionProxy(factory);
+				const name = "email";
+				const fn = () => proxy.trait(name);
+
+				expect(fn).to.throw("wrong options");
+			});
 		});
 	});
 });
