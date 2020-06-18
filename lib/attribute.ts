@@ -7,7 +7,5 @@ export abstract class Attribute {
 		this.name = name;
 	}
 
-	build(): Function {
-		return function() {};
-	}
+	abstract build(): Function;
 }

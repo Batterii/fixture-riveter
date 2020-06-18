@@ -1,3 +1,5 @@
+import {DynamicDeclaration} from "../../lib/declarations/dynamic-declaration";
+import {ImplicitDeclaration} from "../../lib/declarations/implicit-declaration";
 import {DefinitionProxy} from "../../lib/definition-proxy";
 import {Factory} from "../../lib/factory";
 import {FactoryBuilder} from "../../lib/factory-builder";
@@ -55,17 +57,37 @@ describe("DefinitionProxy", function() {
 	});
 
 	describe("#attr", function() {
-		it("calls definiton's defineAttribute when given a block", function() {
-			const factoryBuilder = new FactoryBuilder();
-			const factory = new Factory(factoryBuilder, "dummy", DummyModel);
-			const proxy = new DefinitionProxy(factory);
-			const name = "email";
-			const block = () => 1;
+		context("when given no block", function() {
+			it("calls declareAttribute with an ImplicitDeclaration", function() {
+				const factoryBuilder = new FactoryBuilder();
+				const factory = new Factory(factoryBuilder, "dummy", DummyModel);
+				const proxy = new DefinitionProxy(factory);
+				const name = "email";
+				sinon.spy(factory, "declareAttribute");
+				proxy.attr(name);
 
-			const stub = sinon.stub(factory, "declareAttribute");
-			proxy.attr(name, block);
+				expect(factory.declareAttribute).to.be.calledOnce;
+				expect(
+					factory.declarationHandler.declarations[0],
+				).to.be.an.instanceof(ImplicitDeclaration);
+			});
+		});
 
-			expect(stub).to.be.calledOnce;
+		context("when given a Function block", function() {
+			it("calls declareAttribute with a DynamicDeclaration", function() {
+				const factoryBuilder = new FactoryBuilder();
+				const factory = new Factory(factoryBuilder, "dummy", DummyModel);
+				const proxy = new DefinitionProxy(factory);
+				const name = "email";
+				const block = () => 1;
+				sinon.spy(factory, "declareAttribute");
+				proxy.attr(name, block);
+
+				expect(factory.declareAttribute).to.be.calledOnce;
+				expect(
+					factory.declarationHandler.declarations[0],
+				).to.be.an.instanceof(DynamicDeclaration);
+			});
 		});
 	});
 

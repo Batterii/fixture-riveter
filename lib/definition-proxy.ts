@@ -34,18 +34,18 @@ export class DefinitionProxy {
 	}
 
 	attr(name: string, block?: Function): void {
-		if (!block) {
-			const declaration = new ImplicitDeclaration(
+		let declaration: DynamicDeclaration | ImplicitDeclaration;
+
+		if (block) {
+			declaration = new DynamicDeclaration(name, block);
+		} else {
+			declaration = new ImplicitDeclaration(
 				name,
 				this.factoryBuilder,
 				this.definition as Factory,
 			);
-			this.definition.declareAttribute(declaration);
-		} else if (isFunction(block)) {
-			this.definition.declareAttribute(new DynamicDeclaration(name, block));
-		} else {
-			throw new Error(`wrong options, bruh: ${name}, ${block}`);
 		}
+		this.definition.declareAttribute(declaration);
 	}
 
 	factory(name: string, model: object, rest?: FactoryOptions | Function): void;
