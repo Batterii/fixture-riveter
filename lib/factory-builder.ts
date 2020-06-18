@@ -125,6 +125,11 @@ export class FactoryBuilder {
 
 	sequence(
 		name: string,
+		initial?: string | number | {aliases: string[]} | Function,
+	): Sequence;
+
+	sequence(
+		name: string,
 		initial?: string | number,
 		options?: {aliases: string[]},
 		callback?: Function,

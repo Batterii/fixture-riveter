@@ -1,4 +1,3 @@
-import {Attribute} from '../attribute';
 import {Declaration} from '../declaration';
 import {DynamicAttribute} from '../attributes/dynamic-attribute';
 
@@ -10,7 +9,7 @@ export class DynamicDeclaration extends Declaration {
 		this.block = block;
 	}
 
-	build(): Attribute[] {
+	build(): DynamicAttribute[] {
 		return [new DynamicAttribute(this.name, this.block)];
 	}
 }
