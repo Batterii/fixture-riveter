@@ -16,11 +16,9 @@ export interface ExtraAttributes {
 	attrs?: Record<string, any>;
 }
 
-export class Factory implements Definition {
+export class Factory extends Definition {
 	factoryBuilder: FactoryBuilder;
-	name: string;
 	model: any;
-	aliases: string[];
 	traits: Set<Trait>;
 	baseTraits: string[];
 	traitsCache?: Record<string, Trait>;
@@ -53,15 +51,10 @@ export class Factory implements Definition {
 		model: any,
 		...rest: any[]
 	) {
-		this.factoryBuilder = factoryBuilder;
-		this.name = name;
+		super(name, factoryBuilder);
+
 		this.model = model;
-		this.aliases = [];
-		this.traits = new Set();
 		this.baseTraits = [];
-		this.attributes = [];
-		this.sequenceHandler = new SequenceHandler();
-		this.declarationHandler = new DeclarationHandler(name);
 
 		this.compiled = false;
 
@@ -82,15 +75,11 @@ export class Factory implements Definition {
 		}
 	}
 
-	names(): string[] {
-		return [this.name, ...this.aliases];
-	}
-
 	parentFactory(): Factory {
 		if (this.parent) {
 			return this.factoryBuilder.getFactory(this.parent, false);
 		}
-		return new NullFactory(this.factoryBuilder, this.model) as any;
+		return new NullFactory(this.factoryBuilder, this.model) as Factory;
 	}
 
 	declareAttribute(declaration: Declaration): void {
