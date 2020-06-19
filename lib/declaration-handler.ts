@@ -11,8 +11,9 @@ export class DeclarationHandler {
 		this.declarations = [];
 	}
 
-	declareAttribute(declaration: Declaration): void {
+	declareAttribute(declaration: Declaration): Declaration {
 		this.declarations.push(declaration);
+		return declaration;
 	}
 
 	convertToAttributes(): Attribute[] {
@@ -23,8 +24,6 @@ export class DeclarationHandler {
 	}
 
 	toAttributes(): Attribute[] {
-		return this.declarations.reduce<Attribute[]>((acc, d) => {
-			return acc.concat(d.build());
-		}, []);
+		return this.declarations.flatMap((d) => d.build());
 	}
 }
