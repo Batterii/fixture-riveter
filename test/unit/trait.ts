@@ -19,7 +19,7 @@ describe("Trait", function() {
 	it("creates an instance with the correct initial values", function() {
 		const result = new Trait("trait", factoryBuilder);
 		expect(result.attributes).to.deep.equal([]);
-		expect(result.traits).to.deep.equal(new Set());
+		expect(result.definedTraits).to.deep.equal(new Set());
 	});
 
 	it("executes the given block immediately", function() {

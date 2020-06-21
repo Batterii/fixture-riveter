@@ -1,6 +1,5 @@
 import {Adapter} from "./adapters/adapter";
 import {Attribute} from "./attribute";
-import {Declaration} from "./declaration";
 import {DeclarationHandler} from "./declaration-handler";
 import {Trait} from "./trait";
 import {Definition} from "./definition";
@@ -19,11 +18,7 @@ export interface ExtraAttributes {
 export class Factory extends Definition {
 	factoryBuilder: FactoryBuilder;
 	model: any;
-	traits: Set<Trait>;
-	baseTraits: string[];
-	traitsCache?: Record<string, Trait>;
 	parent?: string;
-	block: Function;
 	declarationHandler: DeclarationHandler;
 	attributes: Attribute[];
 	sequenceHandler: SequenceHandler;
@@ -54,7 +49,6 @@ export class Factory extends Definition {
 		super(name, factoryBuilder);
 
 		this.model = model;
-		this.baseTraits = [];
 
 		this.compiled = false;
 
@@ -79,26 +73,19 @@ export class Factory extends Definition {
 		if (this.parent) {
 			return this.factoryBuilder.getFactory(this.parent, false);
 		}
-		return new NullFactory(this.factoryBuilder, this.model) as Factory;
-	}
-
-	declareAttribute(declaration: Declaration): void {
-		this.declarationHandler.declareAttribute(declaration);
-	}
-
-	defineTrait(trait: Trait): void {
-		this.traits.add(trait);
+		return new NullFactory(this.factoryBuilder) as Factory;
 	}
 
 	compile(): void {
 		if (!this.compiled) {
-			this.attributes = this.declarationHandler.convertToAttributes();
+			const parentFactory = this.parentFactory();
+			parentFactory.compile();
+			for (const definedTrait of parentFactory.definedTraits) {
+				this.defineTrait(definedTrait);
+			}
+			super.compile();
 			this.compiled = true;
 		}
-	}
-
-	attributeNames(): string[] {
-		return this.attributes.map((a) => a.name);
 	}
 
 	getParentAttributes(): Attribute[] {
@@ -112,13 +99,11 @@ export class Factory extends Definition {
 	getAttributes(): Attribute[] {
 		this.compile();
 
+		// Need to generate child attributes before parent attributes
+		const definitionAttributes = super.getAttributes();
 		const attributesToKeep = this.getParentAttributes();
-		return attributesToKeep.concat(this.attributes);
-	}
 
-	traitNames(): string[] {
-		const traits = Array.from(this.traits.values());
-		return traits.map((t: Trait) => t.name);
+		return attributesToKeep.concat(definitionAttributes);
 	}
 
 	getParentTraits(): Trait[] {
@@ -131,38 +116,11 @@ export class Factory extends Definition {
 
 	getTraits(): Trait[] {
 		const traitsToKeep = this.getParentTraits();
-		return traitsToKeep.concat(Array.from(this.traits.values()));
+		return traitsToKeep.concat(Array.from(this.definedTraits.values()));
 	}
 
 	inheritTraits(traits: string[]): void {
 		this.baseTraits = this.baseTraits.concat(traits);
-	}
-
-	traitByName(name: string): Trait | undefined {
-		return this.traitFor(name) || this.factoryBuilder.getTrait(name, false);
-	}
-
-	traitFor(name: string): Trait | undefined {
-		if (!this.traitsCache) {
-			const cache = {};
-			this.traits.forEach((trait: Trait) => {
-				cache[trait.name] = trait;
-			});
-			this.traitsCache = cache;
-		}
-
-		return this.traitsCache[name];
-	}
-
-	getBaseTraits(): Trait[] {
-		const traits: Trait[] = [];
-		this.baseTraits.forEach((name: string) => {
-			const result = this.traitByName(name);
-			if (result) {
-				traits.push(result);
-			}
-		});
-		return traits;
 	}
 
 	applyAttributes(extraAttributes?: ExtraAttributes): Record<string, any> {

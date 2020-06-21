@@ -32,7 +32,7 @@ describe("Factory", function() {
 	it("defines default options", function() {
 		const noOptions = new Factory(factoryBuilder, "name", DummyModel);
 		expect(noOptions.aliases).to.deep.equal([]);
-		expect(noOptions.traits).to.deep.equal(new Set());
+		expect(noOptions.definedTraits).to.deep.equal(new Set());
 	});
 
 	it("accepts aliases", function() {
@@ -63,7 +63,7 @@ describe("Factory", function() {
 	it("can take a block", function() {
 		const withBlock = new Factory(factoryBuilder, "name", DummyModel, function() {
 			return 1;
-		});
+		}) as Required<Factory>;
 		expect(withBlock.block).to.exist;
 		expect(withBlock.block).to.be.a("function");
 		expect(withBlock.block()).to.equal(1);

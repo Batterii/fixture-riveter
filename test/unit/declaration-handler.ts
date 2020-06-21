@@ -35,12 +35,12 @@ describe("DeclarationHandler", function() {
 		});
 	});
 
-	describe("#convertToAttribute", function() {
+	describe("#getAttributes", function() {
 		it("returns the list of attributes", function() {
 			const dh = new DeclarationHandler(name);
 			const attributes = [] as Attribute[];
 			dh.attributes = attributes;
-			const result = dh.convertToAttributes();
+			const result = dh.getAttributes();
 
 			expect(result).to.equal(attributes);
 		});
@@ -50,7 +50,7 @@ describe("DeclarationHandler", function() {
 			const attributes = [] as Attribute[];
 			sinon.stub(dh, "toAttributes");
 			dh.attributes = attributes;
-			dh.convertToAttributes();
+			dh.getAttributes();
 
 			expect(dh.toAttributes).to.not.be.called;
 		});
@@ -60,7 +60,7 @@ describe("DeclarationHandler", function() {
 			delete dh.attributes;
 			const attributes = [] as Attribute[];
 			sinon.stub(dh, "toAttributes").returns(attributes);
-			dh.convertToAttributes();
+			dh.getAttributes();
 
 			expect(dh.toAttributes).to.be.calledOnce;
 		});

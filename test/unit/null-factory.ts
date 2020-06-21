@@ -1,8 +1,6 @@
 import {FactoryBuilder} from "../../lib/factory-builder";
 import {NullFactory} from "../../lib/null-factory";
 
-import {DummyModel} from "../test-fixtures/dummy-model";
-
 import {expect} from "chai";
 
 describe("NullFactory", function() {
@@ -11,7 +9,7 @@ describe("NullFactory", function() {
 
 	beforeEach(function() {
 		factoryBuilder = new FactoryBuilder();
-		nullFactory = new NullFactory(factoryBuilder, DummyModel);
+		nullFactory = new NullFactory(factoryBuilder);
 	});
 
 	it("can be created", function() {

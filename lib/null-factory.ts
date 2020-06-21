@@ -7,17 +7,15 @@ import {FactoryBuilder} from "./factory-builder";
 export class NullFactory extends Definition {
 	model: any;
 
-	constructor(
-		factoryBuilder: FactoryBuilder,
-		model: any,
-	) {
+	constructor(factoryBuilder: FactoryBuilder) {
 		super("nullFactory", factoryBuilder);
-		this.model = model;
 	}
 
 	names(): string[] {
 		return [this.name];
 	}
+
+	compile(): void { }
 
 	attributeNames(): string[] {
 		return [];
