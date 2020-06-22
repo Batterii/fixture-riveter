@@ -18,8 +18,4 @@ export class Trait extends Definition {
 		const proxy = new DefinitionProxy(this);
 		proxy.execute();
 	}
-
-	defineTrait(trait: Trait): void {
-		throw new Error(`Can't define nested traits: ${trait.name}`);
-	}
 }

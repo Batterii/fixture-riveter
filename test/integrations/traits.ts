@@ -55,7 +55,7 @@ describe("tests from factory_bot", function() {
 			});
 
 			fb.factory("user", User, (f: any) => {
-				f.attr("name", () => "Noah");
+				f.attr("name", () => "John");
 
 				f.trait("great", (t: any) => {
 					t.attr("great", () => "GREAT!!!");
@@ -95,7 +95,7 @@ describe("tests from factory_bot", function() {
 					});
 				});
 
-				f.factory("admin", {traits: ["admin"]});
+				f.factory("admin", User, {traits: ["admin"]});
 
 				f.factory("maleUser", User, (ff: any) => {
 					ff.attr("male");
@@ -105,7 +105,7 @@ describe("tests from factory_bot", function() {
 					});
 				});
 
-				f.factory("femaleUser", User, {traits: ["female"]}, (ff: any) => {
+				f.factory("female", User, {traits: ["female"]}, (ff: any) => {
 					ff.trait("admin", (t: any) => {
 						t.attr("admin", () => true);
 						t.attr("name", () => "Judy");
@@ -131,5 +131,117 @@ describe("tests from factory_bot", function() {
 				f.attr("name", () => "Bill");
 			});
 		});
+	});
+
+	specify("the parent class", async function() {
+		const user = await fb.build("user");
+		expect(user.name).to.equal("John");
+		expect(user.gender).to.not.exist;
+		expect(user.admin).to.not.exist;
+	});
+
+	specify("the child class with one trait", async function() {
+		const user = await fb.build("admin");
+		expect(user.name).to.equal("John");
+		expect(user.gender).to.not.exist;
+		expect(user.admin).to.be.true;
+	});
+
+	specify("the other child class with one trait", async function() {
+		const user = await fb.build("female");
+		expect(user.name).to.equal("Jane");
+		expect(user.gender).to.equal("Female");
+		expect(user.admin).to.not.exist;
+	});
+
+	specify("the child with multiple traits", async function() {
+		const user = await fb.build("femaleAdmin");
+		expect(user.name).to.equal("Jane");
+		expect(user.gender).to.equal("Female");
+		expect(user.admin).to.be.true;
+	});
+
+	specify("the child with multiple traits and overridden attributes", async function() {
+		const user = await fb.build("femaleAdmin", {name: "Jill", gender: undefined});
+		expect(user.name).to.equal("Jill");
+		expect(user.gender).to.not.exist;
+		expect(user.admin).to.be.true;
+	});
+
+	context("the child with multiple traits who override the same attribute", function() {
+		specify("when the male assigns name after female", async function() {
+			const user = await fb.build("maleAfterFemaleAdmin");
+			expect(user.name).to.equal("Joe");
+			expect(user.gender).to.equal("Male");
+			expect(user.admin).to.be.true;
+		});
+
+		specify("when the female assigns name after male", async function() {
+			const user = await fb.build("femaleAfterMaleAdmin");
+			expect(user.name).to.equal("Jane");
+			expect(user.gender).to.equal("Female");
+			expect(user.admin).to.be.true;
+		});
+	});
+
+	specify("child class with scoped trait and inherited trait", async function() {
+		const user = await fb.build("femaleAdminJudy");
+		expect(user.name).to.equal("Judy");
+		expect(user.gender).to.equal("Female");
+		expect(user.admin).to.be.true;
+	});
+
+	specify("factory using global trait", async function() {
+		const user = await fb.build("userWithEmail");
+		expect(user.name).to.equal("Bill");
+		expect(user.email).to.equal("Bill@example.com");
+	});
+
+	context("factory created with alternate syntax for specifying trait", function() {
+		specify("creation works", async function() {
+			const user = await fb.build("maleUser");
+			expect(user.gender).to.equal("Male");
+		});
+
+		specify("where trait name and attribute are the same", async function() {
+			const user = await fb.build("greatUser");
+			expect(user.great).to.equal("GREAT!!!");
+		});
+
+		specify(
+			"where trait name and attribute are the same and attribute is overridden",
+			async function() {
+				const user = await fb.build("greatUser", {great: "SORT OF!!!"});
+				expect(user.great).to.equal("SORT OF!!!");
+			},
+		);
+	});
+
+	context("factory with trait defined multiple times", function() {
+		specify("creation works", async function() {
+			const user = await fb.build("greatUser");
+			expect(user.great).to.equal("GREAT!!!");
+		});
+
+		specify("child factory redefining trait", async function() {
+			const user = await fb.build("evenGreaterUser");
+			expect(user.great).to.equal("EVEN GREATER!!!");
+		});
+	});
+
+	specify("child factory created where trait attributes are inherited", async function() {
+		const user = await fb.build("childMaleUser");
+		expect(user.gender).to.equal("Male");
+		expect(user.dateOfBirth).to.deep.equal(new Date("1/1/2020"));
+	});
+
+	specify("factory outside of scope", async function() {
+		const fn = async() => fb.build("userWithoutAdminScoping");
+		expect(fn).to.throw;
+	});
+
+	specify("child factory using grandparents' trait", async function() {
+		const user = await fb.build("femaleGreatUser");
+		expect(user.great).to.equal("GREAT!!!");
 	});
 });

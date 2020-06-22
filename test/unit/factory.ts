@@ -32,7 +32,7 @@ describe("Factory", function() {
 	it("defines default options", function() {
 		const noOptions = new Factory(factoryBuilder, "name", DummyModel);
 		expect(noOptions.aliases).to.deep.equal([]);
-		expect(noOptions.definedTraits).to.deep.equal(new Set());
+		expect(noOptions.definedTraits).to.deep.equal([]);
 	});
 
 	it("accepts aliases", function() {

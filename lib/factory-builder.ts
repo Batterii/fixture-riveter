@@ -61,9 +61,9 @@ export class FactoryBuilder {
 		}
 	}
 
-	factory(name: string, model: object, rest?: FactoryOptions | Function): Factory;
-	factory(name: string, model: object, options?: FactoryOptions, block?: Function): Factory;
-	factory(name: string, model: object, ...rest: any[]): Factory {
+	factory(name: string, model: Function, rest?: FactoryOptions | Function): Factory;
+	factory(name: string, model: Function, options?: FactoryOptions, block?: Function): Factory;
+	factory(name: string, model: Function, ...rest: any[]): Factory {
 		if (this.getFactory(name, false)) {
 			throw new Error(`${name} is already defined`);
 		}

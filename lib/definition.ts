@@ -10,8 +10,9 @@ export class Definition {
 	name: string;
 	aliases: string[];
 	attributes: Attribute[];
-	definedTraits: Set<Trait>;
+	definedTraits: Trait[];
 	baseTraits: string[];
+	additionalTraits: string[];
 	traitsCache?: Record<string, Trait>;
 	compiled: boolean;
 	block?: Function;
@@ -25,8 +26,9 @@ export class Definition {
 
 		this.aliases = [];
 		this.attributes = [];
-		this.definedTraits = new Set();
+		this.definedTraits = [];
 		this.baseTraits = [];
+		this.additionalTraits = [];
 		this.compiled = false;
 
 		this.sequenceHandler = new SequenceHandler();
@@ -39,10 +41,15 @@ export class Definition {
 
 	compile(): void {
 		if (!this.compiled) {
+			// Generates the list of attributes
 			this.declarationHandler.getAttributes();
+
 			for (const definedTrait of this.definedTraits) {
 				for (const baseTrait of this.getBaseTraits()) {
 					baseTrait.defineTrait(definedTrait);
+				}
+				for (const additionalTraits of this.getAdditionalTraits()) {
+					additionalTraits.defineTrait(definedTrait);
 				}
 			}
 			this.compiled = true;
@@ -53,25 +60,42 @@ export class Definition {
 		return this.attributes.map((a) => a.name);
 	}
 
+	attr(name: string): any {
+		const attributes = this.getAttributes();
+		const attribute = attributes.find((a) => a.name === name);
+		if (attribute) {
+			return attribute.build().call(this, this);
+		}
+	}
+
 	traitNames(): string[] {
-		const traits = Array.from(this.definedTraits.values());
-		return traits.map((t: Trait) => t.name);
+		return this.definedTraits.map((trait) => trait.name);
 	}
 
 	declareAttribute(declaration: Declaration): void {
 		this.declarationHandler.declareAttribute(declaration);
 	}
 
-	defineTrait(trait: Trait): void {
-		this.definedTraits.add(trait);
+	defineTrait(newTrait: Trait): void {
+		if (!this.definedTraits.map((t) => t.name).includes(newTrait.name)) {
+			this.definedTraits.push(newTrait);
+		}
+	}
+
+	appendTraits(traits: string[]): void {
+		this.additionalTraits = this.additionalTraits.concat(traits);
+	}
+
+	inheritTraits(traits: string[]): void {
+		this.baseTraits = this.baseTraits.concat(traits);
 	}
 
 	populateTraitsCache(): Record<string, Trait> {
 		if (!this.traitsCache || Object.keys(this.traitsCache).length === 0) {
 			const cache = {};
-			this.definedTraits.forEach((trait: Trait) => {
+			for (const trait of this.definedTraits) {
 				cache[trait.name] = trait;
-			});
+			}
 			this.traitsCache = cache;
 		}
 		return this.traitsCache;
@@ -86,9 +110,9 @@ export class Definition {
 		return this.traitFor(name) || this.factoryBuilder.getTrait(name, false);
 	}
 
-	getBaseTraits(): Trait[] {
+	getInternalTraits(internalTraits: string[]): Trait[] {
 		const traits: Trait[] = [];
-		this.baseTraits.forEach((name: string) => {
+		internalTraits.forEach((name: string) => {
 			const result = this.traitByName(name);
 			if (result) {
 				traits.push(result);
@@ -97,19 +121,35 @@ export class Definition {
 		return traits;
 	}
 
-	aggregateFromTraitsAndSelf(attributes: any): any {
+	getBaseTraits(): Trait[] {
+		return this.getInternalTraits(this.baseTraits);
+	}
+
+	getAdditionalTraits(): Trait[] {
+		return this.getInternalTraits(this.additionalTraits);
+	}
+
+	aggregateFromTraitsAndSelf(attributes: Function): any {
 		this.compile();
 
+		const baseTraits = this.getBaseTraits().flatMap(
+			(t: Trait) => t.getAttributes(),
+		);
+		const givenAttributes = attributes();
+		const additionalTraits = this.getAdditionalTraits().flatMap(
+			(t: Trait) => t.getAttributes(),
+		);
+
 		return [
-			this.getBaseTraits(),
-			attributes,
-			// this.additionalTraits(),
+			baseTraits,
+			givenAttributes,
+			additionalTraits,
 		].flat(Infinity).filter(Boolean);
 	}
 
 	getAttributes(): Attribute[] {
 		if (!this.attributes || this.attributes.length === 0) {
-			const declarationAttributes = this.declarationHandler.getAttributes();
+			const declarationAttributes = (): any => this.declarationHandler.getAttributes();
 			this.attributes = this.aggregateFromTraitsAndSelf(declarationAttributes);
 		}
 		return this.attributes;

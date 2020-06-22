@@ -19,7 +19,7 @@ describe("Trait", function() {
 	it("creates an instance with the correct initial values", function() {
 		const result = new Trait("trait", factoryBuilder);
 		expect(result.attributes).to.deep.equal([]);
-		expect(result.definedTraits).to.deep.equal(new Set());
+		expect(result.definedTraits).to.deep.equal([]);
 	});
 
 	it("executes the given block immediately", function() {
@@ -59,15 +59,6 @@ describe("Trait", function() {
 
 			expect(declarations).to.have.length(1);
 			expect(declarations.map((a) => a.name)).to.deep.equal([name]);
-		});
-	});
-
-	describe("#defineTrait", function() {
-		it("throws an error", function() {
-			factoryBuilder = new FactoryBuilder();
-			const trait = new Trait("trait", factoryBuilder, () => true);
-			const trait2 = new Trait("trait2", factoryBuilder, () => false);
-			expect(() => trait.defineTrait(trait2)).to.throw();
 		});
 	});
 });

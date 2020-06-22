@@ -11,25 +11,9 @@ export class NullFactory extends Definition {
 		super("nullFactory", factoryBuilder);
 	}
 
-	names(): string[] {
-		return [this.name];
-	}
-
 	compile(): void { }
-
-	attributeNames(): string[] {
-		return [];
-	}
-
-	getParentAttributes(): Attribute[] {
-		return [];
-	}
 
 	getAttributes(): Attribute[] {
 		return [];
-	}
-
-	applyAttributes(): Record<string, any> {
-		return {};
 	}
 }
