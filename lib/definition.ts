@@ -60,10 +60,6 @@ export class Definition {
 		return this.attributes.map((a) => a.name);
 	}
 
-	traitNames(): string[] {
-		return this.definedTraits.map((trait) => trait.name);
-	}
-
 	declareAttribute(declaration: Declaration): void {
 		this.declarationHandler.declareAttribute(declaration);
 	}
@@ -98,17 +94,14 @@ export class Definition {
 		return traitsCache[name];
 	}
 
-	traitByName(name: string): Trait | undefined {
+	traitByName(name: string): Trait {
 		return this.traitFor(name) || this.factoryBuilder.getTrait(name);
 	}
 
 	getInternalTraits(internalTraits: string[]): Trait[] {
 		const traits: Trait[] = [];
 		for (const name of internalTraits) {
-			const result = this.traitByName(name);
-			if (result) {
-				traits.push(result);
-			}
+			traits.push(this.traitByName(name));
 		}
 		return traits;
 	}
