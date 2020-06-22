@@ -60,14 +60,6 @@ export class Definition {
 		return this.attributes.map((a) => a.name);
 	}
 
-	attr(name: string): any {
-		const attributes = this.getAttributes();
-		const attribute = attributes.find((a) => a.name === name);
-		if (attribute) {
-			return attribute.build().call(this, this);
-		}
-	}
-
 	traitNames(): string[] {
 		return this.definedTraits.map((trait) => trait.name);
 	}
@@ -107,17 +99,17 @@ export class Definition {
 	}
 
 	traitByName(name: string): Trait | undefined {
-		return this.traitFor(name) || this.factoryBuilder.getTrait(name, false);
+		return this.traitFor(name) || this.factoryBuilder.getTrait(name);
 	}
 
 	getInternalTraits(internalTraits: string[]): Trait[] {
 		const traits: Trait[] = [];
-		internalTraits.forEach((name: string) => {
+		for (const name of internalTraits) {
 			const result = this.traitByName(name);
 			if (result) {
 				traits.push(result);
 			}
-		});
+		}
 		return traits;
 	}
 
@@ -153,5 +145,14 @@ export class Definition {
 			this.attributes = this.aggregateFromTraitsAndSelf(declarationAttributes);
 		}
 		return this.attributes;
+	}
+
+	copy(): any {
+		const copy = Object.assign(Object.create(Object.getPrototypeOf(this)), this);
+		copy.compiled = false;
+		delete copy.attributes;
+		delete copy.traitsCache;
+
+		return copy;
 	}
 }

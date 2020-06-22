@@ -98,13 +98,11 @@ export class Factory extends Definition {
 	}
 
 	applyAttributes(extraAttributes?: ExtraAttributes): Record<string, any> {
-		const {attrs, traits} = mergeDefaults(extraAttributes);
-		this.appendTraits(traits);
+		const {attrs} = mergeDefaults(extraAttributes);
 
 		const attributesToApply = this.getAttributes()
 			// This will skip any attribute passed in by the caller
-			.filter((attribute) => !Object.prototype.hasOwnProperty.call(attrs, attribute.name))
-			.reverse();
+			.filter((attribute) => !Object.prototype.hasOwnProperty.call(attrs, attribute.name));
 
 		const evaluator = new Evaluator(this.name, attributesToApply);
 

@@ -17,7 +17,7 @@ export function extractAttributes(traitsAndOptions: any[]): Record<string, any> 
 	return {};
 }
 
-export function buildTraitsAndAttributes(traits: any[]): ExtraAttributes {
+export function buildTraitsAndAttributes(traits: any[]): any {
 	const attrs = extractAttributes(traits);
 	return {traits, attrs};
 }
@@ -83,10 +83,10 @@ export class FactoryBuilder {
 		return factory;
 	}
 
-	getTrait(name: string, throws = true): Trait {
+	getTrait(name: string): Trait {
 		const trait = this.traits[name];
-		if (throws && !trait) {
-			throw new Error(`${name} hasn't been defined yet`);
+		if (!trait) {
+			throw new Error(`Trait ${name} hasn't been defined yet`);
 		}
 		return trait;
 	}
@@ -105,21 +105,36 @@ export class FactoryBuilder {
 
 	attributesFor(name: string, ...traits: any[]): Record<string, any> {
 		const traitsAndAttributes = buildTraitsAndAttributes(traits);
-		const factory = this.getFactory(name);
+		let factory = this.getFactory(name);
+		if (traitsAndAttributes.traits.length > 0) {
+			factory = factory.copy();
+			factory.appendTraits(traitsAndAttributes.traits);
+			delete traitsAndAttributes.traits;
+		}
 		return factory.applyAttributes(traitsAndAttributes);
 	}
 
 	async build(name: string, ...traits: any[]): Promise<Record<string, any>> {
 		const traitsAndAttributes = buildTraitsAndAttributes(traits);
 		const adapter = this.getAdapter();
-		const factory = this.getFactory(name);
+		let factory = this.getFactory(name);
+		if (traitsAndAttributes.traits.length > 0) {
+			factory = factory.copy();
+			factory.appendTraits(traitsAndAttributes.traits);
+			delete traitsAndAttributes.traits;
+		}
 		return factory.build(adapter, traitsAndAttributes);
 	}
 
 	async create(name: string, ...traits: any[]): Promise<Record<string, any>> {
 		const traitsAndAttributes = buildTraitsAndAttributes(traits);
 		const adapter = this.getAdapter();
-		const factory = this.getFactory(name);
+		let factory = this.getFactory(name);
+		if (traitsAndAttributes.traits.length > 0) {
+			factory = factory.copy();
+			factory.appendTraits(traitsAndAttributes.traits);
+			delete traitsAndAttributes.traits;
+		}
 		return factory.create(adapter, traitsAndAttributes);
 	}
 

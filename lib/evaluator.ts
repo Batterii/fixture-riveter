@@ -14,7 +14,7 @@ export class Evaluator {
 	static defineAttributes(givenAttributes: Attribute[]): Record<string, Function> {
 		const attributes: Record<string, Function> = {};
 
-		for (const attribute of givenAttributes) {
+		for (const attribute of givenAttributes.reverse()) {
 			const {name} = attribute;
 			if (!Object.prototype.hasOwnProperty.call(attributes, name)) {
 				attributes[name] = attribute.build();
