@@ -274,30 +274,6 @@ describe("Factory", function() {
 			expect(result).to.deep.equal({name: "Bogart", age: 32});
 		});
 
-		it("executes the attribute block with the factory as context", function() {
-			const factory = new Factory(factoryBuilder, "dummy", DummyModel);
-			factory.compiled = true;
-			factory.attributes = [
-				new DynamicAttribute("self", function() {
-					return this.names(); // eslint-disable-line no-invalid-this
-				}),
-			];
-			const result = factory.applyAttributes();
-
-			expect(result).to.deep.equal({self: ["dummy"]});
-		});
-
-		it("passes the factory into the attribute function", function() {
-			const factory = new Factory(factoryBuilder, "dummy", DummyModel);
-			factory.compiled = true;
-			factory.attributes = [
-				new DynamicAttribute("self", (f: Factory) => f.names()),
-			];
-			const result = factory.applyAttributes();
-
-			expect(result).to.deep.equal({self: ["dummy"]});
-		});
-
 		it("applies attributes from parent attribute", function() {
 			factoryBuilder.define((fb: FactoryBuilder) => {
 				fb.factory("parent", DummyModel, (f: DefinitionProxy) => {

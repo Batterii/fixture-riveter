@@ -1,7 +1,7 @@
 import {Adapter} from "./adapters/adapter";
 import {Attribute} from "./attribute";
-import {Trait} from "./trait";
 import {Definition} from "./definition";
+import {Evaluator} from "./evaluator";
 import {FactoryBuilder} from "./factory-builder";
 import {NullFactory} from "./null-factory";
 import {FactoryOptions, factoryOptionsParser} from "./factory-options-parser";
@@ -101,22 +101,14 @@ export class Factory extends Definition {
 		const {attrs, traits} = mergeDefaults(extraAttributes);
 		this.appendTraits(traits);
 
-		const attributesToApply = this.getAttributes();
-		const evaluator: Record<string, Function> = {};
+		const attributesToApply = this.getAttributes()
+			// This will skip any attribute passed in by the caller
+			.filter((attribute) => !Object.prototype.hasOwnProperty.call(attrs, attribute.name))
+			.reverse();
 
-		for (const attribute of attributesToApply.reverse()) {
-			const {name} = attribute;
-			if (!Object.prototype.hasOwnProperty.call(attrs, name) &&
-				!Object.prototype.hasOwnProperty.call(evaluator, name)) {
-				evaluator[name] = attribute.build();
-			}
-		}
+		const evaluator = new Evaluator(this.name, attributesToApply);
 
-		const instance: Record<string, any> = {};
-
-		for (const [key, value] of Object.entries(evaluator)) {
-			instance[key] = value(this);
-		}
+		const instance = evaluator.run();
 
 		for (const [key, value] of Object.entries(attrs)) {
 			instance[key] = value;
