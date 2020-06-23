@@ -1,10 +1,13 @@
 import {Declaration} from "../declaration";
-import {DynamicAttribute} from "../attributes/dynamic-attribute";
+import {
+	AttributeBlock,
+	DynamicAttribute,
+} from "../attributes/dynamic-attribute";
 
 export class DynamicDeclaration extends Declaration {
-	block: Function;
+	block: AttributeBlock;
 
-	constructor(name: string, block: Function) {
+	constructor(name: string, block: AttributeBlock) {
 		super(name);
 		this.block = block;
 	}

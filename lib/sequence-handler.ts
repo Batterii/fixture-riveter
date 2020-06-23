@@ -1,4 +1,7 @@
-import {Sequence} from "./sequences/sequence";
+import {
+	Sequence,
+	SequenceCallback,
+} from "./sequences/sequence";
 import {IntegerSequence} from "./sequences/integer-sequence";
 import {StringSequence} from "./sequences/string-sequence";
 
@@ -12,7 +15,7 @@ import {
 export interface SequenceOptions {
 	initial?: string | number;
 	aliases?: string[];
-	callback?: Function;
+	callback?: SequenceCallback;
 }
 
 export class SequenceHandler {
@@ -26,7 +29,7 @@ export class SequenceHandler {
 		name: string,
 		initial?: string | number,
 		options?: {aliases: string[]},
-		callback?: Function,
+		callback?: SequenceCallback,
 	): Sequence;
 
 	registerSequence(name: string, ...rest: any[]): Sequence {
@@ -48,12 +51,11 @@ export class SequenceHandler {
 
 type initial = string | number;
 type options = {aliases: string[]};
-type callback = Function;
 
 export function optionsParser(
-	initial?: initial | options | callback,
-	options?: initial | options | callback,
-	callback?: initial | options | callback,
+	initial?: initial | options | SequenceCallback,
+	options?: initial | options | SequenceCallback,
+	callback?: initial | options | SequenceCallback,
 ): SequenceOptions;
 
 export function optionsParser(...args: any[]): SequenceOptions {

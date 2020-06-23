@@ -1,8 +1,12 @@
 import {Adapter} from "./adapters/adapter";
 import {AdapterHandler, FactoryNames} from "./adapter-handler";
 import {DefinitionProxy} from "./definition-proxy";
-import {ExtraAttributes, Factory} from "./factory";
-import {FactoryOptions, factoryOptionsParser} from "./factory-options-parser";
+import {Factory} from "./factory";
+import {
+	blockFunction,
+	FactoryOptions,
+	factoryOptionsParser,
+} from "./factory-options-parser";
 import {Sequence} from "./sequences/sequence";
 import {SequenceHandler} from "./sequence-handler";
 import {Trait} from "./trait";
@@ -44,7 +48,7 @@ export class FactoryBuilder {
 	}
 
 	define(block: Function): void {
-		block.call(this, this);
+		block(this);
 	}
 
 	getFactory(name: string, throws = true): Factory {
@@ -61,8 +65,8 @@ export class FactoryBuilder {
 		}
 	}
 
-	factory(name: string, model: Function, rest?: FactoryOptions | Function): Factory;
-	factory(name: string, model: Function, options?: FactoryOptions, block?: Function): Factory;
+	factory(name: string, model: Function, rest?: FactoryOptions | blockFunction): Factory;
+	factory(name: string, model: Function, options?: FactoryOptions, block?: blockFunction): Factory;
 	factory(name: string, model: Function, ...rest: any[]): Factory {
 		if (this.getFactory(name, false)) {
 			throw new Error(`${name} is already defined`);
@@ -97,45 +101,10 @@ export class FactoryBuilder {
 		}
 	}
 
-	trait(name: string, block?: Function): Trait {
+	trait(name: string, block?: blockFunction): Trait {
 		const trait = new Trait(name, this, block);
 		this.registerTrait(trait);
 		return trait;
-	}
-
-	attributesFor(name: string, ...traits: any[]): Record<string, any> {
-		const traitsAndAttributes = buildTraitsAndAttributes(traits);
-		let factory = this.getFactory(name);
-		if (traitsAndAttributes.traits.length > 0) {
-			factory = factory.copy();
-			factory.appendTraits(traitsAndAttributes.traits);
-			delete traitsAndAttributes.traits;
-		}
-		return factory.applyAttributes(traitsAndAttributes);
-	}
-
-	async build(name: string, ...traits: any[]): Promise<Record<string, any>> {
-		const traitsAndAttributes = buildTraitsAndAttributes(traits);
-		const adapter = this.getAdapter();
-		let factory = this.getFactory(name);
-		if (traitsAndAttributes.traits.length > 0) {
-			factory = factory.copy();
-			factory.appendTraits(traitsAndAttributes.traits);
-			delete traitsAndAttributes.traits;
-		}
-		return factory.build(adapter, traitsAndAttributes);
-	}
-
-	async create(name: string, ...traits: any[]): Promise<Record<string, any>> {
-		const traitsAndAttributes = buildTraitsAndAttributes(traits);
-		const adapter = this.getAdapter();
-		let factory = this.getFactory(name);
-		if (traitsAndAttributes.traits.length > 0) {
-			factory = factory.copy();
-			factory.appendTraits(traitsAndAttributes.traits);
-			delete traitsAndAttributes.traits;
-		}
-		return factory.create(adapter, traitsAndAttributes);
 	}
 
 	sequence(
@@ -163,5 +132,29 @@ export class FactoryBuilder {
 
 	findSequence(name: string): Sequence | undefined {
 		return this.sequenceHandler.findSequence(name);
+	}
+
+	async run(name: string, buildStrategy: string, traits: any[]): Promise<Record<string, any>> {
+		const traitsAndAttributes = buildTraitsAndAttributes(traits);
+		let factory = this.getFactory(name);
+		if (traitsAndAttributes.traits.length > 0) {
+			factory = factory.copy();
+			factory.appendTraits(traitsAndAttributes.traits);
+			delete traitsAndAttributes.traits;
+		}
+		const adapter = this.getAdapter();
+		return factory.run(buildStrategy, adapter, traitsAndAttributes);
+	}
+
+	async attributesFor(name: string, ...traits: any[]): Promise<Record<string, any>> {
+		return this.run(name, "applyAttributes", traits);
+	}
+
+	async build(name: string, ...traits: any[]): Promise<Record<string, any>> {
+		return this.run(name, "build", traits);
+	}
+
+	async create(name: string, ...traits: any[]): Promise<Record<string, any>> {
+		return this.run(name, "create", traits);
 	}
 }

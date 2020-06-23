@@ -66,7 +66,7 @@ describe("Factory", function() {
 		}) as Required<Factory>;
 		expect(withBlock.block).to.exist;
 		expect(withBlock.block).to.be.a("function");
-		expect(withBlock.block()).to.equal(1);
+		expect(withBlock.block({} as DefinitionProxy)).to.equal(1);
 	});
 
 	describe("#names", function() {
@@ -241,27 +241,27 @@ describe("Factory", function() {
 			factoryBuilder = new FactoryBuilder();
 		});
 
-		it("creates an object", function() {
+		it("creates an object", async function() {
 			const factory = new Factory(factoryBuilder, "dummy", DummyModel);
-			const result = factory.applyAttributes();
+			const result = await factory.applyAttributes();
 
 			expect(result).to.exist;
 			expect(result).to.be.instanceof(Object);
 		});
 
-		it("iterates over attributes", function() {
+		it("iterates over attributes", async function() {
 			const factory = new Factory(factoryBuilder, "dummy", DummyModel);
 			factory.compiled = true;
 			factory.attributes = [
 				new DynamicAttribute("name", () => "Noah"),
 				new DynamicAttribute("age", () => 32),
 			];
-			const result = factory.applyAttributes();
+			const result = await factory.applyAttributes();
 
 			expect(result).to.deep.equal({name: "Noah", age: 32});
 		});
 
-		it("applies attrs argument last", function() {
+		it("applies attrs argument last", async function() {
 			const factory = new Factory(factoryBuilder, "dummy", DummyModel);
 			factory.compiled = true;
 			factory.attributes = [
@@ -269,12 +269,12 @@ describe("Factory", function() {
 				new DynamicAttribute("age", () => 32),
 			];
 			const extraAttributes = {attrs: {name: "Bogart"}};
-			const result = factory.applyAttributes(extraAttributes);
+			const result = await factory.applyAttributes(extraAttributes);
 
 			expect(result).to.deep.equal({name: "Bogart", age: 32});
 		});
 
-		it("applies attributes from parent attribute", function() {
+		it("applies attributes from parent attribute", async function() {
 			factoryBuilder.define((fb: FactoryBuilder) => {
 				fb.factory("parent", DummyModel, (f: DefinitionProxy) => {
 					f.attr("execute1", () => 1);
@@ -290,7 +290,7 @@ describe("Factory", function() {
 					},
 				);
 			});
-			const result = factoryBuilder.attributesFor("child");
+			const result = await factoryBuilder.attributesFor("child");
 
 			expect(result).to.deep.equal({execute1: 1, execute2: 20, execute3: 3});
 		});
@@ -321,110 +321,81 @@ describe("Factory", function() {
 	});
 
 	describe("#build", function() {
-		beforeEach(function() {
-			factoryBuilder = new FactoryBuilder();
-		});
-
-		it("builds an instance of the model", async function() {
-			const adapter = new DefaultAdapter();
-			const factory = new Factory(factoryBuilder, "dummy", DummyModel);
-			const result = await factory.build(adapter);
-
-			expect(result).to.be.an.instanceof(DummyModel);
-		});
-
-		it("builds an instance from an alias", async function() {
-			const adapter = new DefaultAdapter();
-			const factory = new Factory(factoryBuilder, "dummy", DummyModel);
-			const result = await factory.build(adapter);
-
-			expect(result).to.be.an.instanceof(DummyModel);
-		});
-
-		it("returns a promise", function() {
-			const adapter = new DefaultAdapter();
-			const factory = new Factory(factoryBuilder, "dummy", DummyModel);
-			const result = factory.build(adapter);
-
-			expect(result.then).to.be.a("function");
-			expect(result).to.be.eventually.fulfilled;
-		});
-
-		it("builds an instance with the right values", async function() {
-			const adapter = new DefaultAdapter();
-			const factory = new Factory(factoryBuilder, "dummy", DummyModel);
-			factory.compiled = true;
-			factory.attributes = [
-				new DynamicAttribute("name", () => "Noah"),
-				new DynamicAttribute("age", () => 32),
-			];
-			const result = await factory.build(adapter);
-
-			expect(result).to.deep.equal({name: "Noah", age: 32});
-		});
-
-		it("calls applyAttributes", async function() {
-			const adapter = new DefaultAdapter();
-			const factory = new Factory(factoryBuilder, "dummy", DummyModel);
-			const model = {name: "Noah", age: 32};
-			sinon.stub(factory, "applyAttributes").returns(model);
-			await factory.build(adapter);
-
-			expect(factory.applyAttributes).to.be.calledOnce;
-		});
-
 		it("calls the adapter's build method", async function() {
 			const adapter = new DefaultAdapter();
-			sinon.stub(adapter, "build").resolves({name: "Noah", age: 32});
+			sinon.stub(adapter, "build");
 			const factory = new Factory(factoryBuilder, "dummy", DummyModel);
-			await factory.build(adapter);
+			const instance = {};
+			await factory.build(adapter, instance);
 
 			expect(adapter.build).to.be.calledOnce;
+			expect(adapter.build).to.be.calledOnceWithExactly(instance, DummyModel);
 		});
 	});
 
 	describe("#create", function() {
-		beforeEach(function() {
-			factoryBuilder = new FactoryBuilder();
-		});
-
-		it("creates an instance of the model", async function() {
-			const adapter = new DefaultAdapter();
-			const factory = new Factory(factoryBuilder, "dummy", DummyModel);
-			const result = await factory.create(adapter);
-
-			expect(result).to.be.an.instanceof(DummyModel);
-		});
-
-		it("returns a promise", function() {
-			const adapter = new DefaultAdapter();
-			const factory = new Factory(factoryBuilder, "dummy", DummyModel);
-			const result = factory.create(adapter);
-
-			expect(result.then).to.be.a("function");
-			expect(result).to.be.eventually.fulfilled;
-		});
-
-		it("uses #build to build the instance", async function() {
-			const adapter = new DefaultAdapter();
-			const factory = new Factory(factoryBuilder, "dummy", DummyModel);
-			const model = new DummyModel("Noah", 32);
-			sinon.stub(factory, "build").resolves(model);
-			await factory.create(adapter);
-
-			expect(factory.build).to.be.calledOnce;
-			expect(factory.build).to.be.calledOnceWith(adapter);
-		});
-
 		it("calls save on the adapter", async function() {
 			const adapter = new DefaultAdapter();
 			const factory = new Factory(factoryBuilder, "dummy", DummyModel);
-			const model = new DummyModel("Noah", 32);
-			sinon.stub(adapter, "save").resolves(model);
-			await factory.create(adapter);
+			sinon.stub(adapter, "save");
+			const instance = {};
+			await factory.create(adapter, instance);
 
 			expect(adapter.save).to.be.calledOnce;
-			expect(adapter.save).to.be.calledOnceWithExactly(model, factory.model);
+			expect(adapter.save).to.be.calledOnceWithExactly(instance, DummyModel);
+		});
+	});
+
+	describe("#run", function() {
+		context("calls applyAttributes unconditionally", function() {
+			let adapter: DefaultAdapter;
+			let factory: Factory;
+			let instance: any;
+
+			beforeEach(function() {
+				adapter = new DefaultAdapter();
+				factory = new Factory(factoryBuilder, "dummy", DummyModel);
+				instance = {};
+
+				sinon.stub(factory, "applyAttributes").resolves(instance);
+				sinon.stub(factory, "build").resolves(instance);
+				sinon.stub(factory, "create").resolves(instance);
+			});
+
+			it("with attributesFor", async function() {
+				const buildStrategy = "attributesFor";
+
+				const result = await factory.run(buildStrategy, adapter);
+
+				expect(result).to.equal(instance);
+				expect(factory.applyAttributes).to.be.calledOnceWithExactly(undefined);
+				expect(factory.build).to.not.be.called;
+				expect(factory.create).to.not.be.called;
+			});
+
+			it("with build", async function() {
+				const buildStrategy = "build";
+
+				const result = await factory.run(buildStrategy, adapter);
+
+				expect(result).to.equal(instance);
+				expect(factory.applyAttributes).to.be.calledOnce;
+				expect(factory.applyAttributes).to.be.calledOnceWith();
+				expect(factory.build).to.be.calledOnceWithExactly(adapter, instance);
+				expect(factory.create).to.not.be.called;
+			});
+
+			it("with create", async function() {
+				const buildStrategy = "create";
+
+				const result = await factory.run(buildStrategy, adapter);
+
+				expect(result).to.equal(instance);
+				expect(factory.applyAttributes).to.be.calledOnce;
+				expect(factory.applyAttributes).to.be.calledOnceWith();
+				expect(factory.build).to.be.calledOnceWithExactly(adapter, instance);
+				expect(factory.create).to.be.calledOnceWithExactly(adapter, instance);
+			});
 		});
 	});
 });

@@ -1,3 +1,5 @@
+import {Evaluator} from "./evaluator";
+
 /* eslint-disable class-methods-use-this */
 /* eslint-disable @typescript-eslint/no-empty-function */
 export abstract class Attribute {
@@ -7,5 +9,5 @@ export abstract class Attribute {
 		this.name = name;
 	}
 
-	abstract build(): Function;
+	abstract evaluate(evaluator?: Evaluator): (e: Evaluator) => any;
 }

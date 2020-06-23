@@ -1,7 +1,9 @@
+export type SequenceCallback = (result: string | number) => any;
+
 export abstract class Sequence {
 	name: string;
 	aliases: string[];
-	callback: Function;
+	callback: SequenceCallback;
 
 	constructor(name: string, options?: any) {
 		this.name = name;
@@ -29,6 +31,6 @@ export abstract class Sequence {
 	}
 
 	abstract increment(): void;
-	abstract next(): void;
+	abstract next(): string | number;
 	abstract reset(): void;
 }

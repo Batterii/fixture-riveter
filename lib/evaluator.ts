@@ -1,43 +1,77 @@
 import {Attribute} from "./attribute";
+import {
+	extractAttributes,
+	FactoryBuilder,
+} from "./factory-builder";
+
+import {omit, zip} from "lodash";
+
+type AttributeFuncs = Record<string, (e: Evaluator) => any>;
 
 export class Evaluator {
-	name: string;
-	attributes: Record<string, Function>;
+	factoryBuilder: FactoryBuilder;
+	buildStrategy: string;
+	attributes: AttributeFuncs;
 	cachedValues: Record<string, any>;
 
-	constructor(name: string, attributes: Attribute[]) {
-		this.name = name;
+	constructor(factoryBuilder: FactoryBuilder, buildStrategy: string, attributes: Attribute[]) {
+		this.factoryBuilder = factoryBuilder;
+		this.buildStrategy = buildStrategy;
 		this.cachedValues = [];
-		this.attributes = Evaluator.defineAttributes(attributes);
+		this.attributes = this.defineAttributes(attributes);
 	}
 
-	static defineAttributes(givenAttributes: Attribute[]): Record<string, Function> {
-		const attributes: Record<string, Function> = {};
+	defineAttributes(givenAttributes: Attribute[]): AttributeFuncs {
+		const attributes: AttributeFuncs = {};
 
 		for (const attribute of givenAttributes.reverse()) {
 			const {name} = attribute;
 			if (!Object.prototype.hasOwnProperty.call(attributes, name)) {
-				attributes[name] = attribute.build();
+				attributes[name] = attribute.evaluate(this);
 			}
 		}
 		return attributes;
 	}
 
-	attr(name: string): any {
+	async attr(name: string): Promise<any> {
 		if (!Object.prototype.hasOwnProperty.call(this.cachedValues, name)) {
 			const fn = this.attributes[name];
-			this.cachedValues[name] = fn(this);
+			this.cachedValues[name] = await fn(this);
 		}
 		return this.cachedValues[name];
 	}
 
-	run(): Record<string, any> {
-		const instance: Record<string, any> = {};
+	async run(): Promise<Record<string, any>> {
+		const names: string[] = [];
+		const promises: Promise<any>[] = [];
 
 		for (const name of Object.keys(this.attributes)) {
-			instance[name] = this.attr(name);
+			names.push(name);
+			promises.push(this.attr(name));
 		}
+		const attributes: any[] = [];
+		await Promise.all(promises).then((val) => {
+			for (const promise of val) {
+				attributes.push(promise);
+			}
+		});
 
+		const instance: Record<string, any> = {};
+		for (const [key, value] of zip(names, attributes)) {
+			instance[key as string] = value;
+		}
 		return instance;
+	}
+
+	async association(
+		factoryName: string,
+		...traitsAndOverrides: any[]
+	): Promise<Record<string, any>> {
+		const overrides = extractAttributes(traitsAndOverrides);
+		const strategy = overrides.strategy || this.buildStrategy;
+
+		traitsAndOverrides.push(omit(overrides, "strategy"));
+
+		return this.factoryBuilder.run(factoryName, strategy, traitsAndOverrides);
 	}
 }

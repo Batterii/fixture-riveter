@@ -1,6 +1,7 @@
 import {FactoryBuilder} from "../../../lib/factory-builder";
 import {Factory} from "../../../lib/factory";
 import {ImplicitDeclaration} from "../../../lib/declarations/implicit-declaration";
+import {AssociationAttribute} from "../../../lib/attributes/association-attribute";
 import {SequenceAttribute} from "../../../lib/attributes/sequence-attribute";
 
 import {expect} from "chai";
@@ -33,7 +34,20 @@ describe("ImplicitDeclaration", function() {
 				expect(factoryBuilder.getFactory).to.be.calledWithExactly(name, false);
 			});
 
-			it("returns an AssociationAttribute");
+			it("returns an AssociationAttribute", function() {
+				const factoryBuilder = new FactoryBuilder();
+				sinon.stub(factoryBuilder, "getFactory").returns(true as any);
+
+				const factory = {} as Factory;
+				const declaration = new ImplicitDeclaration(name, factoryBuilder, factory);
+				const array = declaration.build();
+				const [result] = array;
+
+				expect(array).to.be.an.instanceof(Array);
+				expect(array).to.have.length(1);
+				expect(result).to.be.an.instanceof(AssociationAttribute);
+				expect(result.name).to.equal(name);
+			});
 
 			it("does not call later functions", function() {
 				const factoryBuilder = new FactoryBuilder();

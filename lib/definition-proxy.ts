@@ -1,14 +1,19 @@
+import {Declaration} from "./declaration";
+import {AssociationDeclaration} from "./declarations/association-declaration";
 import {DynamicDeclaration} from "./declarations/dynamic-declaration";
 import {ImplicitDeclaration} from "./declarations/implicit-declaration";
 import {Trait} from "./trait";
 import {Definition} from "./definition";
 import {Factory} from "./factory";
-import {FactoryOptions} from "./factory-options-parser";
+import {blockFunction, FactoryOptions} from "./factory-options-parser";
 import {FactoryBuilder} from "./factory-builder";
-import {Sequence} from "./sequences/sequence";
+import {
+	Sequence,
+	SequenceCallback,
+} from "./sequences/sequence";
 import {SequenceHandler} from "./sequence-handler";
 
-import {isFunction} from "lodash";
+import {isFunction, last} from "lodash";
 
 export class DefinitionProxy {
 	definition: Definition;
@@ -33,11 +38,16 @@ export class DefinitionProxy {
 		return this.definition.sequenceHandler;
 	}
 
-	attr(name: string, block?: Function): void {
-		let declaration: DynamicDeclaration | ImplicitDeclaration;
+	attr(name: string, ...rest: any[]): void {
+		let declaration: Declaration;
 
-		if (block) {
-			declaration = new DynamicDeclaration(name, block);
+		if (rest.length > 0) {
+			const block = last(rest);
+			if (isFunction(block)) {
+				declaration = new DynamicDeclaration(name, block);
+			} else {
+				declaration = new AssociationDeclaration(name, rest);
+			}
 		} else {
 			declaration = new ImplicitDeclaration(
 				name,
@@ -48,25 +58,31 @@ export class DefinitionProxy {
 		this.definition.declareAttribute(declaration);
 	}
 
-	factory(name: string, model: object, rest?: FactoryOptions | Function): void;
+	factory(name: string, model: object, rest?: FactoryOptions | blockFunction): void;
+	factory(name: string, model: object, options: FactoryOptions, block?: blockFunction): void;
 	factory(name: string, model: object, ...rest: any[]): void {
 		this.childFactories.push([name, model, ...rest]);
+	}
+
+	association(name: string, ...rest: any[]): void {
+		const association = new AssociationDeclaration(name, rest);
+		this.definition.declareAttribute(association);
 	}
 
 	sequence(
 		name: string,
 		initial?: string | number,
 		options?: {aliases: string[]},
-		callback?: Function,
+		callback?: SequenceCallback,
 	): Sequence;
 
 	sequence(name: string, ...rest: any[]): Sequence {
-		const newSequence = this.sequenceHandler.registerSequence(name, ...rest);
-		this.definition.declareAttribute(new DynamicDeclaration(name, () => newSequence.next()));
-		return newSequence;
+		const sequence = this.sequenceHandler.registerSequence(name, ...rest);
+		this.definition.declareAttribute(new DynamicDeclaration(name, () => sequence.next()));
+		return sequence;
 	}
 
-	trait(name: string, block?: Function): void {
+	trait(name: string, block?: blockFunction): void {
 		if (block && isFunction(block)) {
 			this.definition.defineTrait(new Trait(name, this.factoryBuilder, block));
 		} else {

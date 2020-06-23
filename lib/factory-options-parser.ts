@@ -1,3 +1,5 @@
+import {DefinitionProxy} from "./definition-proxy";
+
 import {first, isFunction, isPlainObject, last} from "lodash";
 
 export interface FactoryOptions {
@@ -6,18 +8,20 @@ export interface FactoryOptions {
 	parent?: string;
 }
 
+export type blockFunction = (f: DefinitionProxy) => any;
+
 export function factoryOptionsParser(
-	option?: FactoryOptions | Function,
-): [Record<string, any>, Function | undefined];
+	option?: FactoryOptions | blockFunction,
+): [Record<string, any>, blockFunction | undefined];
 
 export function factoryOptionsParser(
 	objOption: FactoryOptions,
-	fnOption: Function,
-): [Record<string, any>, Function | undefined];
+	fnOption: blockFunction,
+): [Record<string, any>, blockFunction | undefined];
 
 export function factoryOptionsParser(
 	...rest: any[]
-): [Record<string, any>, Function | undefined] {
+): [Record<string, any>, blockFunction | undefined] {
 	let options = first(rest);
 	if (!isPlainObject(options)) {
 		options = {};

@@ -13,10 +13,10 @@ describe("DynamicAttribute", function() {
 		expect(result.block).to.equal(identity);
 	});
 
-	describe("#build", function() {
+	describe("#evaluate", function() {
 		it("returns a function that calls the block", function() {
 			const attribute = new DynamicAttribute("email", () => 1);
-			const result = attribute.build();
+			const result = attribute.evaluate();
 
 			expect(result()).to.equal(1);
 		});
@@ -25,9 +25,9 @@ describe("DynamicAttribute", function() {
 			const name = "email";
 			const attribute = new DynamicAttribute(name, (t: any) => t.age);
 			const context = {age: 33};
-			const result = attribute.build();
+			const result = attribute.evaluate();
 
-			expect(result(context)).to.equal(33);
+			expect(result(context as any)).to.equal(33);
 		});
 
 		it("calls the block with the right context", function() {
@@ -37,9 +37,9 @@ describe("DynamicAttribute", function() {
 				return this.age;
 			});
 			const context = {age: 33};
-			const result = attribute.build();
+			const result = attribute.evaluate();
 
-			expect(result(context)).to.equal(33);
+			expect(result(context as any)).to.equal(33);
 		});
 	});
 });

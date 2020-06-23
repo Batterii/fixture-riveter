@@ -1,6 +1,7 @@
 import {Attribute} from "./attribute";
 import {Declaration} from "./declaration";
 import {DeclarationHandler} from "./declaration-handler";
+import {blockFunction} from "./factory-options-parser";
 import {Trait} from "./trait";
 import {FactoryBuilder} from "./factory-builder";
 import {SequenceHandler} from "./sequence-handler";
@@ -15,7 +16,7 @@ export class Definition {
 	additionalTraits: string[];
 	traitsCache?: Record<string, Trait>;
 	compiled: boolean;
-	block?: Function;
+	block?: blockFunction;
 
 	sequenceHandler: SequenceHandler;
 	declarationHandler: DeclarationHandler;
@@ -114,7 +115,7 @@ export class Definition {
 		return this.getInternalTraits(this.additionalTraits);
 	}
 
-	aggregateFromTraitsAndSelf(attributes: Function): any {
+	aggregateFromTraitsAndSelf(attributes: () => Attribute[]): Attribute[] {
 		this.compile();
 
 		const baseTraits = this.getBaseTraits().flatMap(
@@ -134,13 +135,15 @@ export class Definition {
 
 	getAttributes(): Attribute[] {
 		if (!this.attributes || this.attributes.length === 0) {
-			const declarationAttributes = (): any => this.declarationHandler.getAttributes();
+			const declarationAttributes = (): Attribute[] => {
+				return this.declarationHandler.getAttributes();
+			};
 			this.attributes = this.aggregateFromTraitsAndSelf(declarationAttributes);
 		}
 		return this.attributes;
 	}
 
-	copy(): any {
+	copy<T>(): T {
 		const copy = Object.assign(Object.create(Object.getPrototypeOf(this)), this);
 		copy.compiled = false;
 		delete copy.attributes;

@@ -4,7 +4,11 @@ import {Definition} from "./definition";
 import {Evaluator} from "./evaluator";
 import {FactoryBuilder} from "./factory-builder";
 import {NullFactory} from "./null-factory";
-import {FactoryOptions, factoryOptionsParser} from "./factory-options-parser";
+import {
+	blockFunction,
+	FactoryOptions,
+	factoryOptionsParser,
+} from "./factory-options-parser";
 
 import {isFunction} from "lodash";
 
@@ -22,7 +26,7 @@ export class Factory extends Definition {
 		factoryBuilder: FactoryBuilder,
 		name: string,
 		model: any,
-		rest?: FactoryOptions | Function,
+		rest?: FactoryOptions | blockFunction,
 	);
 
 	constructor(
@@ -30,7 +34,7 @@ export class Factory extends Definition {
 		name: string,
 		model: any,
 		options?: FactoryOptions,
-		block?: Function,
+		block?: blockFunction,
 	);
 
 	constructor(
@@ -97,16 +101,16 @@ export class Factory extends Definition {
 		return attributesToKeep.concat(definitionAttributes);
 	}
 
-	applyAttributes(extraAttributes?: ExtraAttributes): Record<string, any> {
+	async applyAttributes(extraAttributes?: ExtraAttributes): Promise<Record<string, any>> {
 		const {attrs} = mergeDefaults(extraAttributes);
 
 		const attributesToApply = this.getAttributes()
 			// This will skip any attribute passed in by the caller
 			.filter((attribute) => !Object.prototype.hasOwnProperty.call(attrs, attribute.name));
 
-		const evaluator = new Evaluator(this.name, attributesToApply);
+		const evaluator = new Evaluator(this.factoryBuilder, "build", attributesToApply);
 
-		const instance = evaluator.run();
+		const instance = await evaluator.run();
 
 		for (const [key, value] of Object.entries(attrs)) {
 			instance[key] = value;
@@ -114,14 +118,34 @@ export class Factory extends Definition {
 		return instance;
 	}
 
-	async build(adapter: Adapter, extraAttributes?: ExtraAttributes): Promise<any> {
-		const modelAttrs = this.applyAttributes(extraAttributes);
-		return adapter.build(this.model, modelAttrs);
+	async build(
+		adapter: Adapter,
+		instance: Record<string, any>,
+	): Promise<any> {
+		return adapter.build(instance, this.model);
 	}
 
-	async create(adapter: Adapter, extraAttributes?: ExtraAttributes): Promise<any> {
-		const instance = await this.build(adapter, extraAttributes);
+	async create(
+		adapter: Adapter,
+		instance: Record<string, any>,
+	): Promise<any> {
 		return adapter.save(instance, this.model);
+	}
+
+	async run(
+		buildStrategy: string,
+		adapter: Adapter,
+		extraAttributes?: ExtraAttributes,
+	): Promise<any> {
+		let instance = await this.applyAttributes(extraAttributes);
+
+		if (buildStrategy === "build") {
+			instance = await this.build(adapter, instance);
+		} else if (buildStrategy === "create") {
+			instance = await this.build(adapter, instance);
+			instance = await this.create(adapter, instance);
+		}
+		return instance;
 	}
 }
 

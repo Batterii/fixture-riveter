@@ -191,7 +191,7 @@ describe("FactoryBuilder", function() {
 	});
 
 	describe("#attributesFor", function() {
-		it("returns an object with the defined attributes", function() {
+		it("returns an object with the defined attributes", async function() {
 			const name = "Noah";
 			const age = 32;
 
@@ -202,7 +202,7 @@ describe("FactoryBuilder", function() {
 					f.attr("age", () => age);
 				});
 			});
-			const result = fb.attributesFor("user");
+			const result = await fb.attributesFor("user");
 			const expected = new DummyModel(name, age);
 
 			expect(result).to.be.an("object");

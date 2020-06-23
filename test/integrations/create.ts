@@ -22,18 +22,14 @@ describe("#create", function() {
 	});
 
 	it("inserts into the database", async function() {
-		const model = await fb.create("user", {name: "Bogart"});
-		const model2 = await fb.create("user");
+		const user = await fb.create("user", {name: "Bogart"});
 
-		expect(model.id).to.exist;
-		expect(model.name).to.equal("Bogart");
-		expect(model.email).to.equal("test1@foo.bar");
-		expect(model2.email).to.equal("test2@foo.bar");
-		expect(model).to.be.an.instanceof(User);
+		expect(user.id).to.exist;
+		expect(user.name).to.equal("Bogart");
+		expect(user.email).to.equal("test1@foo.bar");
+		expect(user).to.be.an.instanceof(User);
 
-		expect(model.email).to.not.equal(model2.email);
-
-		const user = await User.query().findById(model.id);
-		expect(user.id).to.equal(model.id);
+		const model = await User.query().findById(user.id);
+		expect(model.id).to.equal(user.id);
 	});
 });

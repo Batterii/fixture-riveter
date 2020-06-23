@@ -125,7 +125,7 @@ describe("tests from factory_bot", function() {
 				});
 
 				fb.trait("email", (t: any) => {
-					t.attr("email", (a: any) => `${a.attr("name")}@example.com`);
+					t.attr("email", async(e: any) => `${await e.attr("name")}@example.com`);
 				});
 
 				fb.factory("userWithEmail", User, {traits: ["email"]}, (f: any) => {
@@ -266,13 +266,15 @@ describe("tests from factory_bot", function() {
 
 		fb.define(function() {
 			fb.trait("email", (f: any) => {
-				f.attr("email", (a) => `${a.attr("name")}@example.com`);
+				f.attr("email", async(e) => `${await e.attr("name")}@example.com`);
 			});
 
 			fb.factory("user", User, (f: any) => {
 				f.attr("name", () => "John");
 				f.attr("email");
-				f.attr("combined", (a) => `${a.attr("name")} <${a.attr("email")}>`);
+				f.attr("combined", async(e) => {
+					return `${await e.attr("name")} <${await e.attr("email")}>`;
+				});
 			});
 		});
 
@@ -287,13 +289,7 @@ describe("tests from factory_bot", function() {
 			static tableName = "users";
 
 			id: string;
-			name: string;
-			age: number;
-			admin: boolean;
-			gender: string;
-			email: string;
-			dateOfBirth: Date;
-			great: string;
+			status: string;
 		}
 		let fb: FactoryBuilder;
 

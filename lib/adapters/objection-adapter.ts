@@ -2,7 +2,7 @@ import {Adapter} from "./adapter";
 
 /* eslint-disable class-methods-use-this */
 export class ObjectionAdapter implements Adapter {
-	build(Model: any, props = {}): any {
+	build(props = {}, Model: any): any {
 		return Object.assign(new Model(), props);
 	}
 

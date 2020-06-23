@@ -9,7 +9,7 @@ export class SequenceAttribute extends Attribute {
 		this.sequence = sequence;
 	}
 
-	build(): Function {
+	evaluate(): () => string | number {
 		return () => this.sequence.next();
 	}
 }

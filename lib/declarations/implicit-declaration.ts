@@ -2,6 +2,7 @@ import {Attribute} from "../attribute";
 import {Declaration} from "../declaration";
 import {Factory} from "../factory";
 import {FactoryBuilder} from "../factory-builder";
+import {AssociationAttribute} from "../attributes/association-attribute";
 import {SequenceAttribute} from "../attributes/sequence-attribute";
 
 export class ImplicitDeclaration extends Declaration {
@@ -21,7 +22,7 @@ export class ImplicitDeclaration extends Declaration {
 	build(): Attribute[] {
 		const factory = this.factoryBuilder.getFactory(this.name, false);
 		if (factory) {
-			return []; // to do: Association
+			return [new AssociationAttribute(this.name, this.name, [])];
 		}
 		const sequence = this.factoryBuilder.findSequence(this.name);
 		if (sequence) {
