@@ -6,6 +6,8 @@ import {DefaultAdapter} from "../../lib/adapters/default-adapter";
 import {DefinitionProxy} from "../../lib/definition-proxy";
 import {NullFactory} from "../../lib/null-factory";
 
+import {AttributesForStrategy} from "../../lib/strategies/attributes-for-strategy";
+
 import {DummyModel} from "../test-fixtures/dummy-model";
 
 import {expect} from "chai";
@@ -237,13 +239,16 @@ describe("Factory", function() {
 	});
 
 	describe("#applyAttributes", function() {
+		let buildStrategy: AttributesForStrategy;
+
 		beforeEach(function() {
 			factoryBuilder = new FactoryBuilder();
+			buildStrategy = new AttributesForStrategy(factoryBuilder, {} as DefaultAdapter);
 		});
 
 		it("creates an object", async function() {
 			const factory = new Factory(factoryBuilder, "dummy", DummyModel);
-			const result = await factory.applyAttributes();
+			const result = await factory.applyAttributes(buildStrategy);
 
 			expect(result).to.exist;
 			expect(result).to.be.instanceof(Object);
@@ -256,7 +261,7 @@ describe("Factory", function() {
 				new DynamicAttribute("name", () => "Noah"),
 				new DynamicAttribute("age", () => 32),
 			];
-			const result = await factory.applyAttributes();
+			const result = await factory.applyAttributes(buildStrategy);
 
 			expect(result).to.deep.equal({name: "Noah", age: 32});
 		});
@@ -269,7 +274,7 @@ describe("Factory", function() {
 				new DynamicAttribute("age", () => 32),
 			];
 			const extraAttributes = {attrs: {name: "Bogart"}};
-			const result = await factory.applyAttributes(extraAttributes);
+			const result = await factory.applyAttributes(buildStrategy, extraAttributes);
 
 			expect(result).to.deep.equal({name: "Bogart", age: 32});
 		});
@@ -320,82 +325,21 @@ describe("Factory", function() {
 		});
 	});
 
-	describe("#build", function() {
-		it("calls the adapter's build method", async function() {
-			const adapter = new DefaultAdapter();
-			sinon.stub(adapter, "build");
-			const factory = new Factory(factoryBuilder, "dummy", DummyModel);
-			const instance = {};
-			await factory.build(adapter, instance);
-
-			expect(adapter.build).to.be.calledOnce;
-			expect(adapter.build).to.be.calledOnceWithExactly(instance, DummyModel);
-		});
-	});
-
-	describe("#create", function() {
-		it("calls save on the adapter", async function() {
-			const adapter = new DefaultAdapter();
-			const factory = new Factory(factoryBuilder, "dummy", DummyModel);
-			sinon.stub(adapter, "save");
-			const instance = {};
-			await factory.create(adapter, instance);
-
-			expect(adapter.save).to.be.calledOnce;
-			expect(adapter.save).to.be.calledOnceWithExactly(instance, DummyModel);
-		});
-	});
-
 	describe("#run", function() {
-		context("calls applyAttributes unconditionally", function() {
-			let adapter: DefaultAdapter;
-			let factory: Factory;
-			let instance: any;
+		it("calls attributesFor", async function() {
+			const adapter = new DefaultAdapter();
+			const factory = new Factory(factoryBuilder, "dummy", DummyModel);
+			const instance = {};
 
-			beforeEach(function() {
-				adapter = new DefaultAdapter();
-				factory = new Factory(factoryBuilder, "dummy", DummyModel);
-				instance = {};
+			sinon.stub(factory, "applyAttributes").resolves(instance);
 
-				sinon.stub(factory, "applyAttributes").resolves(instance);
-				sinon.stub(factory, "build").resolves(instance);
-				sinon.stub(factory, "create").resolves(instance);
-			});
+			const buildStrategy = new AttributesForStrategy(factoryBuilder, adapter);
+			sinon.stub(buildStrategy, "run").resolves(instance);
 
-			it("with attributesFor", async function() {
-				const buildStrategy = "attributesFor";
+			const result = await factory.run(buildStrategy);
 
-				const result = await factory.run(buildStrategy, adapter);
-
-				expect(result).to.equal(instance);
-				expect(factory.applyAttributes).to.be.calledOnceWithExactly(undefined);
-				expect(factory.build).to.not.be.called;
-				expect(factory.create).to.not.be.called;
-			});
-
-			it("with build", async function() {
-				const buildStrategy = "build";
-
-				const result = await factory.run(buildStrategy, adapter);
-
-				expect(result).to.equal(instance);
-				expect(factory.applyAttributes).to.be.calledOnce;
-				expect(factory.applyAttributes).to.be.calledOnceWith();
-				expect(factory.build).to.be.calledOnceWithExactly(adapter, instance);
-				expect(factory.create).to.not.be.called;
-			});
-
-			it("with create", async function() {
-				const buildStrategy = "create";
-
-				const result = await factory.run(buildStrategy, adapter);
-
-				expect(result).to.equal(instance);
-				expect(factory.applyAttributes).to.be.calledOnce;
-				expect(factory.applyAttributes).to.be.calledOnceWith();
-				expect(factory.build).to.be.calledOnceWithExactly(adapter, instance);
-				expect(factory.create).to.be.calledOnceWithExactly(adapter, instance);
-			});
+			expect(result).to.equal(instance);
+			expect(factory.applyAttributes).to.be.calledOnceWithExactly(buildStrategy, undefined);
 		});
 	});
 });

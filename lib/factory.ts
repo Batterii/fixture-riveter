@@ -9,6 +9,7 @@ import {
 	FactoryOptions,
 	factoryOptionsParser,
 } from "./factory-options-parser";
+import {Strategy} from "./strategies/strategy";
 
 import {isFunction} from "lodash";
 
@@ -101,14 +102,17 @@ export class Factory extends Definition {
 		return attributesToKeep.concat(definitionAttributes);
 	}
 
-	async applyAttributes(extraAttributes?: ExtraAttributes): Promise<Record<string, any>> {
+	async applyAttributes(
+		buildStrategy: Strategy,
+		extraAttributes?: ExtraAttributes,
+	): Promise<Record<string, any>> {
 		const {attrs} = mergeDefaults(extraAttributes);
 
 		const attributesToApply = this.getAttributes()
 			// This will skip any attribute passed in by the caller
 			.filter((attribute) => !Object.prototype.hasOwnProperty.call(attrs, attribute.name));
 
-		const evaluator = new Evaluator(this.factoryBuilder, "build", attributesToApply);
+		const evaluator = new Evaluator(this.factoryBuilder, buildStrategy, attributesToApply);
 
 		const instance = await evaluator.run();
 
@@ -118,33 +122,9 @@ export class Factory extends Definition {
 		return instance;
 	}
 
-	async build(
-		adapter: Adapter,
-		instance: Record<string, any>,
-	): Promise<any> {
-		return adapter.build(instance, this.model);
-	}
-
-	async create(
-		adapter: Adapter,
-		instance: Record<string, any>,
-	): Promise<any> {
-		return adapter.save(instance, this.model);
-	}
-
-	async run(
-		buildStrategy: string,
-		adapter: Adapter,
-		extraAttributes?: ExtraAttributes,
-	): Promise<any> {
-		let instance = await this.applyAttributes(extraAttributes);
-
-		if (buildStrategy === "build") {
-			instance = await this.build(adapter, instance);
-		} else if (buildStrategy === "create") {
-			instance = await this.build(adapter, instance);
-			instance = await this.create(adapter, instance);
-		}
+	async run(buildStrategy: Strategy, extraAttributes?: ExtraAttributes): Promise<any> {
+		let instance = await this.applyAttributes(buildStrategy, extraAttributes);
+		instance = await buildStrategy.run(instance, this.model);
 		return instance;
 	}
 }

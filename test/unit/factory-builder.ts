@@ -191,98 +191,35 @@ describe("FactoryBuilder", function() {
 	});
 
 	describe("#attributesFor", function() {
-		it("returns an object with the defined attributes", async function() {
-			const name = "Noah";
-			const age = 32;
-
+		it("calls run correctly", async function() {
 			const fb = new FactoryBuilder();
-			fb.define(function() {
-				fb.factory("user", DummyModel, (f: any) => {
-					f.attr("name", () => name);
-					f.attr("age", () => age);
-				});
-			});
-			const result = await fb.attributesFor("user");
-			const expected = new DummyModel(name, age);
-
-			expect(result).to.be.an("object");
-			expect(result).to.deep.equal(expected);
+			const name = "name";
+			sinon.stub(fb, "run").resolves({});
+			await fb.attributesFor(name);
+			expect(fb.run).to.be.calledOnceWith(name, "attributesFor", []);
 		});
 	});
 
 	describe("#build", function() {
-		it("returns an instance of the model", async function() {
-			const name = "name";
-			const factory = new FactoryBuilder();
-			factory.factory(name, DummyModel);
-			const result = await factory.build(name);
-
-			expect(result).to.be.instanceof(DummyModel);
-		});
-
-		it("can build from an alias", async function() {
-			const factory = new FactoryBuilder();
-			factory.factory("dummy", DummyModel, {aliases: ["user"]});
-			const result = await factory.build("user");
-
-			expect(result).to.be.instanceof(DummyModel);
-		});
-
-		it("calls the right functions", async function() {
+		it("calls run correctly", async function() {
 			const fb = new FactoryBuilder();
 			const name = "name";
-			const adapter = new DefaultAdapter();
-			const factory = new Factory(fb, name, DummyModel);
-			fb.factory(name, DummyModel);
-			sinon.stub(fb, "getAdapter").returns(adapter);
-			sinon.stub(fb, "getFactory").returns(factory);
-			sinon.spy(factory, "build");
+			sinon.stub(fb, "run").resolves({});
 			await fb.build(name);
-
-			expect(fb.getAdapter).to.be.calledOnce;
-			expect(fb.getFactory).to.be.calledOnce;
-			expect(fb.getFactory).to.be.calledOnceWithExactly(name);
-			expect(factory.build).to.be.calledOnce;
-			expect(factory.build).to.be.calledOnceWith(adapter);
+			expect(fb.run).to.be.calledOnceWith(name, "build", []);
 		});
 	});
 
 	describe("#create", function() {
-		it("returns an instance of the model", async function() {
-			const name = "name";
-			const factory = new FactoryBuilder();
-			factory.factory(name, DummyModel);
-			const result = await factory.create(name);
-
-			expect(result).to.be.instanceof(DummyModel);
-		});
-
-		it("can create from an alias", async function() {
-			const factory = new FactoryBuilder();
-			factory.factory("dummy", DummyModel, {aliases: ["user"]});
-			const result = await factory.create("user");
-
-			expect(result).to.be.instanceof(DummyModel);
-		});
-
-		it("calls the right functions", async function() {
+		it("calls run correctly", async function() {
 			const fb = new FactoryBuilder();
 			const name = "name";
-			const adapter = new DefaultAdapter();
-			const factory = new Factory(fb, name, DummyModel);
-			fb.factory(name, DummyModel);
-			sinon.stub(fb, "getAdapter").returns(adapter);
-			sinon.stub(fb, "getFactory").returns(factory);
-			sinon.spy(factory, "create");
+			sinon.stub(fb, "run").resolves({});
 			await fb.create(name);
-
-			expect(fb.getAdapter).to.be.calledOnce;
-			expect(fb.getFactory).to.be.calledOnce;
-			expect(fb.getFactory).to.be.calledOnceWithExactly(name);
-			expect(factory.create).to.be.calledOnce;
-			expect(factory.create).to.be.calledOnceWith(adapter);
+			expect(fb.run).to.be.calledOnceWith(name, "create", []);
 		});
 	});
+
 
 	describe("#sequence", function() {
 		it("returns the created sequence", function() {

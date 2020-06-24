@@ -1,18 +1,19 @@
 import {Adapter} from "./adapter";
 
 /* eslint-disable class-methods-use-this */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 export class DefaultAdapter implements Adapter {
-	build(props = {}, Model: any): any {
-		return Object.assign(new Model(), props);
+	build(attributes = {}, Model: any): any {
+		return Object.assign(new Model(), attributes);
 	}
 
-	async save(model: any): Promise<any> {
-		await model.save();
-		return model;
+	async save(instance: any, Model?: any): Promise<any> {
+		await instance.save();
+		return instance;
 	}
 
-	async destroy(model: any): Promise<any> {
-		await model.destroy();
-		return model;
+	async destroy(instance: any, Model?: any): Promise<any> {
+		await instance.destroy();
+		return instance;
 	}
 }

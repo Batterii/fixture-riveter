@@ -9,6 +9,11 @@ import {
 } from "./factory-options-parser";
 import {Sequence} from "./sequences/sequence";
 import {SequenceHandler} from "./sequence-handler";
+import {Strategy} from "./strategies/strategy";
+import {AttributesForStrategy} from "./strategies/attributes-for-strategy";
+import {BuildStrategy} from "./strategies/build-strategy";
+import {CreateStrategy} from "./strategies/create-strategy";
+import {NullStrategy} from "./strategies/null-strategy";
 import {Trait} from "./trait";
 
 import {isPlainObject, last} from "lodash";
@@ -24,6 +29,25 @@ export function extractAttributes(traitsAndOptions: any[]): Record<string, any> 
 export function buildTraitsAndAttributes(traits: any[]): any {
 	const attrs = extractAttributes(traits);
 	return {traits, attrs};
+}
+
+export function strategyCalculator(
+	factoryBuilder: FactoryBuilder,
+	buildStrategy: string,
+	adapter: Adapter,
+): Strategy {
+	switch (buildStrategy) {
+		case "attributesFor":
+			return new AttributesForStrategy(factoryBuilder, adapter);
+		case "build":
+			return new BuildStrategy(factoryBuilder, adapter);
+		case "create":
+			return new CreateStrategy(factoryBuilder, adapter);
+		case "null":
+			return new NullStrategy(factoryBuilder, adapter);
+		default:
+			throw new Error("Choose a better strategy");
+	}
 }
 
 export class FactoryBuilder {
@@ -66,7 +90,14 @@ export class FactoryBuilder {
 	}
 
 	factory(name: string, model: Function, rest?: FactoryOptions | blockFunction): Factory;
-	factory(name: string, model: Function, options?: FactoryOptions, block?: blockFunction): Factory;
+
+	factory(
+		name: string,
+		model: Function,
+		options?: FactoryOptions,
+		block?: blockFunction,
+	): Factory;
+
 	factory(name: string, model: Function, ...rest: any[]): Factory {
 		if (this.getFactory(name, false)) {
 			throw new Error(`${name} is already defined`);
@@ -134,7 +165,7 @@ export class FactoryBuilder {
 		return this.sequenceHandler.findSequence(name);
 	}
 
-	async run(name: string, buildStrategy: string, traits: any[]): Promise<Record<string, any>> {
+	async run(name: string, strategy: string, traits: any[]): Promise<Record<string, any>> {
 		const traitsAndAttributes = buildTraitsAndAttributes(traits);
 		let factory = this.getFactory(name);
 		if (traitsAndAttributes.traits.length > 0) {
@@ -143,11 +174,12 @@ export class FactoryBuilder {
 			delete traitsAndAttributes.traits;
 		}
 		const adapter = this.getAdapter();
-		return factory.run(buildStrategy, adapter, traitsAndAttributes);
+		const buildStrategy = strategyCalculator(this, strategy, adapter);
+		return factory.run(buildStrategy, traitsAndAttributes);
 	}
 
 	async attributesFor(name: string, ...traits: any[]): Promise<Record<string, any>> {
-		return this.run(name, "applyAttributes", traits);
+		return this.run(name, "attributesFor", traits);
 	}
 
 	async build(name: string, ...traits: any[]): Promise<Record<string, any>> {

@@ -1,16 +1,12 @@
-import {Adapter} from "./adapter";
+import {DefaultAdapter} from "./default-adapter";
 
 /* eslint-disable class-methods-use-this */
-export class ObjectionAdapter implements Adapter {
-	build(props = {}, Model: any): any {
-		return Object.assign(new Model(), props);
+export class ObjectionAdapter extends DefaultAdapter {
+	async save(instance: any, Model: any): Promise<any> {
+		return Model.query().insert(instance);
 	}
 
-	async save(model: any, Model: any): Promise<any> {
-		return Model.query().insert(model);
-	}
-
-	async destroy(model: any, Model: any): Promise<any> {
-		return Model.query().deleteById(model.id);
+	async destroy(instance: any, Model: any): Promise<any> {
+		return Model.query().deleteById(instance.id);
 	}
 }

@@ -2,7 +2,9 @@ import {Attribute} from "./attribute";
 import {
 	extractAttributes,
 	FactoryBuilder,
+	strategyCalculator,
 } from "./factory-builder";
+import {Strategy} from "./strategies/strategy";
 
 import {omit, zip} from "lodash";
 
@@ -10,11 +12,15 @@ type AttributeFuncs = Record<string, (e: Evaluator) => any>;
 
 export class Evaluator {
 	factoryBuilder: FactoryBuilder;
-	buildStrategy: string;
+	buildStrategy: Strategy;
 	attributes: AttributeFuncs;
 	cachedValues: Record<string, any>;
 
-	constructor(factoryBuilder: FactoryBuilder, buildStrategy: string, attributes: Attribute[]) {
+	constructor(
+		factoryBuilder: FactoryBuilder,
+		buildStrategy: Strategy,
+		attributes: Attribute[],
+	) {
 		this.factoryBuilder = factoryBuilder;
 		this.buildStrategy = buildStrategy;
 		this.cachedValues = [];
@@ -68,10 +74,18 @@ export class Evaluator {
 		...traitsAndOverrides: any[]
 	): Promise<Record<string, any>> {
 		const overrides = extractAttributes(traitsAndOverrides);
-		const strategy = overrides.strategy || this.buildStrategy;
 
-		traitsAndOverrides.push(omit(overrides, "strategy"));
+		let {buildStrategy} = this;
+		if (overrides.strategy) {
+			buildStrategy = strategyCalculator(
+				this.factoryBuilder,
+				overrides.strategy,
+				this.buildStrategy.adapter,
+			);
+		}
 
-		return this.factoryBuilder.run(factoryName, strategy, traitsAndOverrides);
+		traitsAndOverrides.push(omit(overrides, "buildStrategy"));
+
+		return buildStrategy.association(factoryName, traitsAndOverrides);
 	}
 }
