@@ -14,20 +14,24 @@ export class Evaluator {
 	factoryBuilder: FactoryBuilder;
 	buildStrategy: Strategy;
 	attributes: AttributeFuncs;
+	overrides: Record<string, any>;
 	cachedValues: Record<string, any>;
 
 	constructor(
 		factoryBuilder: FactoryBuilder,
 		buildStrategy: Strategy,
 		attributes: Attribute[],
+		overrides: Record<string, any>,
 	) {
 		this.factoryBuilder = factoryBuilder;
 		this.buildStrategy = buildStrategy;
 		this.cachedValues = [];
-		this.attributes = this.defineAttributes(attributes);
+
+		this.defineAttributes(attributes);
+		this.assignOverrides(overrides);
 	}
 
-	defineAttributes(givenAttributes: Attribute[]): AttributeFuncs {
+	defineAttributes(givenAttributes: Attribute[]): void {
 		const attributes: AttributeFuncs = {};
 
 		for (const attribute of givenAttributes.reverse()) {
@@ -36,7 +40,13 @@ export class Evaluator {
 				attributes[name] = attribute.evaluate(this);
 			}
 		}
-		return attributes;
+		this.attributes = attributes;
+	}
+
+	assignOverrides(overrides: Record<string, any>): void {
+		for (const [key, value] of Object.entries(overrides)) {
+			this.attributes[key] = () => value;
+		}
 	}
 
 	async attr(name: string): Promise<any> {
@@ -75,17 +85,25 @@ export class Evaluator {
 	): Promise<Record<string, any>> {
 		const overrides = extractAttributes(traitsAndOverrides);
 
-		let {buildStrategy} = this;
+		let strategyOverride: Strategy;
 		if (overrides.strategy) {
-			buildStrategy = strategyCalculator(
+			strategyOverride = strategyCalculator(
 				this.factoryBuilder,
 				overrides.strategy,
+				this.buildStrategy.adapter,
+			);
+		} else if (this.factoryBuilder.useParentStrategy) {
+			strategyOverride = this.buildStrategy;
+		} else {
+			strategyOverride = strategyCalculator(
+				this.factoryBuilder,
+				"create",
 				this.buildStrategy.adapter,
 			);
 		}
 
 		traitsAndOverrides.push(omit(overrides, "buildStrategy"));
 
-		return buildStrategy.association(factoryName, traitsAndOverrides);
+		return strategyOverride.association(factoryName, traitsAndOverrides);
 	}
 }

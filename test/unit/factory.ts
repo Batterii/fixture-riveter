@@ -238,48 +238,47 @@ describe("Factory", function() {
 		});
 	});
 
-	describe("#applyAttributes", function() {
-		let buildStrategy: AttributesForStrategy;
-
+	describe("attributesToApply", function() {
+		let overrides: Record<string, any>;
 		beforeEach(function() {
 			factoryBuilder = new FactoryBuilder();
-			buildStrategy = new AttributesForStrategy(factoryBuilder, {} as DefaultAdapter);
+			overrides = {};
 		});
 
-		it("creates an object", async function() {
+		it("creates an object", function() {
 			const factory = new Factory(factoryBuilder, "dummy", DummyModel);
-			const result = await factory.applyAttributes(buildStrategy);
+			const result = factory.attributesToApply(overrides);
 
 			expect(result).to.exist;
 			expect(result).to.be.instanceof(Object);
 		});
 
-		it("iterates over attributes", async function() {
+		it("iterates over attributes", function() {
 			const factory = new Factory(factoryBuilder, "dummy", DummyModel);
 			factory.compiled = true;
 			factory.attributes = [
 				new DynamicAttribute("name", () => "Noah"),
 				new DynamicAttribute("age", () => 32),
 			];
-			const result = await factory.applyAttributes(buildStrategy);
+			const result = factory.attributesToApply(overrides);
 
 			expect(result).to.deep.equal({name: "Noah", age: 32});
 		});
 
-		it("applies attrs argument last", async function() {
+		it("applies attrs argument last", function() {
 			const factory = new Factory(factoryBuilder, "dummy", DummyModel);
 			factory.compiled = true;
 			factory.attributes = [
 				new DynamicAttribute("name", () => "Noah"),
 				new DynamicAttribute("age", () => 32),
 			];
-			const extraAttributes = {attrs: {name: "Bogart"}};
-			const result = await factory.applyAttributes(buildStrategy, extraAttributes);
+			const extraAttributes = {name: "Bogart"};
+			const result = factory.attributesToApply(extraAttributes);
 
 			expect(result).to.deep.equal({name: "Bogart", age: 32});
 		});
 
-		it("applies attributes from parent attribute", async function() {
+		it("applies attributes from parent attribute", function() {
 			factoryBuilder.define((fb: FactoryBuilder) => {
 				fb.factory("parent", DummyModel, (f: DefinitionProxy) => {
 					f.attr("execute1", () => 1);
@@ -295,7 +294,7 @@ describe("Factory", function() {
 					},
 				);
 			});
-			const result = await factoryBuilder.attributesFor("child");
+			const result = factoryBuilder.attributesFor("child");
 
 			expect(result).to.deep.equal({execute1: 1, execute2: 20, execute3: 3});
 		});
@@ -329,17 +328,17 @@ describe("Factory", function() {
 		it("calls attributesFor", async function() {
 			const adapter = new DefaultAdapter();
 			const factory = new Factory(factoryBuilder, "dummy", DummyModel);
-			const instance = {};
+			const instance = [];
 
-			sinon.stub(factory, "applyAttributes").resolves(instance);
+			sinon.stub(factory, "attributesToApply").resolves(instance);
 
 			const buildStrategy = new AttributesForStrategy(factoryBuilder, adapter);
-			sinon.stub(buildStrategy, "run").resolves(instance);
+			sinon.stub(buildStrategy, "result").resolves(instance);
 
 			const result = await factory.run(buildStrategy);
 
 			expect(result).to.equal(instance);
-			expect(factory.applyAttributes).to.be.calledOnceWithExactly(buildStrategy, undefined);
+			expect(factory.attributesToApply).to.be.calledOnceWithExactly(buildStrategy, undefined);
 		});
 	});
 });

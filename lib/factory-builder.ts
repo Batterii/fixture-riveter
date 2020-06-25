@@ -7,7 +7,10 @@ import {
 	FactoryOptions,
 	factoryOptionsParser,
 } from "./factory-options-parser";
-import {Sequence} from "./sequences/sequence";
+import {
+	Sequence,
+	SequenceCallback,
+} from "./sequences/sequence";
 import {SequenceHandler} from "./sequence-handler";
 import {Strategy} from "./strategies/strategy";
 import {AttributesForStrategy} from "./strategies/attributes-for-strategy";
@@ -15,6 +18,11 @@ import {BuildStrategy} from "./strategies/build-strategy";
 import {CreateStrategy} from "./strategies/create-strategy";
 import {NullStrategy} from "./strategies/null-strategy";
 import {Trait} from "./trait";
+import {
+	callbackFunction,
+	Callback,
+} from "./callback";
+import {CallbackHandler} from "./callback-handler";
 
 import {isPlainObject, last} from "lodash";
 
@@ -55,12 +63,16 @@ export class FactoryBuilder {
 	traits: Record<string, Trait>;
 	adapterHandler: any;
 	sequenceHandler: SequenceHandler;
+	useParentStrategy: boolean;
+	callbackHandler: CallbackHandler;
 
 	constructor() {
 		this.factories = {};
 		this.traits = {};
 		this.adapterHandler = new AdapterHandler();
 		this.sequenceHandler = new SequenceHandler();
+		this.callbackHandler = new CallbackHandler(this);
+		this.useParentStrategy = true;
 	}
 
 	getAdapter(factoryName?: string): Adapter {
@@ -140,7 +152,7 @@ export class FactoryBuilder {
 
 	sequence(
 		name: string,
-		initial?: string | number | {aliases: string[]} | Function,
+		initial?: string | number | {aliases: string[]} | SequenceCallback,
 	): Sequence;
 
 	sequence(
@@ -188,5 +200,21 @@ export class FactoryBuilder {
 
 	async create(name: string, ...traits: any[]): Promise<Record<string, any>> {
 		return this.run(name, "create", traits);
+	}
+
+	before(name: string, block: callbackFunction): void;
+	before(name: string, ...rest: any[]): void;
+	before(...rest: any[]): void {
+		this.callbackHandler.before(...rest);
+	}
+
+	after(name: string, block: callbackFunction): void;
+	after(name: string, ...rest: any[]): void;
+	after(...rest: any[]): void {
+		this.callbackHandler.after(...rest);
+	}
+
+	getCallbacks(): Callback[] {
+		return this.callbackHandler.callbacks;
 	}
 }

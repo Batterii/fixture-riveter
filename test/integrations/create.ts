@@ -13,10 +13,10 @@ describe("#create", function() {
 		fb.setAdapter(new ObjectionAdapter());
 
 		fb.define(function() {
-			fb.factory("user", User, (f: any) => {
+			fb.factory("user", User, (f) => {
 				f.attr("name", () => "Noah");
 				f.attr("age", () => 32);
-				f.sequence("email", (n: number) => `test${n}@foo.bar`);
+				f.sequence("email", (n) => `test${n}@foo.bar`);
 			});
 		});
 	});

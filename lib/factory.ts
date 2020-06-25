@@ -1,5 +1,5 @@
-import {Adapter} from "./adapters/adapter";
 import {Attribute} from "./attribute";
+import {CallbackHandler} from "./callback-handler";
 import {Definition} from "./definition";
 import {Evaluator} from "./evaluator";
 import {FactoryBuilder} from "./factory-builder";
@@ -12,6 +12,7 @@ import {
 import {Strategy} from "./strategies/strategy";
 
 import {isFunction} from "lodash";
+import {Callback} from "./callback";
 
 export interface ExtraAttributes {
 	traits?: string[];
@@ -102,30 +103,38 @@ export class Factory extends Definition {
 		return attributesToKeep.concat(definitionAttributes);
 	}
 
-	async applyAttributes(
-		buildStrategy: Strategy,
-		extraAttributes?: ExtraAttributes,
-	): Promise<Record<string, any>> {
-		const {attrs} = mergeDefaults(extraAttributes);
-
-		const attributesToApply = this.getAttributes()
+	attributesToApply(overrides: Record<string, any>): Attribute[] {
+		return this.getAttributes()
 			// This will skip any attribute passed in by the caller
-			.filter((attribute) => !Object.prototype.hasOwnProperty.call(attrs, attribute.name));
+			.filter((attribute) => {
+				return !Object.prototype.hasOwnProperty.call(overrides, attribute.name);
+			});
+	}
 
-		const evaluator = new Evaluator(this.factoryBuilder, buildStrategy, attributesToApply);
+	getCallbacks(): Callback[] {
+		const globalCallbacks = this.factoryBuilder.getCallbacks();
+		const parentCallbacks = this.parentFactory().getCallbacks();
+		const definedCallbacks = super.getCallbacks();
 
-		const instance = await evaluator.run();
-
-		for (const [key, value] of Object.entries(attrs)) {
-			instance[key] = value;
-		}
-		return instance;
+		return Array.prototype.concat(globalCallbacks, parentCallbacks, definedCallbacks);
 	}
 
 	async run(buildStrategy: Strategy, extraAttributes?: ExtraAttributes): Promise<any> {
-		let instance = await this.applyAttributes(buildStrategy, extraAttributes);
-		instance = await buildStrategy.run(instance, this.model);
-		return instance;
+		const overrides = mergeDefaults(extraAttributes).attrs;
+
+		const attributesToApply = this.attributesToApply(overrides);
+
+		const evaluator = new Evaluator(
+			this.factoryBuilder,
+			buildStrategy,
+			attributesToApply,
+			overrides,
+		);
+
+		this.callbackHandler.setEvaluator(evaluator);
+		this.callbackHandler.setCallbacks(this.getCallbacks());
+
+		return buildStrategy.result(this.callbackHandler, this.model);
 	}
 }
 

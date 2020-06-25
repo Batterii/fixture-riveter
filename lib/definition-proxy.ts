@@ -5,7 +5,11 @@ import {ImplicitDeclaration} from "./declarations/implicit-declaration";
 import {Trait} from "./trait";
 import {Definition} from "./definition";
 import {Factory} from "./factory";
-import {blockFunction, FactoryOptions} from "./factory-options-parser";
+import {
+	blockFunction,
+	FactoryOptions,
+} from "./factory-options-parser";
+import {callbackFunction} from "./callback";
 import {FactoryBuilder} from "./factory-builder";
 import {
 	Sequence,
@@ -71,9 +75,7 @@ export class DefinitionProxy {
 
 	sequence(
 		name: string,
-		initial?: string | number,
-		options?: {aliases: string[]},
-		callback?: SequenceCallback,
+		initial?: string | number | {aliases: string[]} | SequenceCallback,
 	): Sequence;
 
 	sequence(name: string, ...rest: any[]): Sequence {
@@ -88,5 +90,15 @@ export class DefinitionProxy {
 		} else {
 			throw new Error(`wrong options, bruh: ${name}, ${block}`);
 		}
+	}
+
+	before(name: string, block: callbackFunction): void;
+	before(...rest: any[]): void {
+		this.definition.before(...rest);
+	}
+
+	after(name: string, block: callbackFunction): void;
+	after(...rest: any[]): void {
+		this.definition.after(...rest);
 	}
 }

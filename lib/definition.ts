@@ -1,4 +1,6 @@
 import {Attribute} from "./attribute";
+import {Callback} from "./callback";
+import {CallbackHandler} from "./callback-handler";
 import {Declaration} from "./declaration";
 import {DeclarationHandler} from "./declaration-handler";
 import {blockFunction} from "./factory-options-parser";
@@ -17,6 +19,7 @@ export class Definition {
 	traitsCache?: Record<string, Trait>;
 	compiled: boolean;
 	block?: blockFunction;
+	callbackHandler: CallbackHandler;
 
 	sequenceHandler: SequenceHandler;
 	declarationHandler: DeclarationHandler;
@@ -34,6 +37,7 @@ export class Definition {
 
 		this.sequenceHandler = new SequenceHandler();
 		this.declarationHandler = new DeclarationHandler(name);
+		this.callbackHandler = new CallbackHandler(factoryBuilder);
 	}
 
 	names(): string[] {
@@ -150,5 +154,17 @@ export class Definition {
 		delete copy.traitsCache;
 
 		return copy;
+	}
+
+	before(...rest: any[]): void {
+		this.callbackHandler.before(...rest);
+	}
+
+	after(...rest: any[]): void {
+		this.callbackHandler.after(...rest);
+	}
+
+	getCallbacks(): Callback[] {
+		return this.callbackHandler.callbacks;
 	}
 }

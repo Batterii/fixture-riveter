@@ -5,6 +5,6 @@ import {Strategy} from "./strategy";
 export class NullStrategy extends Strategy {
 	name: "null";
 
-	run(): any { }
 	association(): any { }
+	result(): any { }
 }
