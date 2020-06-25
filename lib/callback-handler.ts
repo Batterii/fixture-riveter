@@ -1,5 +1,7 @@
-import {blockFunction} from "./factory-options-parser";
-import {Callback} from "./callback";
+import {
+	callbackFunction,
+	Callback,
+} from "./callback";
 import {Evaluator} from "./evaluator";
 import {FactoryBuilder} from "./factory-builder";
 
@@ -25,7 +27,7 @@ export class CallbackHandler {
 		this.currentCallbacks = callbacks;
 	}
 
-	addCallback(names: string[], block: blockFunction): void {
+	addCallback(names: string[], block: callbackFunction): void {
 		for (const name of names) {
 			this.callbacks.push(new Callback(this.factoryBuilder, name, block));
 		}

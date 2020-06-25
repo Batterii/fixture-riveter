@@ -119,30 +119,22 @@ export class Definition {
 		return this.getInternalTraits(this.additionalTraits);
 	}
 
-	aggregateFromTraitsAndSelf(attributes: () => Attribute[]): Attribute[] {
+	aggregateFromTraitsAndSelf(methodName: string, block: Function): any[] {
 		this.compile();
 
-		const baseTraits = this.getBaseTraits().flatMap(
-			(t: Trait) => t.getAttributes(),
-		);
-		const givenAttributes = attributes();
-		const additionalTraits = this.getAdditionalTraits().flatMap(
-			(t: Trait) => t.getAttributes(),
-		);
-
 		return [
-			baseTraits,
-			givenAttributes,
-			additionalTraits,
+			this.getBaseTraits().map((t) => t[methodName]()),
+			block(),
+			this.getAdditionalTraits().map((t) => t[methodName]()),
 		].flat(Infinity).filter(Boolean);
 	}
 
 	getAttributes(): Attribute[] {
 		if (!this.attributes || this.attributes.length === 0) {
-			const declarationAttributes = (): Attribute[] => {
-				return this.declarationHandler.getAttributes();
-			};
-			this.attributes = this.aggregateFromTraitsAndSelf(declarationAttributes);
+			this.attributes = this.aggregateFromTraitsAndSelf(
+				"getAttributes",
+				() => this.declarationHandler.getAttributes(),
+			);
 		}
 		return this.attributes;
 	}
@@ -165,6 +157,9 @@ export class Definition {
 	}
 
 	getCallbacks(): Callback[] {
-		return this.callbackHandler.callbacks;
+		return this.aggregateFromTraitsAndSelf(
+			"getCallbacks",
+			() => this.callbackHandler.callbacks,
+		);
 	}
 }

@@ -93,11 +93,16 @@ export class DefinitionProxy {
 	}
 
 	before(name: string, block: callbackFunction): void;
+	before(name: string, name2: string, block: callbackFunction): void;
+	before(name: string, name2: string, name3: string, block: callbackFunction): void;
 	before(...rest: any[]): void {
 		this.definition.before(...rest);
 	}
 
 	after(name: string, block: callbackFunction): void;
+	after(name: string, name2: string, block: callbackFunction): void;
+	after(name: string, name2: string, name3: string, block: callbackFunction): void;
+	after(name: string, ...block: any[]): void;
 	after(...rest: any[]): void {
 		this.definition.after(...rest);
 	}
