@@ -177,6 +177,13 @@ export class FactoryBuilder {
 		return this.sequenceHandler.findSequence(name);
 	}
 
+	generate(name: string): any {
+		const sequence = this.findSequence(name);
+		if (sequence) {
+			return sequence.next();
+		}
+	}
+
 	async run(name: string, strategy: string, traits: any[]): Promise<Record<string, any>> {
 		const traitsAndAttributes = buildTraitsAndAttributes(traits);
 		let factory = this.getFactory(name);
@@ -200,6 +207,43 @@ export class FactoryBuilder {
 
 	async create(name: string, ...traits: any[]): Promise<Record<string, any>> {
 		return this.run(name, "create", traits);
+	}
+
+	async generateList(
+		name: string,
+		strategy: string,
+		count: number,
+		traits: any[],
+	): Promise<Record<string, any>[]> {
+		const promises: Promise<any>[] = [];
+		for (let idx = 0; idx < count; idx += 1) {
+			promises.push(this.run(name, strategy, traits));
+		}
+		return Promise.all(promises);
+	}
+
+	async attributesForList(
+		name: string,
+		count: number,
+		...traits: any[]
+	): Promise<Record<string, any>[]> {
+		return this.generateList(name, "attributesFor", count, traits);
+	}
+
+	async buildList(
+		name: string,
+		count: number,
+		...traits: any[]
+	): Promise<Record<string, any>[]> {
+		return this.generateList(name, "build", count, traits);
+	}
+
+	async createList(
+		name: string,
+		count: number,
+		...traits: any[]
+	): Promise<Record<string, any>[]> {
+		return this.generateList(name, "create", count, traits);
 	}
 
 	before(name: string, block: callbackFunction): void;
