@@ -10,9 +10,11 @@ export class BuildStrategy extends Strategy {
 	}
 
 	async result(callbackHandler: CallbackHandler, model: any): Promise<any> {
-		const instance = await callbackHandler.evaluator.run();
+		let instance = await callbackHandler.evaluator.run();
 
+		instance = this.adapter.build(instance, model);
 		await callbackHandler.runCallbacks("afterBuild", instance);
-		return this.adapter.build(instance, model);
+
+		return instance;
 	}
 }

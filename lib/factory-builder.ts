@@ -34,11 +34,6 @@ export function extractAttributes(traitsAndOptions: any[]): Record<string, any> 
 	return {};
 }
 
-export function buildTraitsAndAttributes(traits: any[]): any {
-	const attrs = extractAttributes(traits);
-	return {traits, attrs};
-}
-
 export function strategyCalculator(
 	factoryBuilder: FactoryBuilder,
 	buildStrategy: string,

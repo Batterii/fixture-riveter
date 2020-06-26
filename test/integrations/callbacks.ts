@@ -1,15 +1,20 @@
-import {User} from "../test-fixtures/user";
+import {defineModel} from "../test-fixtures/define-helpers";
 
 import {ObjectionAdapter} from "../../lib/adapters/objection-adapter";
 import {FactoryBuilder} from "../../lib/factory-builder";
 
 import {expect} from "chai";
-import {Model} from "objection";
 
 describe("Callbacks", function() {
 	let fb: FactoryBuilder;
+	let User: any;
 
-	before(function() {
+	before(async function() {
+		User = await defineModel("User", {
+			name: "string",
+			age: "integer",
+		});
+
 		fb = new FactoryBuilder();
 		fb.setAdapter(new ObjectionAdapter());
 
@@ -52,8 +57,14 @@ describe("Callbacks", function() {
 describe("binding a callback to multiple callbacks", function() {
 	let fb: FactoryBuilder;
 	let counter: number;
+	let User: any;
 
-	beforeEach(function() {
+	beforeEach(async function() {
+		User = await defineModel("User", {
+			name: "string",
+			age: "integer",
+		});
+
 		counter = 0;
 
 		fb = new FactoryBuilder();
@@ -83,23 +94,27 @@ describe("binding a callback to multiple callbacks", function() {
 	});
 });
 
-class Company extends Model {
-	static tableName = "companies";
-
-	id: string;
-	name: string;
-	type: string;
-}
-
 describe("global callbacks", function() {
 	let fb: FactoryBuilder;
+	let User: any;
+	let Company: any;
 
-	beforeEach(function() {
+	before(async function() {
+		User = await defineModel("User", {
+			name: "string",
+			age: "integer",
+		});
+
+		Company = await defineModel("Company", {
+			name: "string",
+			type: "string",
+		});
+
 		fb = new FactoryBuilder();
 		fb.setAdapter(new ObjectionAdapter());
 
 		fb.after("build", (object) => {
-			if (object.type) {
+			if (object.constructor.tableName === "company") {
 				object.name = "Acme Suppliers";
 			} else {
 				object.name = "John Doe";
@@ -127,8 +142,6 @@ describe("global callbacks", function() {
 		});
 
 		fb.factory("company", Company, (f) => {
-			f.attr("type", () => "Company");
-
 			f.after("build", (company) => {
 				company.name = company.name.toUpperCase();
 			});

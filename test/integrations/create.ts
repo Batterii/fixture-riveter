@@ -1,4 +1,4 @@
-import {User} from "../test-fixtures/user";
+import {defineModel} from "../test-fixtures/define-helpers";
 
 import {ObjectionAdapter} from "../../lib/adapters/objection-adapter";
 import {FactoryBuilder} from "../../lib/factory-builder";
@@ -7,8 +7,15 @@ import {expect} from "chai";
 
 describe("#create", function() {
 	let fb: FactoryBuilder;
+	let User: any;
 
-	beforeEach(function() {
+	before(async function() {
+		User = await defineModel("User", {
+			name: "string",
+			age: "integer",
+			email: "string",
+		});
+
 		fb = new FactoryBuilder();
 		fb.setAdapter(new ObjectionAdapter());
 

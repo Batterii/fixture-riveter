@@ -2,24 +2,21 @@ import {FactoryBuilder} from "../../lib/factory-builder";
 import {DefinitionProxy} from "../../lib/definition-proxy";
 
 import {expect} from "chai";
-import {Model} from "objection";
-
-class User extends Model {
-	static tableName = "users";
-
-	id: string;
-	execute1: number;
-	execute2: number;
-	execute3: number;
-	execute4: number;
-	execute5: number;
-}
+import {defineModel} from "../test-fixtures/define-helpers";
 
 describe("Nested factories", function() {
 	let factoryBuilder: FactoryBuilder;
+	let User: any;
 
-	beforeEach(function() {
+	beforeEach(async function() {
 		factoryBuilder = new FactoryBuilder();
+		User = await defineModel("User", {
+			execute1: "integer",
+			execute2: "integer",
+			execute3: "integer",
+			execute4: "integer",
+			execute5: "integer",
+		});
 	});
 
 	it("applies attributes from parent attribute", async function() {

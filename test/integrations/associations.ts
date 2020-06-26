@@ -1,30 +1,25 @@
+import {defineModel} from "../test-fixtures/define-helpers";
+
 import {ObjectionAdapter} from "../../lib/adapters/objection-adapter";
 import {FactoryBuilder} from "../../lib/factory-builder";
 
-import {Model} from "objection";
-
 import {expect} from "chai";
-
-class User extends Model {
-	static tableName = "users";
-
-	id: string;
-	name: string;
-	age: number;
-}
-
-class Post extends Model {
-	static tableName = "posts";
-
-	id: string;
-	user: User;
-	body: string;
-}
 
 describe("associations", function() {
 	let fb: FactoryBuilder;
+	let User: any;
+	let Post: any;
 
-	beforeEach(function() {
+	before(async function() {
+		User = await defineModel("User", {
+			name: "string",
+			age: "integer",
+		});
+
+		Post = await defineModel("Post", {
+			body: "string",
+		});
+
 		fb = new FactoryBuilder();
 		fb.setAdapter(new ObjectionAdapter());
 
@@ -40,7 +35,14 @@ describe("associations", function() {
 		});
 	});
 
-	specify("can be created", async function() {
+	specify("attributesFor doesn't create an association", async function() {
+		const post = await fb.attributesFor("post");
+		expect(post).to.be.an.instanceof(Object);
+		expect(post.body).to.equal("Post body");
+		expect(post.user).to.be.undefined;
+	});
+
+	specify("build creates an association", async function() {
 		const post = await fb.build("post");
 		expect(post).to.be.an.instanceof(Post);
 		expect(post.body).to.equal("Post body");

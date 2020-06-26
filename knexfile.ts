@@ -1,10 +1,5 @@
-const config = {
-	client: "pg",
-	connection: {
-		user: "fb_user",
-		password: "password",
-		database: "fb",
-	},
+export = {
+	client: "sqlite3",
+	connection: ":memory:",
+	useNullAsDefault: true,
 };
-
-export = config;
