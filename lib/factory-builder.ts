@@ -185,16 +185,15 @@ export class FactoryBuilder {
 	}
 
 	async run(name: string, strategy: string, traits: any[]): Promise<Record<string, any>> {
-		const traitsAndAttributes = buildTraitsAndAttributes(traits);
+		const overrides = extractAttributes(traits);
 		let factory = this.getFactory(name);
-		if (traitsAndAttributes.traits.length > 0) {
+		if (traits.length > 0) {
 			factory = factory.copy();
-			factory.appendTraits(traitsAndAttributes.traits);
-			delete traitsAndAttributes.traits;
+			factory.appendTraits(traits);
 		}
 		const adapter = this.getAdapter();
 		const buildStrategy = strategyCalculator(this, strategy, adapter);
-		return factory.run(buildStrategy, traitsAndAttributes);
+		return factory.run(buildStrategy, overrides);
 	}
 
 	async attributesFor(name: string, ...traits: any[]): Promise<Record<string, any>> {

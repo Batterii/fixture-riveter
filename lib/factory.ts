@@ -119,9 +119,7 @@ export class Factory extends Definition {
 		return Array.prototype.concat(globalCallbacks, parentCallbacks, definedCallbacks);
 	}
 
-	async run(buildStrategy: Strategy, extraAttributes?: ExtraAttributes): Promise<any> {
-		const overrides = mergeDefaults(extraAttributes).attrs;
-
+	async run(buildStrategy: Strategy, overrides: Record<string, any> = {}): Promise<any> {
 		const attributesToApply = this.attributesToApply(overrides);
 
 		const evaluator = new Evaluator(
@@ -136,14 +134,4 @@ export class Factory extends Definition {
 
 		return buildStrategy.result(this.callbackHandler, this.model);
 	}
-}
-
-const defaultAttributes = {traits: [], attrs: {}};
-
-export function mergeDefaults(extraAttributes?: ExtraAttributes):
-{
-	traits: string[];
-	attrs: Record<string, any>;
-} {
-	return {...defaultAttributes, ...extraAttributes};
 }

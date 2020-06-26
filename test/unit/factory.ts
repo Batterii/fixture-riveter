@@ -240,87 +240,29 @@ describe("Factory", function() {
 
 	describe("attributesToApply", function() {
 		let overrides: Record<string, any>;
+		let factory: Factory;
+
 		beforeEach(function() {
 			factoryBuilder = new FactoryBuilder();
+			factory = new Factory(factoryBuilder, "dummy", DummyModel);
 			overrides = {};
 		});
 
-		it("creates an object", function() {
-			const factory = new Factory(factoryBuilder, "dummy", DummyModel);
-			const result = factory.attributesToApply(overrides);
+		it("calls #getAttributes", function() {
+			sinon.stub(factory, "getAttributes").returns([]);
 
-			expect(result).to.exist;
-			expect(result).to.be.instanceof(Object);
+			factory.attributesToApply(overrides);
+			expect(factory.getAttributes).to.be.calledOnce;
 		});
 
-		it("iterates over attributes", function() {
-			const factory = new Factory(factoryBuilder, "dummy", DummyModel);
-			factory.compiled = true;
-			factory.attributes = [
-				new DynamicAttribute("name", () => "Noah"),
-				new DynamicAttribute("age", () => 32),
-			];
-			const result = factory.attributesToApply(overrides);
+		it("filters out any keys from overrides", function() {
+			const a = {name: "a"} as any;
+			const b = {name: "b"} as any;
+			sinon.stub(factory, "getAttributes").returns([a, b]);
+			const result = factory.attributesToApply({a: true, c: true});
 
-			expect(result).to.deep.equal({name: "Noah", age: 32});
-		});
-
-		it("applies attrs argument last", function() {
-			const factory = new Factory(factoryBuilder, "dummy", DummyModel);
-			factory.compiled = true;
-			factory.attributes = [
-				new DynamicAttribute("name", () => "Noah"),
-				new DynamicAttribute("age", () => 32),
-			];
-			const extraAttributes = {name: "Bogart"};
-			const result = factory.attributesToApply(extraAttributes);
-
-			expect(result).to.deep.equal({name: "Bogart", age: 32});
-		});
-
-		it("applies attributes from parent attribute", function() {
-			factoryBuilder.define((fb: FactoryBuilder) => {
-				fb.factory("parent", DummyModel, (f: DefinitionProxy) => {
-					f.attr("execute1", () => 1);
-					f.attr("execute2", () => 2);
-				});
-				fb.factory(
-					"child",
-					DummyModel,
-					{parent: "parent"},
-					(f: DefinitionProxy) => {
-						f.attr("execute2", () => 20);
-						f.attr("execute3", () => 3);
-					},
-				);
-			});
-			const result = factoryBuilder.attributesFor("child");
-
-			expect(result).to.deep.equal({execute1: 1, execute2: 20, execute3: 3});
-		});
-
-		it("doesn't call attributes that are overwritten", function() {
-			let spy = false;
-			factoryBuilder.define((fb: FactoryBuilder) => {
-				fb.factory("parent", DummyModel, (f: DefinitionProxy) => {
-					f.attr("execute1", () => 1);
-					f.attr("execute2", () => {
-						spy = true;
-						return 2;
-					});
-				});
-				fb.factory(
-					"child",
-					DummyModel,
-					{parent: "parent"},
-					(f: DefinitionProxy) => {
-						f.attr("execute2", () => 20);
-						f.attr("execute3", () => 3);
-					},
-				);
-			});
-			factoryBuilder.attributesFor("child");
-			expect(spy).to.be.false;
+			expect(result).to.have.length(1);
+			expect(result[0]).to.equal(b);
 		});
 	});
 
@@ -330,7 +272,7 @@ describe("Factory", function() {
 			const factory = new Factory(factoryBuilder, "dummy", DummyModel);
 			const instance = [];
 
-			sinon.stub(factory, "attributesToApply").resolves(instance);
+			sinon.stub(factory, "attributesToApply").returns(instance);
 
 			const buildStrategy = new AttributesForStrategy(factoryBuilder, adapter);
 			sinon.stub(buildStrategy, "result").resolves(instance);
@@ -338,7 +280,7 @@ describe("Factory", function() {
 			const result = await factory.run(buildStrategy);
 
 			expect(result).to.equal(instance);
-			expect(factory.attributesToApply).to.be.calledOnceWithExactly(buildStrategy, undefined);
+			expect(factory.attributesToApply).to.be.calledOnceWithExactly({});
 		});
 	});
 });
