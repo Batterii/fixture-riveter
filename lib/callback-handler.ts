@@ -2,29 +2,17 @@ import {
 	callbackFunction,
 	Callback,
 } from "./callback";
-import {Evaluator} from "./evaluator";
 import {FactoryBuilder} from "./factory-builder";
 
 import {isFunction} from "lodash";
 
 export class CallbackHandler {
 	callbacks: Callback[];
-	currentCallbacks: Callback[];
-	evaluator: Evaluator;
 	factoryBuilder: FactoryBuilder;
 
 	constructor(factoryBuilder: FactoryBuilder) {
 		this.callbacks = [];
-		this.currentCallbacks = [];
 		this.factoryBuilder = factoryBuilder;
-	}
-
-	setEvaluator(evaluator: Evaluator): void {
-		this.evaluator = evaluator;
-	}
-
-	setCallbacks(callbacks: Callback[]): void {
-		this.currentCallbacks = callbacks;
 	}
 
 	addCallback(names: string[], block: callbackFunction): void {
@@ -49,17 +37,6 @@ export class CallbackHandler {
 			return `after${string}`;
 		});
 		this.addCallback(names, block);
-	}
-
-	async runCallbacks(name: string, instance: any): Promise<void> {
-		const callbacks = this.currentCallbacks.filter((c) => c.name === name);
-
-		const promises: Promise<any>[] = [];
-
-		for (const callback of callbacks) {
-			promises.push(callback.run(instance, this.evaluator));
-		}
-		await Promise.all(promises);
 	}
 }
 

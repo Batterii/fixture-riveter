@@ -1,5 +1,8 @@
 import {Attribute} from "./attribute";
-import {Callback} from "./callback";
+import {
+	Callback,
+	callbackFunction,
+} from "./callback";
 import {CallbackHandler} from "./callback-handler";
 import {Declaration} from "./declaration";
 import {DeclarationHandler} from "./declaration-handler";
@@ -154,6 +157,10 @@ export class Definition {
 
 	after(...rest: any[]): void {
 		this.callbackHandler.after(...rest);
+	}
+
+	addCallback(names: string[], block: callbackFunction): void {
+		this.callbackHandler.addCallback(names, block);
 	}
 
 	getCallbacks(): Callback[] {

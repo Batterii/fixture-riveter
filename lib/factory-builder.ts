@@ -24,7 +24,7 @@ import {
 } from "./callback";
 import {CallbackHandler} from "./callback-handler";
 
-import {isPlainObject, last} from "lodash";
+import {isFunction, isPlainObject, last} from "lodash";
 
 export function extractAttributes(traitsAndOptions: any[]): Record<string, any> {
 	const options = last(traitsAndOptions);
@@ -209,11 +209,19 @@ export class FactoryBuilder {
 		count: number,
 		traits: any[],
 	): Promise<Record<string, any>[]> {
-		const promises: Promise<any>[] = [];
-		for (let idx = 0; idx < count; idx += 1) {
-			promises.push(this.run(name, strategy, traits));
+		let fn = (instance: any, index: number): any => [index, instance];
+		if (isFunction(last(traits))) {
+			fn = traits.pop();
 		}
-		return Promise.all(promises);
+		const instances: any[] = [];
+		for (let idx = 0; idx < count; idx += 1) {
+			// eslint-disable-next-line no-await-in-loop
+			const instance = await this.run(name, strategy, traits);
+			// eslint-disable-next-line no-await-in-loop
+			await fn(instance, idx);
+			instances.push(instance);
+		}
+		return instances;
 	}
 
 	async attributesForList(
@@ -250,6 +258,10 @@ export class FactoryBuilder {
 	after(name: string, ...rest: any[]): void;
 	after(...rest: any[]): void {
 		this.callbackHandler.after(...rest);
+	}
+
+	addCallback(names: string[], block: callbackFunction): void {
+		this.callbackHandler.addCallback(names, block);
 	}
 
 	getCallbacks(): Callback[] {

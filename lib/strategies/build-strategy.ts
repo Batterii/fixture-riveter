@@ -1,4 +1,4 @@
-import {CallbackHandler} from "../callback-handler";
+import {Assembler} from "../assembler";
 import {Strategy} from "./strategy";
 
 /* eslint-disable class-methods-use-this */
@@ -9,11 +9,9 @@ export class BuildStrategy extends Strategy {
 		return this.factoryBuilder.run(factoryName, "build", traitsAndOverrides);
 	}
 
-	async result(callbackHandler: CallbackHandler, model: any): Promise<any> {
-		let instance = await callbackHandler.evaluator.run();
-
-		instance = this.adapter.build(instance, model);
-		await callbackHandler.runCallbacks("afterBuild", instance);
+	async result(assembler: Assembler): Promise<any> {
+		const instance = await assembler.toInstance();
+		await assembler.runCallbacks("afterBuild", instance);
 
 		return instance;
 	}

@@ -16,8 +16,8 @@ describe("DefaultAdapter", function() {
 			const adapter = new DefaultAdapter();
 			const spiedDM = sinon.spy(DummyModel as any);
 			const model = adapter.build(
-				{name: "Bruce", age: 204},
 				spiedDM,
+				{name: "Bruce", age: 204},
 			);
 			expect(model).to.be.an.instanceof(DummyModel);
 			expect(model.name).to.be.equal("Bruce");

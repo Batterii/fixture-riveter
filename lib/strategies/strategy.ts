@@ -1,5 +1,5 @@
 import {Adapter} from "../adapters/adapter";
-import {CallbackHandler} from "../callback-handler";
+import {Assembler} from "../assembler";
 import {FactoryBuilder} from "../factory-builder";
 
 export abstract class Strategy {
@@ -13,5 +13,5 @@ export abstract class Strategy {
 	}
 
 	abstract association(factoryName: string, traitsAndOverrides: any[]): Promise<any>;
-	abstract result(callbackHandler: CallbackHandler, model?: any): Promise<any>;
+	abstract result(assembler: Assembler, model?: any): Promise<any>;
 }

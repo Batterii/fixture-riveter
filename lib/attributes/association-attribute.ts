@@ -9,6 +9,7 @@ export class AssociationAttribute extends Attribute {
 		super(name);
 		this.factory = factory;
 		this.overrides = overrides;
+		this.isAssociation = true;
 	}
 
 	evaluate(evaluator: Evaluator): () => Promise<Record<string, any>> {

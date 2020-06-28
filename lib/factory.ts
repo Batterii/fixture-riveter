@@ -1,4 +1,6 @@
+import {Assembler} from "./assembler";
 import {Attribute} from "./attribute";
+import {AttributeAssigner} from "./attribute-assigner";
 import {CallbackHandler} from "./callback-handler";
 import {Definition} from "./definition";
 import {Evaluator} from "./evaluator";
@@ -116,7 +118,7 @@ export class Factory extends Definition {
 		const parentCallbacks = this.parentFactory().getCallbacks();
 		const definedCallbacks = super.getCallbacks();
 
-		return Array.prototype.concat(globalCallbacks, parentCallbacks, definedCallbacks);
+		return globalCallbacks.concat(parentCallbacks, definedCallbacks);
 	}
 
 	async run(buildStrategy: Strategy, overrides: Record<string, any> = {}): Promise<any> {
@@ -129,9 +131,14 @@ export class Factory extends Definition {
 			overrides,
 		);
 
-		this.callbackHandler.setEvaluator(evaluator);
-		this.callbackHandler.setCallbacks(this.getCallbacks());
+		const attributeAssigner = new AttributeAssigner(
+			this.factoryBuilder,
+			this.model,
+			evaluator,
+		);
 
-		return buildStrategy.result(this.callbackHandler, this.model);
+		const assembler = new Assembler(attributeAssigner, this.getCallbacks());
+
+		return buildStrategy.result(assembler, this.model);
 	}
 }
