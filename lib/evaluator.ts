@@ -2,11 +2,10 @@ import {Attribute} from "./attribute";
 import {
 	extractAttributes,
 	FactoryBuilder,
-	strategyCalculator,
 } from "./factory-builder";
 import {Strategy} from "./strategies/strategy";
 
-import {omit, zip} from "lodash";
+import {omit} from "lodash";
 
 type AttributeFuncs = Record<string, (e: Evaluator) => any>;
 
@@ -59,17 +58,21 @@ export class Evaluator {
 
 		let strategyOverride: Strategy;
 		if (overrides.strategy) {
-			strategyOverride = strategyCalculator(
-				this.factoryBuilder,
+			const StrategyBuilder = this.factoryBuilder.strategyHandler.getStrategy(
 				overrides.strategy,
+			);
+			strategyOverride = new StrategyBuilder(
+				this.factoryBuilder,
 				this.buildStrategy.adapter,
 			);
 		} else if (this.factoryBuilder.useParentStrategy) {
 			strategyOverride = this.buildStrategy;
 		} else {
-			strategyOverride = strategyCalculator(
+			const StrategyBuilder = this.factoryBuilder.strategyHandler.getStrategy(
+				overrides.strategy,
+			);
+			strategyOverride = new StrategyBuilder(
 				this.factoryBuilder,
-				"create",
 				this.buildStrategy.adapter,
 			);
 		}

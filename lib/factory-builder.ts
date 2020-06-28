@@ -12,17 +12,13 @@ import {
 	SequenceCallback,
 } from "./sequences/sequence";
 import {SequenceHandler} from "./sequence-handler";
-import {Strategy} from "./strategies/strategy";
-import {AttributesForStrategy} from "./strategies/attributes-for-strategy";
-import {BuildStrategy} from "./strategies/build-strategy";
-import {CreateStrategy} from "./strategies/create-strategy";
-import {NullStrategy} from "./strategies/null-strategy";
 import {Trait} from "./trait";
 import {
 	callbackFunction,
 	Callback,
 } from "./callback";
 import {CallbackHandler} from "./callback-handler";
+import {StrategyHandler} from "./strategy-handler";
 
 import {isFunction, isPlainObject, last} from "lodash";
 
@@ -34,25 +30,6 @@ export function extractAttributes(traitsAndOptions: any[]): Record<string, any> 
 	return {};
 }
 
-export function strategyCalculator(
-	factoryBuilder: FactoryBuilder,
-	buildStrategy: string,
-	adapter: Adapter,
-): Strategy {
-	switch (buildStrategy) {
-		case "attributesFor":
-			return new AttributesForStrategy(factoryBuilder, adapter);
-		case "build":
-			return new BuildStrategy(factoryBuilder, adapter);
-		case "create":
-			return new CreateStrategy(factoryBuilder, adapter);
-		case "null":
-			return new NullStrategy(factoryBuilder, adapter);
-		default:
-			throw new Error("Choose a better strategy");
-	}
-}
-
 export class FactoryBuilder {
 	factories: Record<string, Factory>;
 	traits: Record<string, Trait>;
@@ -60,6 +37,7 @@ export class FactoryBuilder {
 	sequenceHandler: SequenceHandler;
 	useParentStrategy: boolean;
 	callbackHandler: CallbackHandler;
+	strategyHandler: StrategyHandler;
 
 	constructor() {
 		this.factories = {};
@@ -67,6 +45,9 @@ export class FactoryBuilder {
 		this.adapterHandler = new AdapterHandler();
 		this.sequenceHandler = new SequenceHandler();
 		this.callbackHandler = new CallbackHandler(this);
+		this.strategyHandler = new StrategyHandler(this);
+
+		this.strategyHandler.registerDefaultStategies();
 		this.useParentStrategy = true;
 	}
 
@@ -187,20 +168,9 @@ export class FactoryBuilder {
 			factory.appendTraits(traits);
 		}
 		const adapter = this.getAdapter();
-		const buildStrategy = strategyCalculator(this, strategy, adapter);
+		const StrategyBuilder = this.strategyHandler.getStrategy(strategy);
+		const buildStrategy = new StrategyBuilder(this, adapter);
 		return factory.run(buildStrategy, overrides);
-	}
-
-	async attributesFor(name: string, ...traits: any[]): Promise<Record<string, any>> {
-		return this.run(name, "attributesFor", traits);
-	}
-
-	async build(name: string, ...traits: any[]): Promise<Record<string, any>> {
-		return this.run(name, "build", traits);
-	}
-
-	async create(name: string, ...traits: any[]): Promise<Record<string, any>> {
-		return this.run(name, "create", traits);
 	}
 
 	async generateList(
@@ -224,30 +194,6 @@ export class FactoryBuilder {
 		return instances;
 	}
 
-	async attributesForList(
-		name: string,
-		count: number,
-		...traits: any[]
-	): Promise<Record<string, any>[]> {
-		return this.generateList(name, "attributesFor", count, traits);
-	}
-
-	async buildList(
-		name: string,
-		count: number,
-		...traits: any[]
-	): Promise<Record<string, any>[]> {
-		return this.generateList(name, "build", count, traits);
-	}
-
-	async createList(
-		name: string,
-		count: number,
-		...traits: any[]
-	): Promise<Record<string, any>[]> {
-		return this.generateList(name, "create", count, traits);
-	}
-
 	before(name: string, block: callbackFunction): void;
 	before(name: string, ...rest: any[]): void;
 	before(...rest: any[]): void {
@@ -267,4 +213,16 @@ export class FactoryBuilder {
 	getCallbacks(): Callback[] {
 		return this.callbackHandler.callbacks;
 	}
+
+	// Typescript sucks for dynamically defined methods lol
+	// All of these will be overwritten on instantiation
+	attributesFor(...rest): any {}
+	attributesForList(...rest): any {}
+	attributesForPair(...rest): any {}
+	build(...rest): any {}
+	buildList(...rest): any {}
+	buildPair(...rest): any {}
+	create(...rest): any {}
+	createList(...rest): any {}
+	createPair(...rest): any {}
 }
