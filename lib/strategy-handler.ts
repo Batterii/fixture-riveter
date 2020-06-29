@@ -48,7 +48,7 @@ export class StrategyHandler {
 			count: number,
 			...traits: any[]
 		) => {
-			return this.factoryBuilder.generateList(name, "attributesFor", count, traits);
+			return this.factoryBuilder.generateList(name, strategyName, count, traits);
 		};
 	}
 
@@ -57,7 +57,7 @@ export class StrategyHandler {
 			name: string,
 			...traits: any[]
 		) => {
-			return this.factoryBuilder.generateList(name, "attributesFor", 2, traits);
+			return this.factoryBuilder.generateList(name, strategyName, 2, traits);
 		};
 	}
 }
