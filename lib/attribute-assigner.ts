@@ -20,13 +20,13 @@ export class AttributeAssigner {
 		if (!this.attributeNamesToAssign) {
 			const attributeNames = this.attributes.map((a) => a.name);
 			const overrideNames = Object.keys(this.evaluator.overrides);
+			const ignoredNames = this.attributes
+				.filter((a) => a.ignored)
+				.map((a) => a.name);
 
-			// To do: use this when implementing transients
-			// const ignoredNames = this.attributes.map((a) => a.isIgnored());
-			// this.attributeNamesToAssign = attributeNames.concat(overrideNames)
-			// 	.filter((name) => !ignoredNames.includes(name));
-
-			this.attributeNamesToAssign = attributeNames.concat(overrideNames);
+			this.attributeNamesToAssign = attributeNames
+				.concat(overrideNames)
+				.filter((name) => !ignoredNames.includes(name));
 		}
 		return this.attributeNamesToAssign;
 	}

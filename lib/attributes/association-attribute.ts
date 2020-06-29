@@ -6,7 +6,7 @@ export class AssociationAttribute extends Attribute {
 	overrides: any[];
 
 	constructor(name: string, factory: string, overrides: any[]) {
-		super(name);
+		super(name, false);
 		this.factory = factory;
 		this.overrides = overrides;
 		this.isAssociation = true;

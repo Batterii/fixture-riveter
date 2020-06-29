@@ -105,14 +105,6 @@ export class Factory extends Definition {
 		return attributesToKeep.concat(definitionAttributes);
 	}
 
-	attributesToApply(overrides: Record<string, any>): Attribute[] {
-		return this.getAttributes()
-			// This will skip any attribute passed in by the caller
-			.filter((attribute) => {
-				return !Object.prototype.hasOwnProperty.call(overrides, attribute.name);
-			});
-	}
-
 	getCallbacks(): Callback[] {
 		const globalCallbacks = this.factoryBuilder.getCallbacks();
 		const parentCallbacks = this.parentFactory().getCallbacks();
@@ -122,12 +114,10 @@ export class Factory extends Definition {
 	}
 
 	async run(buildStrategy: Strategy, overrides: Record<string, any> = {}): Promise<any> {
-		const attributesToApply = this.attributesToApply(overrides);
-
 		const evaluator = new Evaluator(
 			this.factoryBuilder,
 			buildStrategy,
-			attributesToApply,
+			this.getAttributes(),
 			overrides,
 		);
 

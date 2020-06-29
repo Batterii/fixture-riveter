@@ -9,8 +9,13 @@ export class ImplicitDeclaration extends Declaration {
 	factoryBuilder: FactoryBuilder;
 	factory: Factory;
 
-	constructor(name: string, factoryBuilder: FactoryBuilder, factory: Factory) {
-		super(name);
+	constructor(
+		name: string,
+		ignored: boolean,
+		factoryBuilder: FactoryBuilder,
+		factory: Factory,
+	) {
+		super(name, ignored);
 		this.factoryBuilder = factoryBuilder;
 		this.factory = factory;
 	}
@@ -26,7 +31,7 @@ export class ImplicitDeclaration extends Declaration {
 		}
 		const sequence = this.factoryBuilder.findSequence(this.name);
 		if (sequence) {
-			return [new SequenceAttribute(this.name, sequence)];
+			return [new SequenceAttribute(this.name, this.ignored, sequence)];
 		}
 		if (this.checkSelfReference()) {
 			throw new Error(`Self-referencing trait '${this.name}'`);

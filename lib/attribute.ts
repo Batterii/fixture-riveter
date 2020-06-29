@@ -5,10 +5,12 @@ import {Evaluator} from "./evaluator";
 export abstract class Attribute {
 	name: string;
 	isAssociation: boolean;
+	ignored: boolean;
 
-	constructor(name: string) {
+	constructor(name: string, ignored: boolean) {
 		this.name = name;
 		this.isAssociation = false;
+		this.ignored = ignored;
 	}
 
 	abstract evaluate(evaluator?: Evaluator): (e: Evaluator) => any;

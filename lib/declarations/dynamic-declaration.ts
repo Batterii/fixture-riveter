@@ -7,12 +7,12 @@ import {
 export class DynamicDeclaration extends Declaration {
 	block: AttributeBlock;
 
-	constructor(name: string, block: AttributeBlock) {
-		super(name);
+	constructor(name: string, ignore: boolean, block: AttributeBlock) {
+		super(name, ignore);
 		this.block = block;
 	}
 
 	build(): DynamicAttribute[] {
-		return [new DynamicAttribute(this.name, this.block)];
+		return [new DynamicAttribute(this.name, this.ignored, this.block)];
 	}
 }

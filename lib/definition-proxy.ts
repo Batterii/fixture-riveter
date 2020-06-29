@@ -22,10 +22,12 @@ import {isFunction, last} from "lodash";
 export class DefinitionProxy {
 	definition: Definition;
 	childFactories: any[];
+	ignore: boolean;
 
-	constructor(definition: Definition) {
+	constructor(definition: Definition, ignore = false) {
 		this.definition = definition;
 		this.childFactories = [];
+		this.ignore = ignore;
 	}
 
 	execute(): void {
@@ -48,13 +50,14 @@ export class DefinitionProxy {
 		if (rest.length > 0) {
 			const block = last(rest);
 			if (isFunction(block)) {
-				declaration = new DynamicDeclaration(name, block);
+				declaration = new DynamicDeclaration(name, this.ignore, block);
 			} else {
 				declaration = new AssociationDeclaration(name, rest);
 			}
 		} else {
 			declaration = new ImplicitDeclaration(
 				name,
+				this.ignore,
 				this.factoryBuilder,
 				this.definition as Factory,
 			);
@@ -80,7 +83,7 @@ export class DefinitionProxy {
 
 	sequence(name: string, ...rest: any[]): Sequence {
 		const sequence = this.sequenceHandler.registerSequence(name, ...rest);
-		this.definition.declareAttribute(new DynamicDeclaration(name, () => sequence.next()));
+		this.attr(name, () => sequence.next());
 		return sequence;
 	}
 
@@ -90,6 +93,11 @@ export class DefinitionProxy {
 		} else {
 			throw new Error(`wrong options, bruh: ${name}, ${block}`);
 		}
+	}
+
+	transient(block: blockFunction): void {
+		const proxy = new DefinitionProxy(this.definition, true);
+		block(proxy);
 	}
 
 	before(name: string, block: callbackFunction): void;

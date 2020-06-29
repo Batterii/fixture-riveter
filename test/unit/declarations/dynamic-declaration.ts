@@ -7,7 +7,7 @@ import {expect} from "chai";
 describe("DynamicDeclaration", function() {
 	it("creates an instance of DynamicDeclaration", function() {
 		const name = "email";
-		const result = new DynamicDeclaration(name, identity);
+		const result = new DynamicDeclaration(name, false, identity);
 
 		expect(result).to.be.an.instanceof(DynamicDeclaration);
 		expect(result.name).to.equal(name);
@@ -17,7 +17,7 @@ describe("DynamicDeclaration", function() {
 	describe("#build", function() {
 		it("returns a list", function() {
 			const name = "email";
-			const declaration = new DynamicDeclaration(name, identity);
+			const declaration = new DynamicDeclaration(name, false, identity);
 			const result = declaration.build();
 
 			expect(result).to.be.an.instanceof(Array);
@@ -26,7 +26,7 @@ describe("DynamicDeclaration", function() {
 
 		it("returns a list with a new DynamicAttribute", function() {
 			const name = "email";
-			const declaration = new DynamicDeclaration(name, identity);
+			const declaration = new DynamicDeclaration(name, false, identity);
 			const [result] = declaration.build();
 
 			expect(result).to.be.an.instanceof(DynamicAttribute);

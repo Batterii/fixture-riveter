@@ -6,8 +6,8 @@ export type AttributeBlock = (evaluator?: Evaluator) => any;
 export class DynamicAttribute extends Attribute {
 	block: AttributeBlock;
 
-	constructor(name: string, block: AttributeBlock) {
-		super(name);
+	constructor(name: string, ignored: boolean, block: AttributeBlock) {
+		super(name, ignored);
 		this.block = block;
 	}
 

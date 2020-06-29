@@ -130,7 +130,7 @@ describe("Factory", function() {
 			factoryBuilder = new FactoryBuilder();
 			const factory = new Factory(factoryBuilder, "name", DummyModel);
 			const name = "email";
-			const attribute = new DynamicDeclaration(name, () => "a");
+			const attribute = new DynamicDeclaration(name, false, () => "a");
 			factory.declareAttribute(attribute);
 			const {declarations} = factory.declarationHandler;
 
@@ -167,7 +167,7 @@ describe("Factory", function() {
 
 		it("calls getAttributes on the parent", function() {
 			const parentFactory = new Factory(factoryBuilder, "parent", DummyModel);
-			const attr = new DynamicAttribute("attr", () => true);
+			const attr = new DynamicAttribute("attr", false, () => true);
 			sinon.stub(parentFactory, "getAttributes")
 				.returns([attr]);
 			const childFactory = new Factory(factoryBuilder, "child", DummyModel);
@@ -180,7 +180,7 @@ describe("Factory", function() {
 
 		it("returns all non-filtered attributes", function() {
 			const parentFactory = new Factory(factoryBuilder, "parent", DummyModel);
-			const attr = new DynamicAttribute("attr", () => true);
+			const attr = new DynamicAttribute("attr", false, () => true);
 			sinon.stub(parentFactory, "getAttributes")
 				.returns([attr]);
 
@@ -196,7 +196,7 @@ describe("Factory", function() {
 
 		it("filters existing attributes", function() {
 			const parentFactory = new Factory(factoryBuilder, "parent", DummyModel);
-			const attr = new DynamicAttribute("attr", () => true);
+			const attr = new DynamicAttribute("attr", false, () => true);
 			sinon.stub(parentFactory, "getAttributes")
 				.returns([attr]);
 
@@ -226,43 +226,15 @@ describe("Factory", function() {
 
 		it("concats child attributes to parent attributes", function() {
 			const factory = new Factory(factoryBuilder, "dummy", DummyModel);
-			const childAttr = new DynamicAttribute("attr", () => true);
+			const childAttr = new DynamicAttribute("attr", false, () => true);
 			factory.attributes = [childAttr];
 			factory.compiled = true;
 
-			const parentAttr = new DynamicAttribute("parent", () => true);
+			const parentAttr = new DynamicAttribute("parent", false, () => true);
 			sinon.stub(factory, "getParentAttributes").returns([parentAttr]);
 
 			const result = factory.getAttributes();
 			expect(result).to.deep.equal([parentAttr, childAttr]);
-		});
-	});
-
-	describe("attributesToApply", function() {
-		let overrides: Record<string, any>;
-		let factory: Factory;
-
-		beforeEach(function() {
-			factoryBuilder = new FactoryBuilder();
-			factory = new Factory(factoryBuilder, "dummy", DummyModel);
-			overrides = {};
-		});
-
-		it("calls #getAttributes", function() {
-			sinon.stub(factory, "getAttributes").returns([]);
-
-			factory.attributesToApply(overrides);
-			expect(factory.getAttributes).to.be.calledOnce;
-		});
-
-		it("filters out any keys from overrides", function() {
-			const a = {name: "a"} as any;
-			const b = {name: "b"} as any;
-			sinon.stub(factory, "getAttributes").returns([a, b]);
-			const result = factory.attributesToApply({a: true, c: true});
-
-			expect(result).to.have.length(1);
-			expect(result[0]).to.equal(b);
 		});
 	});
 
@@ -272,7 +244,7 @@ describe("Factory", function() {
 			const factory = new Factory(factoryBuilder, "dummy", DummyModel);
 			const instance = [];
 
-			sinon.stub(factory, "attributesToApply").returns(instance);
+			sinon.stub(factory, "getAttributes").returns(instance);
 
 			const buildStrategy = new AttributesForStrategy(factoryBuilder, adapter);
 			sinon.stub(buildStrategy, "result").resolves(instance);
@@ -280,7 +252,7 @@ describe("Factory", function() {
 			const result = await factory.run(buildStrategy);
 
 			expect(result).to.equal(instance);
-			expect(factory.attributesToApply).to.be.calledOnceWithExactly({});
+			expect(factory.getAttributes).to.be.calledOnceWithExactly({});
 		});
 	});
 });

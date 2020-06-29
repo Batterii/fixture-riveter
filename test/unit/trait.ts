@@ -53,7 +53,7 @@ describe("Trait", function() {
 			factoryBuilder = new FactoryBuilder();
 			const trait = new Trait("trait", factoryBuilder, () => true);
 			const name = "email";
-			const declaration = new DynamicDeclaration(name, () => "a");
+			const declaration = new DynamicDeclaration(name, false, () => "a");
 			trait.declareAttribute(declaration);
 			const {declarations} = trait.declarationHandler;
 

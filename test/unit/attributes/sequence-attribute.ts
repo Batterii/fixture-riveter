@@ -8,7 +8,7 @@ describe("SequenceAttribute", function() {
 	it("creates an instance of SequenceAttribute", function() {
 		const name = "email";
 		const sequence = {} as Sequence;
-		const result = new SequenceAttribute(name, sequence);
+		const result = new SequenceAttribute(name, false, sequence);
 
 		expect(result).to.be.an.instanceof(SequenceAttribute);
 		expect(result.name).to.equal(name);
@@ -19,7 +19,7 @@ describe("SequenceAttribute", function() {
 		it("returns a function that calls #next()", function() {
 			const options = {callback: (n: number) => `Name ${n}`};
 			const sequence = new IntegerSequence("email", options);
-			const attribute = new SequenceAttribute("email", sequence);
+			const attribute = new SequenceAttribute("email", false, sequence);
 			const result = attribute.evaluate();
 
 			expect(result()).to.equal("Name 1");

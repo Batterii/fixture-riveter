@@ -13,7 +13,7 @@ describe("ImplicitDeclaration", function() {
 	it("creates an instance of ImplicitDeclaration", function() {
 		const factoryBuilder = {} as FactoryBuilder;
 		const factory = {} as Factory;
-		const result = new ImplicitDeclaration(name, factoryBuilder, factory);
+		const result = new ImplicitDeclaration(name, false, factoryBuilder, factory);
 
 		expect(result).to.be.an.instanceof(ImplicitDeclaration);
 		expect(result.name).to.equal(name);
@@ -27,7 +27,7 @@ describe("ImplicitDeclaration", function() {
 				const factoryBuilder = new FactoryBuilder();
 				sinon.stub(factoryBuilder, "getFactory").returns(true as any);
 				const factory = {} as Factory;
-				const declaration = new ImplicitDeclaration(name, factoryBuilder, factory);
+				const declaration = new ImplicitDeclaration(name, false, factoryBuilder, factory);
 				declaration.build();
 
 				expect(factoryBuilder.getFactory).to.be.calledOnce;
@@ -39,7 +39,7 @@ describe("ImplicitDeclaration", function() {
 				sinon.stub(factoryBuilder, "getFactory").returns(true as any);
 
 				const factory = {} as Factory;
-				const declaration = new ImplicitDeclaration(name, factoryBuilder, factory);
+				const declaration = new ImplicitDeclaration(name, false, factoryBuilder, factory);
 				const array = declaration.build();
 				const [result] = array;
 
@@ -57,7 +57,7 @@ describe("ImplicitDeclaration", function() {
 				const factory = new Factory(factoryBuilder, "name", {});
 				sinon.stub(factory, "inheritTraits");
 
-				const declaration = new ImplicitDeclaration(name, factoryBuilder, factory);
+				const declaration = new ImplicitDeclaration(name, false, factoryBuilder, factory);
 				sinon.stub(declaration, "checkSelfReference").returns(false);
 				declaration.build();
 
@@ -73,7 +73,7 @@ describe("ImplicitDeclaration", function() {
 				sinon.stub(factoryBuilder, "getFactory").returns(false as any);
 				sinon.stub(factoryBuilder, "findSequence").returns(true as any);
 				const factory = {} as Factory;
-				const declaration = new ImplicitDeclaration(name, factoryBuilder, factory);
+				const declaration = new ImplicitDeclaration(name, false, factoryBuilder, factory);
 				declaration.build();
 
 				expect(factoryBuilder.findSequence).to.be.calledOnce;
@@ -88,7 +88,7 @@ describe("ImplicitDeclaration", function() {
 				factoryBuilder.sequence(name, (n: number) => `Name ${n}`);
 
 				const factory = {} as Factory;
-				const declaration = new ImplicitDeclaration(name, factoryBuilder, factory);
+				const declaration = new ImplicitDeclaration(name, false, factoryBuilder, factory);
 				const array = declaration.build();
 				const [result] = array;
 
@@ -106,7 +106,7 @@ describe("ImplicitDeclaration", function() {
 				const factory = new Factory(factoryBuilder, "name", {});
 				sinon.stub(factory, "inheritTraits");
 
-				const declaration = new ImplicitDeclaration(name, factoryBuilder, factory);
+				const declaration = new ImplicitDeclaration(name, false, factoryBuilder, factory);
 				sinon.stub(declaration, "checkSelfReference").returns(false);
 				declaration.build();
 
@@ -124,7 +124,7 @@ describe("ImplicitDeclaration", function() {
 				const factory = new Factory(factoryBuilder, "name", {});
 				sinon.stub(factory, "inheritTraits");
 
-				const declaration = new ImplicitDeclaration(name, factoryBuilder, factory);
+				const declaration = new ImplicitDeclaration(name, false, factoryBuilder, factory);
 				sinon.stub(declaration, "checkSelfReference");
 
 				declaration.build();
@@ -137,7 +137,7 @@ describe("ImplicitDeclaration", function() {
 				sinon.stub(factoryBuilder, "getFactory").returns(false as any);
 				sinon.stub(factoryBuilder, "findSequence").returns(false as any);
 				const factory = {} as Factory;
-				const declaration = new ImplicitDeclaration(name, factoryBuilder, factory);
+				const declaration = new ImplicitDeclaration(name, false, factoryBuilder, factory);
 				sinon.stub(declaration, "checkSelfReference").returns(true);
 				const fn = () => declaration.build();
 
@@ -152,7 +152,7 @@ describe("ImplicitDeclaration", function() {
 				const factory = new Factory(factoryBuilder, "name", {});
 				sinon.stub(factory, "inheritTraits");
 
-				const declaration = new ImplicitDeclaration(name, factoryBuilder, factory);
+				const declaration = new ImplicitDeclaration(name, false, factoryBuilder, factory);
 				sinon.stub(declaration, "checkSelfReference").returns(true);
 				const fn = () => declaration.build();
 
@@ -170,7 +170,7 @@ describe("ImplicitDeclaration", function() {
 				const factory = new Factory(factoryBuilder, "name", {});
 				sinon.stub(factory, "inheritTraits");
 
-				const declaration = new ImplicitDeclaration(name, factoryBuilder, factory);
+				const declaration = new ImplicitDeclaration(name, false, factoryBuilder, factory);
 				sinon.stub(declaration, "checkSelfReference").returns(false);
 
 				declaration.build();
@@ -187,7 +187,7 @@ describe("ImplicitDeclaration", function() {
 				const factory = new Factory(factoryBuilder, "name", {});
 				sinon.stub(factory, "inheritTraits");
 
-				const declaration = new ImplicitDeclaration(name, factoryBuilder, factory);
+				const declaration = new ImplicitDeclaration(name, false, factoryBuilder, factory);
 				sinon.stub(declaration, "checkSelfReference").returns(false);
 
 				const result = declaration.build();

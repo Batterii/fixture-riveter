@@ -2,9 +2,11 @@ import {Attribute} from "./attribute";
 
 export abstract class Declaration {
 	name: string;
+	ignored: boolean;
 
-	constructor(name: string) {
+	constructor(name: string, ignored = false) {
 		this.name = name;
+		this.ignored = ignored;
 	}
 
 	abstract build(): Attribute[];
