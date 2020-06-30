@@ -12,6 +12,10 @@ export class DefaultAdapter implements Adapter {
 		return instance;
 	}
 
+	async associate(instance: any, name: string, other: any): Promise<any> {
+		return this.set(instance, name, other);
+	}
+
 	set(instance: any, key: string, value: any): any {
 		instance[key] = value;
 		return instance;

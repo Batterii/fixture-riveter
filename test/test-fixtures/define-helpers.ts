@@ -17,9 +17,7 @@ function defineClass(name: string) {
 	return classes[name];
 }
 
-export async function defineModel(name: string, props: Record<string, ColumnType>): Promise<any> {
-	const Model = defineClass(name);
-
+export async function createTable(Model: any, props: Record<string, ColumnType>): Promise<any> {
 	await knex.schema.dropTableIfExists(Model.tableName);
 
 	await knex.schema.createTable(Model.tableName, (table) => {
@@ -28,5 +26,10 @@ export async function defineModel(name: string, props: Record<string, ColumnType
 			table[type](columnName);
 		}
 	});
+}
+
+export async function defineModel(name: string, props: Record<string, ColumnType>): Promise<any> {
+	const Model = defineClass(name);
+	await createTable(Model, props);
 	return Model;
 }

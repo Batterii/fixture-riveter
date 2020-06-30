@@ -69,7 +69,7 @@ export class Evaluator {
 			strategyOverride = this.buildStrategy;
 		} else {
 			const StrategyBuilder = this.factoryBuilder.strategyHandler.getStrategy(
-				overrides.strategy,
+				"create",
 			);
 			strategyOverride = new StrategyBuilder(
 				this.factoryBuilder,
@@ -77,7 +77,7 @@ export class Evaluator {
 			);
 		}
 
-		traitsAndOverrides.push(omit(overrides, "buildStrategy"));
+		traitsAndOverrides.push(omit(overrides, "strategy"));
 
 		return strategyOverride.association(factoryName, traitsAndOverrides);
 	}

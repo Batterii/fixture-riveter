@@ -31,10 +31,14 @@ export class AttributeAssigner {
 		return this.attributeNamesToAssign;
 	}
 
-	attributesForObject(): any[] {
-		const associationNames = this.attributes
+	associationNames(): string[] {
+		return this.attributes
 			.filter((a) => a.isAssociation)
 			.map((a) => a.name);
+	}
+
+	attributesForObject(): any[] {
+		const associationNames = this.associationNames();
 
 		// Remove all associations
 		return this.getAttributeNamesToAssign()
@@ -64,11 +68,17 @@ export class AttributeAssigner {
 	async toInstance(): Promise<Record<string, any>> {
 		const adapter = this.factoryBuilder.getAdapter();
 		const instance = adapter.build(this.model);
+		const associationNames = this.associationNames();
 
 		for (const name of this.attributesForInstance()) {
 			// eslint-disable-next-line no-await-in-loop
 			const attribute = await this.get(name);
-			adapter.set(instance, name, attribute);
+			if (associationNames.includes(name)) {
+				// eslint-disable-next-line no-await-in-loop
+				await adapter.associate(instance, name, attribute);
+			} else {
+				adapter.set(instance, name, attribute);
+			}
 		}
 
 		return instance;
