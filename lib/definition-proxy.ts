@@ -32,7 +32,7 @@ export class DefinitionProxy {
 
 	execute(): void {
 		if (this.definition.block) {
-			this.definition.block(this);
+			this.definition.block.call(this, this);
 		}
 	}
 

@@ -60,7 +60,7 @@ export class FactoryBuilder {
 	}
 
 	define(block: Function): void {
-		block(this);
+		block.call(this, this);
 	}
 
 	getFactory(name: string, throws = true): Factory {
