@@ -144,6 +144,7 @@ export class Definition {
 
 	copy<T>(): T {
 		const copy = Object.assign(Object.create(Object.getPrototypeOf(this)), this);
+
 		copy.compiled = false;
 		delete copy.attributes;
 		delete copy.traitsCache;

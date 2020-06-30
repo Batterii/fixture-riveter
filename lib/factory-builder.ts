@@ -163,6 +163,9 @@ export class FactoryBuilder {
 	async run(name: string, strategy: string, traits: any[]): Promise<Record<string, any>> {
 		const overrides = extractAttributes(traits);
 		let factory = this.getFactory(name);
+
+		factory.compile();
+
 		if (traits.length > 0) {
 			factory = factory.copy();
 			factory.appendTraits(traits);

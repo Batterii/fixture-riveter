@@ -373,4 +373,46 @@ describe("tests from factory_bot", function() {
 			},
 		);
 	});
+
+	describe("making sure the factory is compiled the first time we instantiate it", function() {
+		let fb: FactoryBuilder;
+
+		before(async function() {
+			User = await defineModel("User", {
+				role: "string",
+				gender: "string",
+				age: "integer",
+			});
+
+			fb = new FactoryBuilder();
+
+			fb.define(function() {
+				fb.factory("user", User, (f: any) => {
+					f.trait("female", (t) => t.attr("gender", () => "female"));
+					f.trait("admin", (t) => t.attr("role", () => "admin"));
+
+					f.factory("femaleUser", User, (ff) => {
+						ff.attr("female");
+					});
+				});
+			});
+		});
+
+		it("can honor traits on the very first call", async function() {
+			const user = await fb.build("femaleUser", "admin", {age: 30});
+			expect(user.gender).to.equal("female");
+			expect(user.age).to.equal(30);
+			expect(user.role).to.equal("admin");
+
+			const user1 = await fb.build("femaleUser", {age: 30});
+			expect(user1.gender).to.equal("female");
+			expect(user1.age).to.equal(30);
+			expect(user1.role).to.be.undefined;
+
+			const user2 = await fb.build("femaleUser");
+			expect(user2.gender).to.equal("female");
+			expect(user2.age).to.be.undefined;
+			expect(user2.role).to.be.undefined;
+		});
+	});
 });

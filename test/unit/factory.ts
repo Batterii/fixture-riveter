@@ -252,7 +252,7 @@ describe("Factory", function() {
 			const result = await factory.run(buildStrategy);
 
 			expect(result).to.equal(instance);
-			expect(factory.getAttributes).to.be.calledOnceWithExactly({});
+			expect(factory.getAttributes).to.be.calledOnce;
 		});
 	});
 });
