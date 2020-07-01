@@ -24,7 +24,7 @@
 		"clean": "rm -rf dist",
 		"test": "npm run build && mocha dist/test",
 		"test:unit": "npm run build && mocha dist/test/unit",
-		"test:integration": "npm run build && mocha dist/test/integration"
+		"test:acceptance": "npm run build && mocha dist/test/acceptance"
 	},
 	"main": "dist/lib/index.js",
 	"types": "dist/types/index.d.ts",
