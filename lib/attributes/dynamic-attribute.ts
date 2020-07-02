@@ -1,4 +1,4 @@
-import {Attribute} from "../attribute";
+import {Attribute} from "./attribute";
 import {Evaluator} from "../evaluator";
 
 export type AttributeBlock = (evaluator?: Evaluator) => any;

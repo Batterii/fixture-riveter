@@ -60,14 +60,14 @@ describe("simple associations", function() {
 		});
 	});
 
-	specify("attributesFor doesn't create an association", async function() {
+	specify("#attributesFor doesn't create an association", async function() {
 		const post = await fb.attributesFor("post");
 		expect(post).to.be.an.instanceof(Object);
 		expect(post.body).to.equal("Post body");
 		expect(post.user).to.be.undefined;
 	});
 
-	specify("create creates an association", async function() {
+	specify("#create creates an association", async function() {
 		const post = await fb.create("post");
 
 		expect(post).to.be.an.instanceof(Post);

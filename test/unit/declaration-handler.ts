@@ -1,5 +1,5 @@
-import {Attribute} from "../../lib/attribute";
-import {Declaration} from "../../lib/declaration";
+import {Attribute} from "../../lib/attributes/attribute";
+import {Declaration} from "../../lib/declarations/declaration";
 import {DeclarationHandler} from "../../lib/declaration-handler";
 
 import {expect} from "chai";

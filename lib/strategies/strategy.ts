@@ -7,7 +7,8 @@ export abstract class Strategy {
 	factoryBuilder: FactoryBuilder;
 	name: string;
 
-	constructor(factoryBuilder: FactoryBuilder, adapter: Adapter) {
+	constructor(name: string, factoryBuilder: FactoryBuilder, adapter: Adapter) {
+		this.name = name;
 		this.adapter = adapter;
 		this.factoryBuilder = factoryBuilder;
 	}

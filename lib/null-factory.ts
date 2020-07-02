@@ -1,4 +1,4 @@
-import {Attribute} from "./attribute";
+import {Attribute} from "./attributes/attribute";
 import {Callback} from "./callback";
 import {Definition} from "./definition";
 import {FactoryBuilder} from "./factory-builder";
@@ -19,6 +19,6 @@ export class NullFactory extends Definition {
 	}
 
 	getCallbacks(): Callback[] {
-		return []
+		return [];
 	}
 }

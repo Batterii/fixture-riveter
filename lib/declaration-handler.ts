@@ -1,5 +1,5 @@
-import {Attribute} from "./attribute";
-import {Declaration} from "./declaration";
+import {Attribute} from "./attributes/attribute";
+import {Declaration} from "./declarations/declaration";
 
 export class DeclarationHandler {
 	name: string;

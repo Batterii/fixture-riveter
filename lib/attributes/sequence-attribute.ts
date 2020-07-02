@@ -1,4 +1,4 @@
-import {Attribute} from "../attribute";
+import {Attribute} from "./attribute";
 import {Sequence} from "../sequences/sequence";
 
 export class SequenceAttribute extends Attribute {

@@ -1,4 +1,4 @@
-import {Declaration} from "../declaration";
+import {Declaration} from "./declaration";
 import {AssociationAttribute} from "../attributes/association-attribute";
 import {extractAttributes} from "../factory-builder";
 

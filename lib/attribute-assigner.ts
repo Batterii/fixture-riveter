@@ -1,4 +1,4 @@
-import {Attribute} from "./attribute";
+import {Attribute} from "./attributes/attribute";
 import {Evaluator} from "./evaluator";
 import {FactoryBuilder} from "./factory-builder";
 

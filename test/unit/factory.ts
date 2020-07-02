@@ -246,7 +246,11 @@ describe("Factory", function() {
 
 			sinon.stub(factory, "getAttributes").returns(instance);
 
-			const buildStrategy = new AttributesForStrategy(factoryBuilder, adapter);
+			const buildStrategy = new AttributesForStrategy(
+				"attributesFor",
+				factoryBuilder,
+				adapter,
+			);
 			sinon.stub(buildStrategy, "result").resolves(instance);
 
 			const result = await factory.run(buildStrategy);

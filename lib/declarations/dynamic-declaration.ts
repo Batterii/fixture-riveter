@@ -1,4 +1,4 @@
-import {Declaration} from "../declaration";
+import {Declaration} from "./declaration";
 import {
 	AttributeBlock,
 	DynamicAttribute,

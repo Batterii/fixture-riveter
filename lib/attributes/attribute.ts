@@ -1,4 +1,4 @@
-import {Evaluator} from "./evaluator";
+import {Evaluator} from "../evaluator";
 
 /* eslint-disable class-methods-use-this */
 /* eslint-disable @typescript-eslint/no-empty-function */

@@ -20,7 +20,12 @@ import {
 import {CallbackHandler} from "./callback-handler";
 import {StrategyHandler} from "./strategy-handler";
 
-import {isFunction, isPlainObject, last} from "lodash";
+import {
+	isFunction,
+	isPlainObject,
+	last,
+	cloneDeep,
+} from "lodash";
 
 export function extractAttributes(traitsAndOptions: any[]): Record<string, any> {
 	const options = last(traitsAndOptions);
@@ -172,7 +177,7 @@ export class FactoryBuilder {
 		}
 		const adapter = this.getAdapter();
 		const StrategyBuilder = this.strategyHandler.getStrategy(strategy);
-		const buildStrategy = new StrategyBuilder(this, adapter);
+		const buildStrategy = new StrategyBuilder(strategy, this, adapter);
 		return factory.run(buildStrategy, overrides);
 	}
 
@@ -189,12 +194,16 @@ export class FactoryBuilder {
 		const instances: any[] = [];
 		for (let idx = 0; idx < count; idx += 1) {
 			// eslint-disable-next-line no-await-in-loop
-			const instance = await this.run(name, strategy, traits);
+			const instance = await this.run(name, strategy, cloneDeep(traits));
 			// eslint-disable-next-line no-await-in-loop
 			await fn(instance, idx);
 			instances.push(instance);
 		}
 		return instances;
+	}
+
+	registerStrategy(strategyName: string, strategyClass: any): void {
+		this.strategyHandler.registerStrategy(strategyName, strategyClass);
 	}
 
 	before(name: string, block: callbackFunction): void;
@@ -219,6 +228,7 @@ export class FactoryBuilder {
 
 	// Typescript sucks for dynamically defined methods lol
 	// All of these will be overwritten on instantiation
+	/* eslint-disable */
 	attributesFor(...rest): any {}
 	attributesForList(...rest): any {}
 	attributesForPair(...rest): any {}

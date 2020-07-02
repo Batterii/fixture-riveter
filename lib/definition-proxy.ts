@@ -1,4 +1,4 @@
-import {Declaration} from "./declaration";
+import {Declaration} from "./declarations/declaration";
 import {AssociationDeclaration} from "./declarations/association-declaration";
 import {DynamicDeclaration} from "./declarations/dynamic-declaration";
 import {ImplicitDeclaration} from "./declarations/implicit-declaration";

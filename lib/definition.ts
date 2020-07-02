@@ -1,10 +1,10 @@
-import {Attribute} from "./attribute";
+import {Attribute} from "./attributes/attribute";
 import {
 	Callback,
 	callbackFunction,
 } from "./callback";
 import {CallbackHandler} from "./callback-handler";
-import {Declaration} from "./declaration";
+import {Declaration} from "./declarations/declaration";
 import {DeclarationHandler} from "./declaration-handler";
 import {blockFunction} from "./factory-options-parser";
 import {Trait} from "./trait";
