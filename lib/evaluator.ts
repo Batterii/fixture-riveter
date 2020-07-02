@@ -56,26 +56,21 @@ export class Evaluator {
 	): Promise<Record<string, any>> {
 		const overrides = extractAttributes(traitsAndOverrides);
 
-		let strategyOverride: Strategy;
+		let strategyName: string;
 		if (overrides.strategy) {
-			const StrategyBuilder = this.factoryBuilder.strategyHandler.getStrategy(
-				overrides.strategy,
-			);
-			strategyOverride = new StrategyBuilder(
-				this.factoryBuilder,
-				this.buildStrategy.adapter,
-			);
+			strategyName = overrides.strategy;
 		} else if (this.factoryBuilder.useParentStrategy) {
-			strategyOverride = this.buildStrategy;
+			strategyName = this.buildStrategy.name;
 		} else {
-			const StrategyBuilder = this.factoryBuilder.strategyHandler.getStrategy(
-				"create",
-			);
-			strategyOverride = new StrategyBuilder(
-				this.factoryBuilder,
-				this.buildStrategy.adapter,
-			);
+			strategyName = "create";
 		}
+
+		const StrategyBuilder = this.factoryBuilder.strategyHandler.getStrategy(strategyName);
+		const strategyOverride = new StrategyBuilder(
+			strategyName,
+			this.factoryBuilder,
+			this.buildStrategy.adapter,
+		);
 
 		traitsAndOverrides.push(omit(overrides, "strategy"));
 

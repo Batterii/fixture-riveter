@@ -1,4 +1,6 @@
-import {defineModel} from "../test-fixtures/define-helpers";
+import {Model as ObjectionModel} from "objection";
+
+import {createTable, defineModel} from "../test-fixtures/define-helpers";
 
 import {ObjectionAdapter} from "../../lib/adapters/objection-adapter";
 import {FactoryBuilder} from "../../lib/factory-builder";
@@ -10,7 +12,7 @@ describe("createList", function() {
 	let Post: any;
 
 	before(async function() {
-		Post = await defineModel("Post", {title: "string", author: "string"});
+		Post = await defineModel("Post", {title: "string", author: "string", position: "integer"});
 
 		fb = new FactoryBuilder();
 		fb.setAdapter(new ObjectionAdapter());
@@ -19,6 +21,7 @@ describe("createList", function() {
 			fb.factory("post", Post, (f) => {
 				f.attr("author", () => "China Mieville");
 				f.attr("title", () => "The City & The City");
+				f.attr("position", () => Math.floor(Math.random() * 1001));
 
 				f.trait("modern", (t) => t.attr("title", () => "Kraken"));
 			});
@@ -39,10 +42,31 @@ describe("createList", function() {
 	it("applies traits and overrides", async function() {
 		const posts = await fb.createList("post", 3, "modern", {author: "Noah"});
 
-		expect(posts).to.have.length(3);
 		for (const post of posts) {
 			expect(post.author).to.equal("Noah");
 			expect(post.title).to.equal("Kraken");
 		}
+	});
+
+	describe("callback", function() {
+		it("it works on both object and index", async function() {
+			const posts = await fb.createList("post", 5, (post) => {
+				post.position = post.id;
+			});
+
+			posts.forEach((post) => {
+				expect(post.position).to.equal(post.id);
+			});
+		});
+
+		it("it works on both object and index", async function() {
+			const posts = await fb.createList("post", 5, (post, idx) => {
+				post.position = idx;
+			});
+
+			posts.forEach((post, idx) => {
+				expect(post.position).to.equal(idx);
+			});
+		});
 	});
 });

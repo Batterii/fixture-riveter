@@ -8,8 +8,7 @@ export class DefaultAdapter implements Adapter {
 	}
 
 	async save(instance: any, Model?: any): Promise<any> {
-		await instance.save();
-		return instance;
+		return instance.save();
 	}
 
 	async associate(instance: any, name: string, other: any): Promise<any> {

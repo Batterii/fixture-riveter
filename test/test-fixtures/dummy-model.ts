@@ -8,11 +8,7 @@ export class DummyModel {
 		this.age = age || 32;
 	}
 
-	async save(model: any): Promise<any> {
-		return model;
-	}
-
-	async destroy(model: any): Promise<any> {
-		return model;
+	async save(): Promise<any> {
+		return this;
 	}
 }

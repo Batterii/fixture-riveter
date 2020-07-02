@@ -39,7 +39,6 @@ describe("createPair", function() {
 	it("applies traits and overrides", async function() {
 		const posts = await fb.createPair("post", "modern", {author: "Noah"});
 
-		expect(posts).to.have.length(2);
 		for (const post of posts) {
 			expect(post.author).to.equal("Noah");
 			expect(post.title).to.equal("Kraken");

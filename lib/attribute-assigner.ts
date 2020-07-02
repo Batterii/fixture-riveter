@@ -69,8 +69,9 @@ export class AttributeAssigner {
 		const adapter = this.factoryBuilder.getAdapter();
 		const instance = adapter.build(this.model);
 		const associationNames = this.associationNames();
+		const attributeNames = this.attributesForInstance();
 
-		for (const name of this.attributesForInstance()) {
+		for (const name of attributeNames) {
 			// eslint-disable-next-line no-await-in-loop
 			const attribute = await this.get(name);
 			if (associationNames.includes(name)) {

@@ -47,6 +47,7 @@
 		"mocha": "^7.2.0",
 		"nyc": "^15.1.0",
 		"objection": "^2.2.0",
+		"sequelize": "^6.2.4",
 		"sinon": "^7.5.0",
 		"sinon-chai": "^3.5.0",
 		"source-map-support": "^0.5.19",
