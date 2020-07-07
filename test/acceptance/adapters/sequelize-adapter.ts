@@ -1,7 +1,7 @@
 import {Sequelize, Model, DataTypes} from "sequelize";
 
 import {SequelizeAdapter} from "../../../lib/adapters/sequelize-adapter";
-import {FactoryBuilder} from "../../../lib/factory-builder";
+import {FixtureRiveter} from "../../../lib/fixture-riveter";
 
 import {expect} from "chai";
 
@@ -42,20 +42,20 @@ describe("Sequelize functionality", function() {
 	User.hasMany(Post);
 
 	describe("simple associations", function() {
-		let fb: FactoryBuilder;
+		let fr: FixtureRiveter;
 
 		before(async function() {
 			await sequelize.sync({force: true});
 
-			fb = new FactoryBuilder();
-			fb.setAdapter(new SequelizeAdapter());
+			fr = new FixtureRiveter();
+			fr.setAdapter(new SequelizeAdapter());
 
-			fb.define(function() {
-				fb.factory("user", User, (f: any) => {
+			fr.define(function() {
+				fr.fixture("user", User, (f: any) => {
 					f.attr("name", () => "Noah");
 					f.attr("age", () => 32);
 				});
-				fb.factory("post", Post, (f: any) => {
+				fr.fixture("post", Post, (f: any) => {
 					f.association("user");
 					f.attr("title", () => "Post title");
 				});
@@ -63,7 +63,7 @@ describe("Sequelize functionality", function() {
 		});
 
 		specify("#create creates an association", async function() {
-			const post = await fb.create("post");
+			const post = await fr.create("post");
 			const user = await post.getUser();
 
 			expect(post).to.be.an.instanceof(Post);
@@ -76,24 +76,24 @@ describe("Sequelize functionality", function() {
 	describe(
 		"multiple creates and transient attributes to dynamically build attribute list",
 		function() {
-			let fb: FactoryBuilder;
+			let fr: FixtureRiveter;
 
 			before(async function() {
 				await sequelize.sync({force: true});
 
-				fb = new FactoryBuilder();
-				fb.setAdapter(new SequelizeAdapter());
+				fr = new FixtureRiveter();
+				fr.setAdapter(new SequelizeAdapter());
 
-				fb.define(function() {
-					fb.factory("user", User, (f: any) => {
+				fr.define(function() {
+					fr.fixture("user", User, (f: any) => {
 						f.attr("name", () => "Noah");
-						f.factory("userWithPosts", User, (ff: any) => {
+						f.fixture("userWithPosts", User, (ff: any) => {
 							ff.transient((t) => {
 								t.attr("postCount", () => 5);
 							});
 
 							ff.after("create", async(user, evaluator) => {
-								const posts = await fb.createList(
+								const posts = await fr.createList(
 									"post",
 									await evaluator.attr("postCount"),
 									{user},
@@ -102,7 +102,7 @@ describe("Sequelize functionality", function() {
 							});
 						});
 					});
-					fb.factory("post", Post, (f: any) => {
+					fr.fixture("post", Post, (f: any) => {
 						f.attr("title", () => "The City & The City");
 						f.attr("user");
 					});
@@ -110,13 +110,13 @@ describe("Sequelize functionality", function() {
 			});
 
 			it("generates the correct number of posts", async function() {
-				const user = await fb.create("userWithPosts");
+				const user = await fr.create("userWithPosts");
 				const posts = await user.getPosts();
 				expect(posts).to.have.length(5);
 			});
 
 			it("allows the number of posts to be modified", async function() {
-				const user = await fb.create("userWithPosts", {postCount: 2});
+				const user = await fr.create("userWithPosts", {postCount: 2});
 				const posts = await user.getPosts();
 				expect(posts).to.have.length(2);
 			});
@@ -124,21 +124,21 @@ describe("Sequelize functionality", function() {
 	);
 
 	describe.skip("a created instance, with strategy build", function() {
-		let fb: FactoryBuilder;
+		let fr: FixtureRiveter;
 
 		before(async function() {
 			await sequelize.sync({force: true});
 
-			fb = new FactoryBuilder();
-			fb.setAdapter(new SequelizeAdapter());
+			fr = new FixtureRiveter();
+			fr.setAdapter(new SequelizeAdapter());
 
-			fb.define(function() {
-				fb.factory("user", User, (f) => {
+			fr.define(function() {
+				fr.fixture("user", User, (f) => {
 					f.attr("name", () => "Noah");
 					f.attr("age", () => 32);
 				});
 
-				fb.factory("post", Post, (f) => {
+				fr.fixture("post", Post, (f) => {
 					f.attr("title", () => "The City & The City");
 					f.association("user", {strategy: "build"});
 				});
@@ -146,7 +146,7 @@ describe("Sequelize functionality", function() {
 		});
 
 		it("saves associations (strategy: :build only affects build, not create)", async function() {
-			const post = await fb.create("post");
+			const post = await fr.create("post");
 			const user = await post.getUser();
 
 			expect(user).to.be.an.instanceof(User);

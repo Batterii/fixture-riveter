@@ -2,22 +2,22 @@ import {
 	callbackFunction,
 	Callback,
 } from "./callback";
-import {FactoryBuilder} from "./factory-builder";
+import {FixtureRiveter} from "./fixture-riveter";
 
 import {isFunction} from "lodash";
 
 export class CallbackHandler {
 	callbacks: Callback[];
-	factoryBuilder: FactoryBuilder;
+	fixtureRiveter: FixtureRiveter;
 
-	constructor(factoryBuilder: FactoryBuilder) {
+	constructor(fixtureRiveter: FixtureRiveter) {
 		this.callbacks = [];
-		this.factoryBuilder = factoryBuilder;
+		this.fixtureRiveter = fixtureRiveter;
 	}
 
 	addCallback(names: string[], block: callbackFunction): void {
 		for (const name of names) {
-			this.callbacks.push(new Callback(this.factoryBuilder, name, block));
+			this.callbacks.push(new Callback(this.fixtureRiveter, name, block));
 		}
 	}
 

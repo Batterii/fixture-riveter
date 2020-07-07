@@ -2,22 +2,22 @@ import {Attribute} from "./attribute";
 import {Evaluator} from "../evaluator";
 
 export class AssociationAttribute extends Attribute {
-	factory: string;
+	fixture: string;
 	overrides: any[];
 
-	constructor(name: string, factory: string, overrides: any[]) {
+	constructor(name: string, fixture: string, overrides: any[]) {
 		super(name, false);
-		this.factory = factory;
+		this.fixture = fixture;
 		this.overrides = overrides;
 		this.isAssociation = true;
 	}
 
 	evaluate(evaluator: Evaluator): () => Promise<Record<string, any>> {
-		const traitsAndOverrides = [this.factory, this.overrides].flat();
-		const factoryName = traitsAndOverrides.shift();
+		const traitsAndOverrides = [this.fixture, this.overrides].flat();
+		const fixtureName = traitsAndOverrides.shift();
 
 		return async() => {
-			return evaluator.association(factoryName, ...traitsAndOverrides);
+			return evaluator.association(fixtureName, ...traitsAndOverrides);
 		};
 	}
 }

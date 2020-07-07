@@ -1,22 +1,22 @@
 import {defineModel} from "../test-fixtures/define-helpers";
 
 import {ObjectionAdapter} from "../../lib/adapters/objection-adapter";
-import {FactoryBuilder} from "../../lib/factory-builder";
+import {FixtureRiveter} from "../../lib/fixture-riveter";
 
 import {expect} from "chai";
 
 describe("createPair", function() {
-	let fb: FactoryBuilder;
+	let fr: FixtureRiveter;
 	let Post: any;
 
 	before(async function() {
 		Post = await defineModel("Post", {title: "string", author: "string"});
 
-		fb = new FactoryBuilder();
-		fb.setAdapter(new ObjectionAdapter());
+		fr = new FixtureRiveter();
+		fr.setAdapter(new ObjectionAdapter());
 
-		fb.define(function() {
-			fb.factory("post", Post, (f) => {
+		fr.define(function() {
+			fr.fixture("post", Post, (f) => {
 				f.attr("author", () => "China Mieville");
 				f.attr("title", () => "The City & The City");
 
@@ -26,7 +26,7 @@ describe("createPair", function() {
 	});
 
 	it("inserts into the database", async function() {
-		const posts = await fb.createPair("post");
+		const posts = await fr.createPair("post");
 
 		expect(posts).to.have.length(2);
 		for (const post of posts) {
@@ -37,7 +37,7 @@ describe("createPair", function() {
 	});
 
 	it("applies traits and overrides", async function() {
-		const posts = await fb.createPair("post", "modern", {author: "Noah"});
+		const posts = await fr.createPair("post", "modern", {author: "Noah"});
 
 		for (const post of posts) {
 			expect(post.author).to.equal("Noah");

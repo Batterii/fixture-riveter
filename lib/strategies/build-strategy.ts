@@ -3,8 +3,8 @@ import {Strategy} from "./strategy";
 
 /* eslint-disable class-methods-use-this */
 export class BuildStrategy extends Strategy {
-	async association(factoryName: string, traitsAndOverrides: any[]): Promise<any> {
-		return this.factoryBuilder.run(factoryName, "build", traitsAndOverrides);
+	async association(fixtureName: string, traitsAndOverrides: any[]): Promise<any> {
+		return this.fixtureRiveter.run(fixtureName, "build", traitsAndOverrides);
 	}
 
 	async result(assembler: Assembler): Promise<any> {

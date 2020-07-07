@@ -2,7 +2,7 @@ import {DefinitionProxy} from "./definition-proxy";
 
 import {first, isFunction, isPlainObject, last} from "lodash";
 
-export interface FactoryOptions {
+export interface FixtureOptions {
 	aliases?: string[];
 	traits?: string[];
 	parent?: string;
@@ -10,16 +10,16 @@ export interface FactoryOptions {
 
 export type blockFunction = (f: DefinitionProxy) => any;
 
-export function factoryOptionsParser(
-	option?: FactoryOptions | blockFunction,
+export function fixtureOptionsParser(
+	option?: FixtureOptions | blockFunction,
 ): [Record<string, any>, blockFunction | undefined];
 
-export function factoryOptionsParser(
-	objOption: FactoryOptions,
+export function fixtureOptionsParser(
+	objOption: FixtureOptions,
 	fnOption: blockFunction,
 ): [Record<string, any>, blockFunction | undefined];
 
-export function factoryOptionsParser(
+export function fixtureOptionsParser(
 	...rest: any[]
 ): [Record<string, any>, blockFunction | undefined] {
 	let options = first(rest);

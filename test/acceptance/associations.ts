@@ -2,12 +2,12 @@ import {Model as ObjectionModel} from "objection";
 
 import {createTable} from "../test-fixtures/define-helpers";
 import {ObjectionAdapter} from "../../lib/adapters/objection-adapter";
-import {FactoryBuilder} from "../../lib/factory-builder";
+import {FixtureRiveter} from "../../lib/fixture-riveter";
 
 import {expect} from "chai";
 
 describe("simple associations", function() {
-	let fb: FactoryBuilder;
+	let fr: FixtureRiveter;
 
 	class User extends ObjectionModel {
 		static tableName = "users";
@@ -45,15 +45,15 @@ describe("simple associations", function() {
 			body: "string",
 		});
 
-		fb = new FactoryBuilder();
-		fb.setAdapter(new ObjectionAdapter());
+		fr = new FixtureRiveter();
+		fr.setAdapter(new ObjectionAdapter());
 
-		fb.define(function() {
-			fb.factory("user", User, (f: any) => {
+		fr.define(function() {
+			fr.fixture("user", User, (f: any) => {
 				f.attr("name", () => "Noah");
 				f.attr("age", () => 32);
 			});
-			fb.factory("post", Post, (f: any) => {
+			fr.fixture("post", Post, (f: any) => {
 				f.association("user");
 				f.attr("body", () => "Post body");
 			});
@@ -61,14 +61,14 @@ describe("simple associations", function() {
 	});
 
 	specify("#attributesFor doesn't create an association", async function() {
-		const post = await fb.attributesFor("post");
+		const post = await fr.attributesFor("post");
 		expect(post).to.be.an.instanceof(Object);
 		expect(post.body).to.equal("Post body");
 		expect(post.user).to.be.undefined;
 	});
 
 	specify("#build creates an association", async function() {
-		const post = await fb.build("post");
+		const post = await fr.build("post");
 		expect(post).to.be.an.instanceof(Object);
 		expect(post.body).to.equal("Post body");
 		expect(post.user).to.be.an.instanceof(User);
@@ -77,7 +77,7 @@ describe("simple associations", function() {
 	});
 
 	specify("#create creates an association", async function() {
-		const post = await fb.create("post");
+		const post = await fr.create("post");
 
 		expect(post).to.be.an.instanceof(Post);
 		expect(post.body).to.equal("Post body");
@@ -135,7 +135,7 @@ describe("Complex associations", function() {
 	describe(
 		"multiple creates and transient attributes to dynamically build attribute list",
 		function() {
-			let fb: FactoryBuilder;
+			let fr: FixtureRiveter;
 
 			before(async function() {
 				await createTable(User, {
@@ -148,19 +148,19 @@ describe("Complex associations", function() {
 					title: "string",
 				});
 
-				fb = new FactoryBuilder();
-				fb.setAdapter(new ObjectionAdapter());
+				fr = new FixtureRiveter();
+				fr.setAdapter(new ObjectionAdapter());
 
-				fb.define(function() {
-					fb.factory("user", User, (f: any) => {
+				fr.define(function() {
+					fr.fixture("user", User, (f: any) => {
 						f.attr("name", () => "Noah");
-						f.factory("userWithPosts", User, (ff: any) => {
+						f.fixture("userWithPosts", User, (ff: any) => {
 							ff.transient((t) => {
 								t.attr("postCount", () => 5);
 							});
 
 							ff.after("create", async(user, evaluator) => {
-								const posts = await fb.createList(
+								const posts = await fr.createList(
 									"post",
 									await evaluator.attr("postCount"),
 									{user},
@@ -169,7 +169,7 @@ describe("Complex associations", function() {
 							});
 						});
 					});
-					fb.factory("post", Post, (f: any) => {
+					fr.fixture("post", Post, (f: any) => {
 						f.attr("title", () => "The City & The City");
 						f.attr("user");
 					});
@@ -177,19 +177,19 @@ describe("Complex associations", function() {
 			});
 
 			it("generates the correct number of posts", async function() {
-				const user = await fb.create("userWithPosts");
+				const user = await fr.create("userWithPosts");
 				expect(user.posts).to.have.length(5);
 			});
 
 			it("allows the number of posts to be modified", async function() {
-				const user = await fb.create("userWithPosts", {postCount: 2});
+				const user = await fr.create("userWithPosts", {postCount: 2});
 				expect(user.posts).to.have.length(2);
 			});
 		},
 	);
 
 	describe("a created instance, with strategy build", function() {
-		let fb: FactoryBuilder;
+		let fr: FixtureRiveter;
 
 		before(async function() {
 			await createTable(User, {
@@ -202,16 +202,16 @@ describe("Complex associations", function() {
 				title: "string",
 			});
 
-			fb = new FactoryBuilder();
-			fb.setAdapter(new ObjectionAdapter());
+			fr = new FixtureRiveter();
+			fr.setAdapter(new ObjectionAdapter());
 
-			fb.define(function() {
-				fb.factory("user", User, (f) => {
+			fr.define(function() {
+				fr.fixture("user", User, (f) => {
 					f.attr("name", () => "Noah");
 					f.attr("age", () => 32);
 				});
 
-				fb.factory("post", Post, (f) => {
+				fr.fixture("post", Post, (f) => {
 					f.attr("title", () => "The City & The City");
 					f.association("user", {strategy: "build"});
 				});
@@ -219,7 +219,7 @@ describe("Complex associations", function() {
 		});
 
 		it("saves associations (strategy: build only affects build, not create)", async function() {
-			const post = await fb.create("post");
+			const post = await fr.create("post");
 
 			expect(post.user).to.be.an.instanceof(User);
 			expect(post.user.id).to.exist;

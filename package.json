@@ -1,7 +1,7 @@
 {
-	"name": "@batterii/factory-builder",
+	"name": "fixture-riveter",
 	"version": "0.0.0",
-	"description": "Fixture replacement inspired by thoughtbot's factory_bot",
+	"description": "Fixture replacement inspired by thoughtbot's fixture_bot",
 	"author": "Batterii, LLC",
 	"contributors": [
 		{
@@ -11,7 +11,10 @@
 		}
 	],
 	"license": "MIT",
-	"repository": "github:Batterii/factory-builder",
+	"repository": {
+		"type": "git",
+		"url": "http://github.com/Batterrii/fixture-riveter.git"
+	},
 	"files": [
 		"dist/lib",
 		"dist/types"

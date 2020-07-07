@@ -1,41 +1,41 @@
 import {Attribute} from "../attributes/attribute";
 import {Declaration} from "../declarations/declaration";
-import {Factory} from "../factory";
-import {FactoryBuilder} from "../factory-builder";
+import {Fixture} from "../fixture";
+import {FixtureRiveter} from "../fixture-riveter";
 import {AssociationAttribute} from "../attributes/association-attribute";
 import {SequenceAttribute} from "../attributes/sequence-attribute";
 
 export class ImplicitDeclaration extends Declaration {
-	factoryBuilder: FactoryBuilder;
-	factory: Factory;
+	fixtureRiveter: FixtureRiveter;
+	fixture: Fixture;
 
 	constructor(
 		name: string,
 		ignored: boolean,
-		factoryBuilder: FactoryBuilder,
-		factory: Factory,
+		fixtureRiveter: FixtureRiveter,
+		fixture: Fixture,
 	) {
 		super(name, ignored);
-		this.factoryBuilder = factoryBuilder;
-		this.factory = factory;
+		this.fixtureRiveter = fixtureRiveter;
+		this.fixture = fixture;
 	}
 
 	checkSelfReference(): boolean {
-		return this.factory.name === this.name;
+		return this.fixture.name === this.name;
 	}
 
 	build(): Attribute[] {
-		if (this.factoryBuilder.getFactory(this.name, false)) {
+		if (this.fixtureRiveter.getFixture(this.name, false)) {
 			return [new AssociationAttribute(this.name, this.name, [])];
 		}
-		const sequence = this.factoryBuilder.findSequence(this.name);
+		const sequence = this.fixtureRiveter.findSequence(this.name);
 		if (sequence) {
 			return [new SequenceAttribute(this.name, this.ignored, sequence)];
 		}
 		if (this.checkSelfReference()) {
 			throw new Error(`Self-referencing trait '${this.name}'`);
 		}
-		this.factory.inheritTraits([this.name]);
+		this.fixture.inheritTraits([this.name]);
 		return [];
 	}
 }

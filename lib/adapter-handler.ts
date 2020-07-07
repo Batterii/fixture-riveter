@@ -1,7 +1,7 @@
 import {Adapter} from "./adapters/adapter";
 import {DefaultAdapter} from "./adapters/default-adapter";
 
-export type FactoryNames = string | string[];
+export type FixtureNames = string | string[];
 
 export class AdapterHandler {
 	adapters: Record<string, Adapter>;
@@ -14,9 +14,9 @@ export class AdapterHandler {
 		this.currentAdapter = adapter || this.defaultAdapter;
 	}
 
-	getAdapter(factoryName?: string): Adapter {
-		if (factoryName && factoryName in this.adapters) {
-			return this.adapters[factoryName];
+	getAdapter(fixtureName?: string): Adapter {
+		if (fixtureName && fixtureName in this.adapters) {
+			return this.adapters[fixtureName];
 		}
 		return this.currentAdapter;
 	}
@@ -28,21 +28,21 @@ export class AdapterHandler {
 	}
 
 	// eslint-disable-next-line class-methods-use-this
-	coerceNames(factoryNames?: FactoryNames): string[] {
-		if (factoryNames) {
-			return Array.isArray(factoryNames) ? factoryNames : [factoryNames];
+	coerceNames(fixtureNames?: FixtureNames): string[] {
+		if (fixtureNames) {
+			return Array.isArray(fixtureNames) ? fixtureNames : [fixtureNames];
 		}
 		return [];
 	}
 
-	setAdapters(adapter: Adapter, factoryNames: FactoryNames): void {
-		const names = this.coerceNames(factoryNames);
+	setAdapters(adapter: Adapter, fixtureNames: FixtureNames): void {
+		const names = this.coerceNames(fixtureNames);
 		this.assignMultiple(adapter, names);
 	}
 
-	setAdapter(adapter: Adapter, factoryNames?: FactoryNames): Adapter {
-		if (factoryNames) {
-			this.setAdapters(adapter, factoryNames);
+	setAdapter(adapter: Adapter, fixtureNames?: FixtureNames): Adapter {
+		if (fixtureNames) {
+			this.setAdapters(adapter, fixtureNames);
 		} else {
 			this.currentAdapter = adapter;
 		}

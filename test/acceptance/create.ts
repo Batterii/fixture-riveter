@@ -1,12 +1,12 @@
 import {Model as ObjectionModel} from "objection";
 import {createTable, defineModel} from "../test-fixtures/define-helpers";
 import {ObjectionAdapter} from "../../lib/adapters/objection-adapter";
-import {FactoryBuilder} from "../../lib/factory-builder";
+import {FixtureRiveter} from "../../lib/fixture-riveter";
 
 import {expect} from "chai";
 
 describe("#create", function() {
-	let fb: FactoryBuilder;
+	let fr: FixtureRiveter;
 	let User: any;
 
 	before(async function() {
@@ -16,20 +16,18 @@ describe("#create", function() {
 			email: "string",
 		});
 
-		fb = new FactoryBuilder();
-		fb.setAdapter(new ObjectionAdapter());
+		fr = new FixtureRiveter();
+		fr.setAdapter(new ObjectionAdapter());
 
-		fb.define(function() {
-			fb.factory("user", User, (f) => {
-				f.attr("name", () => "Noah");
-				f.attr("age", () => 32);
-				f.sequence("email", (n) => `test${n}@foo.bar`);
-			});
+		fr.fixture("user", User, (f) => {
+			f.attr("name", () => "Noah");
+			f.attr("age", () => 32);
+			f.sequence("email", (n) => `test${n}@foo.bar`);
 		});
 	});
 
 	it("inserts into the database", async function() {
-		const user = await fb.create("user", {name: "Bogart"});
+		const user = await fr.create("user", {name: "Bogart"});
 
 		expect(user.id).to.exist;
 		expect(user.name).to.equal("Bogart");
@@ -42,7 +40,7 @@ describe("#create", function() {
 });
 
 describe("a created instance, with strategy build", function() {
-	let fb: FactoryBuilder;
+	let fr: FixtureRiveter;
 
 	class User extends ObjectionModel {
 		static tableName = "users";
@@ -77,24 +75,24 @@ describe("a created instance, with strategy build", function() {
 		});
 		await createTable(Post, {userId: "integer"});
 
-		fb = new FactoryBuilder();
-		fb.setAdapter(new ObjectionAdapter());
+		fr = new FixtureRiveter();
+		fr.setAdapter(new ObjectionAdapter());
 
-		fb.define(function() {
-			fb.factory("user", User, (f) => {
+		fr.define(function() {
+			fr.fixture("user", User, (f) => {
 				f.attr("name", () => "Noah");
 				f.attr("age", () => 32);
 				f.sequence("email", (n) => `test${n}@foo.bar`);
 			});
 
-			fb.factory("post", Post, (f) => {
+			fr.fixture("post", Post, (f) => {
 				f.association("user", {strategy: "build"});
 			});
 		});
 	});
 
 	it("saves associations (strategy: :build only affects build, not create)", async function() {
-		const post = await fb.create("post");
+		const post = await fr.create("post");
 		expect(post.user).to.be.an.instanceof(User);
 		expect(post.user.id).to.exist;
 	});

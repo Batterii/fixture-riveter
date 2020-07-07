@@ -1,11 +1,11 @@
 import {defineModel} from "../test-fixtures/define-helpers";
-import {FactoryBuilder} from "../../lib/factory-builder";
+import {FixtureRiveter} from "../../lib/fixture-riveter";
 import {ObjectionAdapter} from "../../lib/adapters/objection-adapter";
 
 import {expect} from "chai";
 
 describe("transient attributes", function() {
-	let fb: FactoryBuilder;
+	let fr: FixtureRiveter;
 	let User: any;
 
 	before(async function() {
@@ -14,13 +14,13 @@ describe("transient attributes", function() {
 			email: "string",
 		});
 
-		fb = new FactoryBuilder();
-		fb.setAdapter(new ObjectionAdapter());
+		fr = new FixtureRiveter();
+		fr.setAdapter(new ObjectionAdapter());
 
-		fb.define(function() {
-			fb.sequence("name", (n: number) => `Noah ${n}`);
+		fr.define(function() {
+			fr.sequence("name", (n: number) => `Noah ${n}`);
 
-			fb.factory("user", User, (f) => {
+			fr.fixture("user", User, (f) => {
 				f.transient((t: any) => {
 					t.attr("four", () => 2 + 2);
 					t.attr("rockstar", () => true);
@@ -32,7 +32,7 @@ describe("transient attributes", function() {
 					if (await a.attr("rockstar")) {
 						rockstar = " - Rockstar";
 					}
-					return `${fb.generate("name")}${rockstar}`;
+					return `${fr.generate("name")}${rockstar}`;
 				});
 
 				f.attr("email", async(a: any) => {
@@ -51,12 +51,12 @@ describe("transient attributes", function() {
 	});
 
 	beforeEach(function() {
-		fb.resetSequences();
+		fr.resetSequences();
 	});
 
-	context("returning attributes from a factory", function() {
+	context("returning attributes from a fixture", function() {
 		it("doesn't have any transient attributes", async function() {
-			const user = await fb.attributesFor("user", {rockstar: true});
+			const user = await fr.attributesFor("user", {rockstar: true});
 
 			expect(user).to.haveOwnProperty("name");
 			expect(user).to.haveOwnProperty("email");
@@ -68,25 +68,25 @@ describe("transient attributes", function() {
 
 	context("with a transint variable assigned", function() {
 		it("generates the correct attibutes on a rockstar", async function() {
-			const rockstar = await fb.create("user", {rockstar: true, four: "1234"});
+			const rockstar = await fr.create("user", {rockstar: true, four: "1234"});
 			expect(rockstar.name).to.equal("Noah 1 - Rockstar");
 			expect(rockstar.email).to.equal("noah 1 - rockstar1234@example.com");
 		});
 
 		it("generates the correct attributes on an uppercased rockstar", async function() {
-			const upperCasedRockstar = await fb.create("user", {rockstar: true, upcased: true});
+			const upperCasedRockstar = await fr.create("user", {rockstar: true, upcased: true});
 			expect(upperCasedRockstar.name).to.equal("NOAH 1 - ROCKSTAR");
 			expect(upperCasedRockstar.email).to.equal("noah 1 - rockstar4@example.com");
 		});
 
 		it("generates the correct attributes on a rockstar with a name", async function() {
-			const rockstarWithName = await fb.create("user", {name: "Jane Doe", rockstar: true});
+			const rockstarWithName = await fr.create("user", {name: "Jane Doe", rockstar: true});
 			expect(rockstarWithName.name).to.equal("Jane Doe");
 			expect(rockstarWithName.email).to.equal("jane doe4@example.com");
 		});
 
 		it("generates the correct attributes on a groupie", async function() {
-			const groupie = await fb.create("user", {rockstar: false});
+			const groupie = await fr.create("user", {rockstar: false});
 			expect(groupie.name).to.equal("Noah 1");
 			expect(groupie.email).to.equal("noah 14@example.com");
 		});
@@ -94,24 +94,24 @@ describe("transient attributes", function() {
 
 	context("without transient variables assigned", function() {
 		it("uses the default value of the attribute", async function() {
-			const rockstar = await fb.create("user");
+			const rockstar = await fr.create("user");
 			expect(rockstar.name).to.equal("Noah 1 - Rockstar");
 		});
 	});
 });
 
 describe("transient sequences", function() {
-	let fb: FactoryBuilder;
+	let fr: FixtureRiveter;
 	let User: any;
 
 	before(async function() {
 		User = await defineModel("User", {name: "string"});
 
-		fb = new FactoryBuilder();
-		fb.setAdapter(new ObjectionAdapter());
+		fr = new FixtureRiveter();
+		fr.setAdapter(new ObjectionAdapter());
 
-		fb.define(function() {
-			fb.factory("user", User, (f) => {
+		fr.define(function() {
+			fr.fixture("user", User, (f) => {
 				f.transient((t: any) => {
 					t.sequence("counter");
 				});
@@ -122,8 +122,8 @@ describe("transient sequences", function() {
 	});
 
 	it("increments correctly", async function() {
-		const user1 = await fb.build("user");
-		const user2 = await fb.build("user");
+		const user1 = await fr.build("user");
+		const user2 = await fr.build("user");
 
 		expect(user1.name).to.equal("Noah 1");
 		expect(user2.name).to.equal("Noah 2");

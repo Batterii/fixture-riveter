@@ -1,23 +1,23 @@
-import {FactoryBuilder} from "../../lib/factory-builder";
-import {NullFactory} from "../../lib/null-factory";
+import {FixtureRiveter} from "../../lib/fixture-riveter";
+import {NullFixture} from "../../lib/null-fixture";
 
 import {expect} from "chai";
 
-describe("NullFactory", function() {
-	let factoryBuilder: FactoryBuilder;
-	let nullFactory: NullFactory;
+describe("NullFixture", function() {
+	let fixtureRiveter: FixtureRiveter;
+	let nullFixture: NullFixture;
 
 	beforeEach(function() {
-		factoryBuilder = new FactoryBuilder();
-		nullFactory = new NullFactory(factoryBuilder);
+		fixtureRiveter = new FixtureRiveter();
+		nullFixture = new NullFixture(fixtureRiveter);
 	});
 
 	it("can be created", function() {
-		expect(nullFactory).to.be.an.instanceof(NullFactory);
-		expect(nullFactory.name).to.equal("nullFactory");
+		expect(nullFixture).to.be.an.instanceof(NullFixture);
+		expect(nullFixture.name).to.equal("nullFixture");
 	});
 
 	it("#getAttributes returns an empty array", function() {
-		expect(nullFactory.getAttributes()).to.deep.equal([]);
+		expect(nullFixture.getAttributes()).to.deep.equal([]);
 	});
 });

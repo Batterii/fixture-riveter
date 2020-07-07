@@ -1,16 +1,16 @@
 import {Attribute} from "./attributes/attribute";
 import {Evaluator} from "./evaluator";
-import {FactoryBuilder} from "./factory-builder";
+import {FixtureRiveter} from "./fixture-riveter";
 
 export class AttributeAssigner {
-	factoryBuilder: FactoryBuilder;
+	fixtureRiveter: FixtureRiveter;
 	model: any;
 	evaluator: Evaluator;
 	attributes: Attribute[];
 	attributeNamesToAssign: string[];
 
-	constructor(factoryBuilder: FactoryBuilder, model: any, evaluator: Evaluator) {
-		this.factoryBuilder = factoryBuilder;
+	constructor(fixtureRiveter: FixtureRiveter, model: any, evaluator: Evaluator) {
+		this.fixtureRiveter = fixtureRiveter;
 		this.model = model;
 		this.evaluator = evaluator;
 		this.attributes = evaluator.attributes;
@@ -66,7 +66,7 @@ export class AttributeAssigner {
 	}
 
 	async toInstance(): Promise<Record<string, any>> {
-		const adapter = this.factoryBuilder.getAdapter();
+		const adapter = this.fixtureRiveter.getAdapter();
 		const instance = adapter.build(this.model);
 		const associationNames = this.associationNames();
 		const attributeNames = this.attributesForInstance();

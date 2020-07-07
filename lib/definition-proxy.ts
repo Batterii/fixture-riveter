@@ -4,13 +4,13 @@ import {DynamicDeclaration} from "./declarations/dynamic-declaration";
 import {ImplicitDeclaration} from "./declarations/implicit-declaration";
 import {Trait} from "./trait";
 import {Definition} from "./definition";
-import {Factory} from "./factory";
+import {Fixture} from "./fixture";
 import {
 	blockFunction,
-	FactoryOptions,
-} from "./factory-options-parser";
+	FixtureOptions,
+} from "./fixture-options-parser";
 import {callbackFunction} from "./callback";
-import {FactoryBuilder} from "./factory-builder";
+import {FixtureRiveter} from "./fixture-riveter";
 import {
 	Sequence,
 	SequenceCallback,
@@ -36,8 +36,8 @@ export class DefinitionProxy {
 		}
 	}
 
-	get factoryBuilder(): FactoryBuilder {
-		return this.definition.factoryBuilder;
+	get fixtureRiveter(): FixtureRiveter {
+		return this.definition.fixtureRiveter;
 	}
 
 	get sequenceHandler(): SequenceHandler {
@@ -58,16 +58,16 @@ export class DefinitionProxy {
 			declaration = new ImplicitDeclaration(
 				name,
 				this.ignore,
-				this.factoryBuilder,
-				this.definition as Factory,
+				this.fixtureRiveter,
+				this.definition as Fixture,
 			);
 		}
 		this.definition.declareAttribute(declaration);
 	}
 
-	factory(name: string, model: object, rest?: FactoryOptions | blockFunction): void;
-	factory(name: string, model: object, options: FactoryOptions, block?: blockFunction): void;
-	factory(name: string, model: object, ...rest: any[]): void {
+	fixture(name: string, model: object, rest?: FixtureOptions | blockFunction): void;
+	fixture(name: string, model: object, options: FixtureOptions, block?: blockFunction): void;
+	fixture(name: string, model: object, ...rest: any[]): void {
 		this.childFactories.push([name, model, ...rest]);
 	}
 
@@ -89,7 +89,7 @@ export class DefinitionProxy {
 
 	trait(name: string, block?: blockFunction): void {
 		if (block && isFunction(block)) {
-			this.definition.defineTrait(new Trait(name, this.factoryBuilder, block));
+			this.definition.defineTrait(new Trait(name, this.fixtureRiveter, block));
 		} else {
 			throw new Error(`wrong options, bruh: ${name}, ${block}`);
 		}

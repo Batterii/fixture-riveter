@@ -1,12 +1,12 @@
 import {Adapter} from "./adapters/adapter";
 import {DefaultAdapter} from "./adapters/default-adapter";
 import {ObjectionAdapter} from "./adapters/objection-adapter";
-import {FactoryBuilder} from "./factory-builder";
+import {FixtureRiveter} from "./fixture-riveter";
 
-const factoryBuilder = new FactoryBuilder();
+const fr = new FixtureRiveter();
 
 export {
-	factoryBuilder,
+	fr,
 	Adapter,
 	DefaultAdapter,
 	ObjectionAdapter,

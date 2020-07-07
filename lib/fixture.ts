@@ -3,13 +3,13 @@ import {Attribute} from "./attributes/attribute";
 import {AttributeAssigner} from "./attribute-assigner";
 import {Definition} from "./definition";
 import {Evaluator} from "./evaluator";
-import {FactoryBuilder} from "./factory-builder";
-import {NullFactory} from "./null-factory";
+import {FixtureRiveter} from "./fixture-riveter";
+import {NullFixture} from "./null-fixture";
 import {
 	blockFunction,
-	FactoryOptions,
-	factoryOptionsParser,
-} from "./factory-options-parser";
+	FixtureOptions,
+	fixtureOptionsParser,
+} from "./fixture-options-parser";
 import {Strategy} from "./strategies/strategy";
 
 import {isFunction} from "lodash";
@@ -20,37 +20,37 @@ export interface ExtraAttributes {
 	attrs?: Record<string, any>;
 }
 
-export class Factory extends Definition {
-	factoryBuilder: FactoryBuilder;
+export class Fixture extends Definition {
+	fixtureRiveter: FixtureRiveter;
 	model: any;
 	parent?: string;
 
 	constructor(
-		factoryBuilder: FactoryBuilder,
+		fixtureRiveter: FixtureRiveter,
 		name: string,
 		model: any,
-		rest?: FactoryOptions | blockFunction,
+		rest?: FixtureOptions | blockFunction,
 	);
 
 	constructor(
-		factoryBuilder: FactoryBuilder,
+		fixtureRiveter: FixtureRiveter,
 		name: string,
 		model: any,
-		options?: FactoryOptions,
+		options?: FixtureOptions,
 		block?: blockFunction,
 	);
 
 	constructor(
-		factoryBuilder: FactoryBuilder,
+		fixtureRiveter: FixtureRiveter,
 		name: string,
 		model: any,
 		...rest: any[]
 	) {
-		super(name, factoryBuilder);
+		super(name, fixtureRiveter);
 
 		this.model = model;
 
-		const [options, block] = factoryOptionsParser(...rest);
+		const [options, block] = fixtureOptionsParser(...rest);
 
 		if (options.aliases) {
 			this.aliases = options.aliases;
@@ -67,18 +67,18 @@ export class Factory extends Definition {
 		}
 	}
 
-	parentFactory(): Factory {
+	parentFixture(): Fixture {
 		if (this.parent) {
-			return this.factoryBuilder.getFactory(this.parent, false);
+			return this.fixtureRiveter.getFixture(this.parent, false);
 		}
-		return new NullFactory(this.factoryBuilder) as Factory;
+		return new NullFixture(this.fixtureRiveter) as Fixture;
 	}
 
 	compile(): void {
 		if (!this.compiled) {
-			const parentFactory = this.parentFactory();
-			parentFactory.compile();
-			for (const definedTrait of parentFactory.definedTraits) {
+			const parentFixture = this.parentFixture();
+			parentFixture.compile();
+			for (const definedTrait of parentFixture.definedTraits) {
 				this.defineTrait(definedTrait);
 			}
 			super.compile();
@@ -89,7 +89,7 @@ export class Factory extends Definition {
 	getParentAttributes(): Attribute[] {
 		const attributeNames = this.attributeNames();
 
-		return this.parentFactory()
+		return this.parentFixture()
 			.getAttributes()
 			.filter((attribute) => !attributeNames.includes(attribute.name));
 	}
@@ -105,8 +105,8 @@ export class Factory extends Definition {
 	}
 
 	getCallbacks(): Callback[] {
-		const globalCallbacks = this.factoryBuilder.getCallbacks();
-		const parentCallbacks = this.parentFactory().getCallbacks();
+		const globalCallbacks = this.fixtureRiveter.getCallbacks();
+		const parentCallbacks = this.parentFixture().getCallbacks();
 		const definedCallbacks = super.getCallbacks();
 
 		return globalCallbacks.concat(parentCallbacks, definedCallbacks);
@@ -114,14 +114,14 @@ export class Factory extends Definition {
 
 	async run(buildStrategy: Strategy, overrides: Record<string, any> = {}): Promise<any> {
 		const evaluator = new Evaluator(
-			this.factoryBuilder,
+			this.fixtureRiveter,
 			buildStrategy,
 			this.getAttributes(),
 			overrides,
 		);
 
 		const attributeAssigner = new AttributeAssigner(
-			this.factoryBuilder,
+			this.fixtureRiveter,
 			this.model,
 			evaluator,
 		);

@@ -1,6 +1,6 @@
 import {Declaration} from "./declaration";
 import {AssociationAttribute} from "../attributes/association-attribute";
-import {extractAttributes} from "../factory-builder";
+import {extractAttributes} from "../fixture-riveter";
 
 import {omit} from "lodash";
 
@@ -15,10 +15,10 @@ export class AssociationDeclaration extends Declaration {
 	}
 
 	build(): AssociationAttribute[] {
-		const factoryName = this.overrides.factory || this.name;
-		const overrides = omit(this.overrides, "factory");
+		const fixtureName = this.overrides.fixture || this.name;
+		const overrides = omit(this.overrides, "fixture");
 		const options = [this.traits, overrides].flat(Infinity);
 
-		return [new AssociationAttribute(this.name, factoryName, options)];
+		return [new AssociationAttribute(this.name, fixtureName, options)];
 	}
 }

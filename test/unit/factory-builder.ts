@@ -1,8 +1,8 @@
 import {DummyModel} from "../test-fixtures/dummy-model";
 
 import {DefaultAdapter} from "../../lib/adapters/default-adapter";
-import {Factory} from "../../lib/factory";
-import {extractAttributes, FactoryBuilder} from "../../lib/factory-builder";
+import {Fixture} from "../../lib/fixture";
+import {extractAttributes, FixtureRiveter} from "../../lib/fixture-riveter";
 import {Sequence} from "../../lib/sequences/sequence";
 import {IntegerSequence} from "../../lib/sequences/integer-sequence";
 import {Trait} from "../../lib/trait";
@@ -27,19 +27,19 @@ describe("extractAttributes", function() {
 	});
 });
 
-describe("FactoryBuilder", function() {
+describe("FixtureRiveter", function() {
 	it("can be built", function() {
-		const factoryBuilder = new FactoryBuilder();
-		expect(factoryBuilder).to.exist;
-		expect(factoryBuilder.factories).to.exist.and.to.be.empty;
+		const fixtureRiveter = new FixtureRiveter();
+		expect(fixtureRiveter).to.exist;
+		expect(fixtureRiveter.factories).to.exist.and.to.be.empty;
 	});
 
 	describe("#getAdapter", function() {
 		it("passes the call down", function() {
-			const factoryBuilder = new FactoryBuilder();
-			sinon.stub(factoryBuilder.adapterHandler, "getAdapter").returns("test");
-			const result = factoryBuilder.getAdapter("value");
-			const {getAdapter} = factoryBuilder.adapterHandler;
+			const fixtureRiveter = new FixtureRiveter();
+			sinon.stub(fixtureRiveter.adapterHandler, "getAdapter").returns("test");
+			const result = fixtureRiveter.getAdapter("value");
+			const {getAdapter} = fixtureRiveter.adapterHandler;
 
 			expect(result).to.deep.equal("test");
 			expect(getAdapter).to.be.calledOnce;
@@ -49,11 +49,11 @@ describe("FactoryBuilder", function() {
 
 	describe("#setAdapter", function() {
 		it("passes the call down", function() {
-			const factoryBuilder = new FactoryBuilder();
-			sinon.stub(factoryBuilder.adapterHandler, "setAdapter").returns("test");
+			const fixtureRiveter = new FixtureRiveter();
+			sinon.stub(fixtureRiveter.adapterHandler, "setAdapter").returns("test");
 			const defaultAdapter = new DefaultAdapter();
-			const result = factoryBuilder.setAdapter(defaultAdapter, "value");
-			const {setAdapter} = factoryBuilder.adapterHandler;
+			const result = fixtureRiveter.setAdapter(defaultAdapter, "value");
+			const {setAdapter} = fixtureRiveter.adapterHandler;
 
 			expect(result).to.deep.equal("test");
 			expect(setAdapter).to.be.calledOnce;
@@ -63,96 +63,96 @@ describe("FactoryBuilder", function() {
 
 	describe("#define", function() {
 		it("calls the block immediately", function() {
-			const factoryBuilder = new FactoryBuilder();
+			const fixtureRiveter = new FixtureRiveter();
 			const testArray = ["test"] as any;
-			factoryBuilder.define(function() {
-				factoryBuilder.factories = testArray;
+			fixtureRiveter.define(function() {
+				fixtureRiveter.factories = testArray;
 			});
 
-			expect(factoryBuilder.factories).to.deep.equal(testArray);
+			expect(fixtureRiveter.factories).to.deep.equal(testArray);
 		});
 	});
 
-	describe("#registerFactory", function() {
-		it("adds the factory by name", function() {
-			const factoryBuilder = new FactoryBuilder();
-			const name = "testFactory";
-			const factory = new Factory(factoryBuilder, name, DummyModel);
+	describe("#registerFixture", function() {
+		it("adds the fixture by name", function() {
+			const fixtureRiveter = new FixtureRiveter();
+			const name = "testFixture";
+			const fixture = new Fixture(fixtureRiveter, name, DummyModel);
 
-			factoryBuilder.registerFactory(factory);
+			fixtureRiveter.registerFixture(fixture);
 
-			expect(factoryBuilder.factories[name]).to.equal(factory);
+			expect(fixtureRiveter.factories[name]).to.equal(fixture);
 		});
 
-		it("adds the factory by alias", function() {
-			const factoryBuilder = new FactoryBuilder();
-			const name = "testFactory";
-			const aliases = ["factory1", "factory2"];
-			const factory = new Factory(factoryBuilder, name, DummyModel, {aliases});
+		it("adds the fixture by alias", function() {
+			const fixtureRiveter = new FixtureRiveter();
+			const name = "testFixture";
+			const aliases = ["fixture1", "fixture2"];
+			const fixture = new Fixture(fixtureRiveter, name, DummyModel, {aliases});
 
-			factoryBuilder.registerFactory(factory);
+			fixtureRiveter.registerFixture(fixture);
 
-			expect(factoryBuilder.factories[aliases[0]]).to.equal(factory);
-			expect(factoryBuilder.factories[aliases[1]]).to.equal(factory);
+			expect(fixtureRiveter.factories[aliases[0]]).to.equal(fixture);
+			expect(fixtureRiveter.factories[aliases[1]]).to.equal(fixture);
 		});
 
-		it("adds the same factory multiples times", function() {
-			const factoryBuilder = new FactoryBuilder();
-			const name = "factory1";
-			const alias = "factory2";
-			const factory = new Factory(factoryBuilder, name, DummyModel, {aliases: [alias]});
+		it("adds the same fixture multiples times", function() {
+			const fixtureRiveter = new FixtureRiveter();
+			const name = "fixture1";
+			const alias = "fixture2";
+			const fixture = new Fixture(fixtureRiveter, name, DummyModel, {aliases: [alias]});
 
-			factoryBuilder.registerFactory(factory);
+			fixtureRiveter.registerFixture(fixture);
 
-			const {factories} = factoryBuilder;
+			const {factories} = fixtureRiveter;
 
 			expect(factories[name]).to.deep.equal(factories[alias]);
 		});
 	});
 
-	describe("#factory", function() {
-		it("creates a factory", function() {
-			const factoryBuilder = new FactoryBuilder();
-			const name = "testFactory";
-			factoryBuilder.factory(name, DummyModel);
+	describe("#fixture", function() {
+		it("creates a fixture", function() {
+			const fixtureRiveter = new FixtureRiveter();
+			const name = "testFixture";
+			fixtureRiveter.fixture(name, DummyModel);
 
-			const factory = factoryBuilder.factories[name];
+			const fixture = fixtureRiveter.factories[name];
 
-			expect(factoryBuilder.factories).to.not.be.empty;
-			expect(factory).to.exist;
-			expect(factory.name).to.equal(name);
+			expect(fixtureRiveter.factories).to.not.be.empty;
+			expect(fixture).to.exist;
+			expect(fixture.name).to.equal(name);
 		});
 
-		it("returns the created factory", function() {
-			const factoryBuilder = new FactoryBuilder();
-			const name = "testFactory";
-			const factory = factoryBuilder.factory(name, DummyModel);
+		it("returns the created fixture", function() {
+			const fixtureRiveter = new FixtureRiveter();
+			const name = "testFixture";
+			const fixture = fixtureRiveter.fixture(name, DummyModel);
 
-			expect(factory.name).to.equal(name);
+			expect(fixture.name).to.equal(name);
 		});
 
-		it("passes the options down to the factory", function() {
-			const factoryBuilder = new FactoryBuilder();
-			const name = "testFactory";
-			const aliases = ["factory1", "factory2"];
-			const factory = factoryBuilder.factory(name, DummyModel, {aliases});
+		it("passes the options down to the fixture", function() {
+			const fixtureRiveter = new FixtureRiveter();
+			const name = "testFixture";
+			const aliases = ["fixture1", "fixture2"];
+			const fixture = fixtureRiveter.fixture(name, DummyModel, {aliases});
 
-			expect(factory.aliases).to.deep.equal(aliases);
+			expect(fixture.aliases).to.deep.equal(aliases);
 		});
 
-		it("registers the factory", function() {
-			const factoryBuilder = new FactoryBuilder();
-			const spy = sinon.spy(factoryBuilder as any, "registerFactory");
-			sinon.stub(factoryBuilder, "getFactory").returns(false as any);
-			factoryBuilder.factory("testFactory", DummyModel);
+		it("registers the fixture", function() {
+			const fixtureRiveter = new FixtureRiveter();
+			const spy = sinon.spy(fixtureRiveter as any, "registerFixture");
+			sinon.stub(fixtureRiveter, "getFixture").returns(false as any);
+			fixtureRiveter.fixture("testFixture", DummyModel);
 
 			expect(spy.calledOnce).to.be.true;
 		});
 
-		it("doesn't register a factory twice", function() {
-			const factoryBuilder = new FactoryBuilder();
+		it("doesn't register a fixture twice", function() {
+			const fixtureRiveter = new FixtureRiveter();
 			const testFn = () => {
-				factoryBuilder.factory("testFactory", DummyModel);
+				fixtureRiveter.fixture("testFixture", DummyModel);
 			};
 
 			testFn();
@@ -161,166 +161,166 @@ describe("FactoryBuilder", function() {
 		});
 
 		it("creates child factories", function() {
-			const factoryBuilder = new FactoryBuilder();
-			factoryBuilder.factory("user", DummyModel, (f: any) => {
-				f.factory("oldUser", DummyModel);
+			const fixtureRiveter = new FixtureRiveter();
+			fixtureRiveter.fixture("user", DummyModel, (f: any) => {
+				f.fixture("oldUser", DummyModel);
 			});
 			const result = Object
-				.keys(factoryBuilder.factories)
-				.map((name: string) => factoryBuilder.factories[name])
-				.map((f: Factory) => f.name);
+				.keys(fixtureRiveter.factories)
+				.map((name: string) => fixtureRiveter.factories[name])
+				.map((f: Fixture) => f.name);
 			expect(result).to.deep.equal(["user", "oldUser"]);
 		});
 	});
 
-	describe("#getFactory", function() {
-		it("returns the requested factory", function() {
+	describe("#getFixture", function() {
+		it("returns the requested fixture", function() {
 			const name = "name";
-			const factory = new FactoryBuilder();
-			factory.factory(name, DummyModel);
-			const t = factory.getFactory(name);
-			const result = factory.factories[name];
+			const fixture = new FixtureRiveter();
+			fixture.fixture(name, DummyModel);
+			const t = fixture.getFixture(name);
+			const result = fixture.factories[name];
 			expect(t).to.equal(result);
 		});
 
-		it("throws if a non-existant factory is requested", function() {
-			const factory = new FactoryBuilder();
-			factory.factory("t", DummyModel);
-			expect(() => factory.getFactory("f")).to.throw();
+		it("throws if a non-existant fixture is requested", function() {
+			const fixture = new FixtureRiveter();
+			fixture.fixture("t", DummyModel);
+			expect(() => fixture.getFixture("f")).to.throw();
 		});
 	});
 
 	describe("#attributesFor", function() {
 		it("calls run correctly", async function() {
-			const fb = new FactoryBuilder();
+			const fr = new FixtureRiveter();
 			const name = "name";
-			sinon.stub(fb, "run").resolves({});
-			await fb.attributesFor(name);
-			expect(fb.run).to.be.calledOnceWith(name, "attributesFor", []);
+			sinon.stub(fr, "run").resolves({});
+			await fr.attributesFor(name);
+			expect(fr.run).to.be.calledOnceWith(name, "attributesFor", []);
 		});
 	});
 
 	describe("#build", function() {
 		it("calls run correctly", async function() {
-			const fb = new FactoryBuilder();
+			const fr = new FixtureRiveter();
 			const name = "name";
-			sinon.stub(fb, "run").resolves({});
-			await fb.build(name);
-			expect(fb.run).to.be.calledOnceWith(name, "build", []);
+			sinon.stub(fr, "run").resolves({});
+			await fr.build(name);
+			expect(fr.run).to.be.calledOnceWith(name, "build", []);
 		});
 	});
 
 	describe("#create", function() {
 		it("calls run correctly", async function() {
-			const fb = new FactoryBuilder();
+			const fr = new FixtureRiveter();
 			const name = "name";
-			sinon.stub(fb, "run").resolves({});
-			await fb.create(name);
-			expect(fb.run).to.be.calledOnceWith(name, "create", []);
+			sinon.stub(fr, "run").resolves({});
+			await fr.create(name);
+			expect(fr.run).to.be.calledOnceWith(name, "create", []);
 		});
 	});
 
 
 	describe("#sequence", function() {
 		it("returns the created sequence", function() {
-			const fb = new FactoryBuilder();
-			const result = fb.sequence("email");
+			const fr = new FixtureRiveter();
+			const result = fr.sequence("email");
 			expect(result).to.be.an.instanceof(Sequence);
 		});
 
 		it("adds the sequence as an attribute", function() {
-			const fb = new FactoryBuilder();
+			const fr = new FixtureRiveter();
 			const name = "email";
-			fb.sequence(name);
-			expect(fb.sequenceHandler.sequences).to.be.length(1);
-			expect(fb.sequenceHandler.sequences[0].name).to.equal(name);
+			fr.sequence(name);
+			expect(fr.sequenceHandler.sequences).to.be.length(1);
+			expect(fr.sequenceHandler.sequences[0].name).to.equal(name);
 		});
 
 		it("delegates sequence creation to sequenceHandler", function() {
-			const fb = new FactoryBuilder();
-			sinon.spy(fb.sequenceHandler, "registerSequence");
+			const fr = new FixtureRiveter();
+			sinon.spy(fr.sequenceHandler, "registerSequence");
 			const name = "email";
-			fb.sequence(name);
+			fr.sequence(name);
 
-			expect(fb.sequenceHandler.registerSequence).to.be.calledOnce;
-			expect(fb.sequenceHandler.registerSequence).to.be.calledOnceWithExactly(name);
+			expect(fr.sequenceHandler.registerSequence).to.be.calledOnce;
+			expect(fr.sequenceHandler.registerSequence).to.be.calledOnceWithExactly(name);
 		});
 	});
 
 	describe("#resetSequences", function() {
 		it("resets all sequences", function() {
 			const name = "user";
-			const fb = new FactoryBuilder();
-			let sequenceInFactory = new IntegerSequence("temp");
-			fb.factory(name, DummyModel, (f: any) => {
-				sequenceInFactory = f.sequence("email") as IntegerSequence;
+			const fr = new FixtureRiveter();
+			let sequenceInFixture = new IntegerSequence("temp");
+			fr.fixture(name, DummyModel, (f: any) => {
+				sequenceInFixture = f.sequence("email") as IntegerSequence;
 			});
-			const globalSeq: any = fb.sequence("usernames");
+			const globalSeq: any = fr.sequence("usernames");
 			globalSeq.next();
 			globalSeq.next();
-			sequenceInFactory.next();
-			sequenceInFactory.next();
-			fb.resetSequences();
+			sequenceInFixture.next();
+			sequenceInFixture.next();
+			fr.resetSequences();
 			expect(globalSeq.index).to.equal(1);
-			expect(sequenceInFactory.index).to.equal(1);
+			expect(sequenceInFixture.index).to.equal(1);
 		});
 	});
 
 	describe("#trait", function() {
 		it("returns a new trait", function() {
-			const fb = new FactoryBuilder();
-			const result = fb.trait("email");
+			const fr = new FixtureRiveter();
+			const result = fr.trait("email");
 
 			expect(result).to.be.an.instanceof(Trait);
 		});
 
 		it("passes both arguments through to Trait", function() {
-			const fb = new FactoryBuilder();
+			const fr = new FixtureRiveter();
 			const name = "email";
 			const block = identity;
-			const result = fb.trait(name, block);
+			const result = fr.trait(name, block);
 
 			expect(result.name).to.equal(name);
 			expect(result.block).to.equal(block);
 		});
 
 		it("calls registerTrait", function() {
-			const fb = new FactoryBuilder();
-			sinon.stub(fb, "registerTrait");
-			fb.trait("email");
+			const fr = new FixtureRiveter();
+			sinon.stub(fr, "registerTrait");
+			fr.trait("email");
 
-			expect(fb.registerTrait).to.be.called;
+			expect(fr.registerTrait).to.be.called;
 		});
 	});
 
 	describe("#registerTrait", function() {
 		it("adds the trait for all names", function() {
-			const fb = new FactoryBuilder();
+			const fr = new FixtureRiveter();
 			const name = "email";
-			const trait = new Trait(name, fb, identity);
+			const trait = new Trait(name, fr, identity);
 			sinon.stub(trait, "names").returns(["temp", name]);
-			fb.registerTrait(trait);
+			fr.registerTrait(trait);
 
-			expect(Object.keys(fb.traits)).to.have.length(2);
-			expect(fb.traits.temp).to.equal(trait);
-			expect(fb.traits[name]).to.equal(trait);
+			expect(Object.keys(fr.traits)).to.have.length(2);
+			expect(fr.traits.temp).to.equal(trait);
+			expect(fr.traits[name]).to.equal(trait);
 		});
 	});
 
 	describe("#getTrait", function() {
-		it("returns the requested factory", function() {
+		it("returns the requested fixture", function() {
 			const name = "name";
-			const factory = new FactoryBuilder();
-			factory.trait(name, identity);
-			const t = factory.getTrait(name);
-			const result = factory.traits[name];
+			const fixture = new FixtureRiveter();
+			fixture.trait(name, identity);
+			const t = fixture.getTrait(name);
+			const result = fixture.traits[name];
 			expect(t).to.equal(result);
 		});
 
-		it("throws if a non-existant factory is requested", function() {
-			const factory = new FactoryBuilder();
-			factory.trait("t", identity);
-			expect(() => factory.getTrait("f")).to.throw();
+		it("throws if a non-existant fixture is requested", function() {
+			const fixture = new FixtureRiveter();
+			fixture.trait("t", identity);
+			expect(() => fixture.getTrait("f")).to.throw();
 		});
 	});
 });

@@ -1,8 +1,8 @@
 import {Attribute} from "./attributes/attribute";
 import {
 	extractAttributes,
-	FactoryBuilder,
-} from "./factory-builder";
+	FixtureRiveter,
+} from "./fixture-riveter";
 import {Strategy} from "./strategies/strategy";
 
 import {omit} from "lodash";
@@ -14,16 +14,16 @@ export class Evaluator {
 	attributes: Attribute[];
 	buildStrategy: Strategy;
 	cachedValues: Record<string, any>;
-	factoryBuilder: FactoryBuilder;
+	fixtureRiveter: FixtureRiveter;
 	overrides: Record<string, any>;
 
 	constructor(
-		factoryBuilder: FactoryBuilder,
+		fixtureRiveter: FixtureRiveter,
 		buildStrategy: Strategy,
 		attributes: Attribute[],
 		overrides: Record<string, any>,
 	) {
-		this.factoryBuilder = factoryBuilder;
+		this.fixtureRiveter = fixtureRiveter;
 		this.buildStrategy = buildStrategy;
 		this.attributes = attributes;
 		this.cachedValues = overrides;
@@ -51,7 +51,7 @@ export class Evaluator {
 	}
 
 	async association(
-		factoryName: string,
+		fixtureName: string,
 		...traitsAndOverrides: any[]
 	): Promise<Record<string, any>> {
 		const overrides = extractAttributes(traitsAndOverrides);
@@ -59,21 +59,21 @@ export class Evaluator {
 		let strategyName: string;
 		if (overrides.strategy) {
 			strategyName = overrides.strategy;
-		} else if (this.factoryBuilder.useParentStrategy) {
+		} else if (this.fixtureRiveter.useParentStrategy) {
 			strategyName = this.buildStrategy.name;
 		} else {
 			strategyName = "create";
 		}
 
-		const StrategyBuilder = this.factoryBuilder.strategyHandler.getStrategy(strategyName);
-		const strategyOverride = new StrategyBuilder(
+		const StrategyRiveter = this.fixtureRiveter.strategyHandler.getStrategy(strategyName);
+		const strategyOverride = new StrategyRiveter(
 			strategyName,
-			this.factoryBuilder,
+			this.fixtureRiveter,
 			this.buildStrategy.adapter,
 		);
 
 		traitsAndOverrides.push(omit(overrides, "strategy"));
 
-		return strategyOverride.association(factoryName, traitsAndOverrides);
+		return strategyOverride.association(fixtureName, traitsAndOverrides);
 	}
 }

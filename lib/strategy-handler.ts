@@ -1,4 +1,4 @@
-import {FactoryBuilder} from "./factory-builder";
+import {FixtureRiveter} from "./fixture-riveter";
 import {Strategy} from "./strategies/strategy";
 import {AttributesForStrategy} from "./strategies/attributes-for-strategy";
 import {BuildStrategy} from "./strategies/build-strategy";
@@ -6,11 +6,11 @@ import {CreateStrategy} from "./strategies/create-strategy";
 import {NullStrategy} from "./strategies/null-strategy";
 
 export class StrategyHandler {
-	factoryBuilder: FactoryBuilder;
+	fixtureRiveter: FixtureRiveter;
 	strategies: Record<string, Strategy>;
 
-	constructor(factoryBuilder: FactoryBuilder) {
-		this.factoryBuilder = factoryBuilder;
+	constructor(fixtureRiveter: FixtureRiveter) {
+		this.fixtureRiveter = fixtureRiveter;
 		this.strategies = {};
 	}
 
@@ -37,27 +37,27 @@ export class StrategyHandler {
 	}
 
 	defineSingularStrategyMethod(strategyName: string): void {
-		this.factoryBuilder[strategyName] = async(name: string, ...traits: any[]) => {
-			return this.factoryBuilder.run(name, strategyName, traits);
+		this.fixtureRiveter[strategyName] = async(name: string, ...traits: any[]) => {
+			return this.fixtureRiveter.run(name, strategyName, traits);
 		};
 	}
 
 	defineListStrategyMethod(strategyName: string): void {
-		this.factoryBuilder[`${strategyName}List`] = async(
+		this.fixtureRiveter[`${strategyName}List`] = async(
 			name: string,
 			count: number,
 			...traits: any[]
 		) => {
-			return this.factoryBuilder.generateList(name, strategyName, count, traits);
+			return this.fixtureRiveter.generateList(name, strategyName, count, traits);
 		};
 	}
 
 	definePairStrategyMethod(strategyName: string): void {
-		this.factoryBuilder[`${strategyName}Pair`] = async(
+		this.fixtureRiveter[`${strategyName}Pair`] = async(
 			name: string,
 			...traits: any[]
 		) => {
-			return this.factoryBuilder.generateList(name, strategyName, 2, traits);
+			return this.fixtureRiveter.generateList(name, strategyName, 2, traits);
 		};
 	}
 }

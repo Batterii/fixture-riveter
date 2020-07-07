@@ -3,22 +3,22 @@ import {Model as ObjectionModel} from "objection";
 import {createTable, defineModel} from "../test-fixtures/define-helpers";
 
 import {ObjectionAdapter} from "../../lib/adapters/objection-adapter";
-import {FactoryBuilder} from "../../lib/factory-builder";
+import {FixtureRiveter} from "../../lib/fixture-riveter";
 
 import {expect} from "chai";
 
 describe("createList", function() {
-	let fb: FactoryBuilder;
+	let fr: FixtureRiveter;
 	let Post: any;
 
 	before(async function() {
 		Post = await defineModel("Post", {title: "string", author: "string", position: "integer"});
 
-		fb = new FactoryBuilder();
-		fb.setAdapter(new ObjectionAdapter());
+		fr = new FixtureRiveter();
+		fr.setAdapter(new ObjectionAdapter());
 
-		fb.define(function() {
-			fb.factory("post", Post, (f) => {
+		fr.define(function() {
+			fr.fixture("post", Post, (f) => {
 				f.attr("author", () => "China Mieville");
 				f.attr("title", () => "The City & The City");
 				f.attr("position", () => Math.floor(Math.random() * 1001));
@@ -29,7 +29,7 @@ describe("createList", function() {
 	});
 
 	it("inserts into the database", async function() {
-		const posts = await fb.createList("post", 4);
+		const posts = await fr.createList("post", 4);
 
 		expect(posts).to.have.length(4);
 		for (const post of posts) {
@@ -40,7 +40,7 @@ describe("createList", function() {
 	});
 
 	it("applies traits and overrides", async function() {
-		const posts = await fb.createList("post", 3, "modern", {author: "Noah"});
+		const posts = await fr.createList("post", 3, "modern", {author: "Noah"});
 
 		for (const post of posts) {
 			expect(post.author).to.equal("Noah");
@@ -50,7 +50,7 @@ describe("createList", function() {
 
 	describe("callback", function() {
 		it("it works on both object and index", async function() {
-			const posts = await fb.createList("post", 5, (post) => {
+			const posts = await fr.createList("post", 5, (post) => {
 				post.position = post.id;
 			});
 
@@ -60,7 +60,7 @@ describe("createList", function() {
 		});
 
 		it("it works on both object and index", async function() {
-			const posts = await fb.createList("post", 5, (post, idx) => {
+			const posts = await fr.createList("post", 5, (post, idx) => {
 				post.position = idx;
 			});
 

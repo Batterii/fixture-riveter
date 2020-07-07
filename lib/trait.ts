@@ -1,16 +1,16 @@
 import {Definition} from "./definition";
 import {DefinitionProxy} from "./definition-proxy";
-import {FactoryBuilder} from "./factory-builder";
-import {blockFunction} from "./factory-options-parser";
+import {FixtureRiveter} from "./fixture-riveter";
+import {blockFunction} from "./fixture-options-parser";
 
 /* eslint-disable class-methods-use-this */
 export class Trait extends Definition {
 	constructor(
 		name: string,
-		factoryBuilder: FactoryBuilder,
+		fixtureRiveter: FixtureRiveter,
 		block?: blockFunction,
 	) {
-		super(name, factoryBuilder);
+		super(name, fixtureRiveter);
 
 		if (block) {
 			this.block = block;

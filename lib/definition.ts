@@ -6,13 +6,13 @@ import {
 import {CallbackHandler} from "./callback-handler";
 import {Declaration} from "./declarations/declaration";
 import {DeclarationHandler} from "./declaration-handler";
-import {blockFunction} from "./factory-options-parser";
+import {blockFunction} from "./fixture-options-parser";
 import {Trait} from "./trait";
-import {FactoryBuilder} from "./factory-builder";
+import {FixtureRiveter} from "./fixture-riveter";
 import {SequenceHandler} from "./sequence-handler";
 
 export class Definition {
-	factoryBuilder: FactoryBuilder;
+	fixtureRiveter: FixtureRiveter;
 	name: string;
 	aliases: string[];
 	attributes: Attribute[];
@@ -27,9 +27,9 @@ export class Definition {
 	sequenceHandler: SequenceHandler;
 	declarationHandler: DeclarationHandler;
 
-	constructor(name: string, factoryBuilder: FactoryBuilder) {
+	constructor(name: string, fixtureRiveter: FixtureRiveter) {
 		this.name = name;
-		this.factoryBuilder = factoryBuilder;
+		this.fixtureRiveter = fixtureRiveter;
 
 		this.aliases = [];
 		this.attributes = [];
@@ -40,7 +40,7 @@ export class Definition {
 
 		this.sequenceHandler = new SequenceHandler();
 		this.declarationHandler = new DeclarationHandler(name);
-		this.callbackHandler = new CallbackHandler(factoryBuilder);
+		this.callbackHandler = new CallbackHandler(fixtureRiveter);
 	}
 
 	names(): string[] {
@@ -103,7 +103,7 @@ export class Definition {
 	}
 
 	traitByName(name: string): Trait {
-		return this.traitFor(name) || this.factoryBuilder.getTrait(name);
+		return this.traitFor(name) || this.fixtureRiveter.getTrait(name);
 	}
 
 	getInternalTraits(internalTraits: string[]): Trait[] {

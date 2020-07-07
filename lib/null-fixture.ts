@@ -1,15 +1,15 @@
 import {Attribute} from "./attributes/attribute";
 import {Callback} from "./callback";
 import {Definition} from "./definition";
-import {FactoryBuilder} from "./factory-builder";
+import {FixtureRiveter} from "./fixture-riveter";
 
 /* eslint-disable class-methods-use-this */
 /* eslint-disable @typescript-eslint/no-empty-function */
-export class NullFactory extends Definition {
+export class NullFixture extends Definition {
 	model: any;
 
-	constructor(factoryBuilder: FactoryBuilder) {
-		super("nullFactory", factoryBuilder);
+	constructor(fixtureRiveter: FixtureRiveter) {
+		super("nullFixture", fixtureRiveter);
 	}
 
 	compile(): void { }

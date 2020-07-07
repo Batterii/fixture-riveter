@@ -1,30 +1,30 @@
 import {DynamicDeclaration} from "../../lib/declarations/dynamic-declaration";
-import {FactoryBuilder} from "../../lib/factory-builder";
+import {FixtureRiveter} from "../../lib/fixture-riveter";
 import {Trait} from "../../lib/trait";
 
 import {expect} from "chai";
 
 describe("Trait", function() {
-	let factoryBuilder: FactoryBuilder;
+	let fixtureRiveter: FixtureRiveter;
 
 	beforeEach(function() {
-		factoryBuilder = new FactoryBuilder();
+		fixtureRiveter = new FixtureRiveter();
 	});
 
 	it("creates an instance", function() {
-		const result = new Trait("trait", factoryBuilder);
+		const result = new Trait("trait", fixtureRiveter);
 		expect(result).to.be.an.instanceof(Trait);
 	});
 
 	it("creates an instance with the correct initial values", function() {
-		const result = new Trait("trait", factoryBuilder);
+		const result = new Trait("trait", fixtureRiveter);
 		expect(result.attributes).to.deep.equal([]);
 		expect(result.definedTraits).to.deep.equal([]);
 	});
 
 	it("executes the given block immediately", function() {
 		let result = false;
-		const trait = new Trait("trait", factoryBuilder, (t: any) => {
+		const trait = new Trait("trait", fixtureRiveter, (t: any) => {
 			result = true;
 			t.definition.name = "traitor";
 		});
@@ -35,13 +35,13 @@ describe("Trait", function() {
 
 	describe("#names", function() {
 		beforeEach(function() {
-			factoryBuilder = new FactoryBuilder();
+			fixtureRiveter = new FixtureRiveter();
 		});
 
 		it("returns the name", function() {
 			const name = "trait";
-			const factory = new Trait(name, factoryBuilder);
-			const names = factory.names();
+			const fixture = new Trait(name, fixtureRiveter);
+			const names = fixture.names();
 
 			expect(names).to.have.length(1);
 			expect(names).to.deep.equal([name]);
@@ -50,8 +50,8 @@ describe("Trait", function() {
 
 	describe("#declareAttribute", function() {
 		it("stores the function", function() {
-			factoryBuilder = new FactoryBuilder();
-			const trait = new Trait("trait", factoryBuilder, () => true);
+			fixtureRiveter = new FixtureRiveter();
+			const trait = new Trait("trait", fixtureRiveter, () => true);
 			const name = "email";
 			const declaration = new DynamicDeclaration(name, false, () => "a");
 			trait.declareAttribute(declaration);

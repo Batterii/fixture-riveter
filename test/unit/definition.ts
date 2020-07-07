@@ -1,18 +1,18 @@
 import {DynamicDeclaration} from "../../lib/declarations/dynamic-declaration";
 import {Definition} from "../../lib/definition";
-import {FactoryBuilder} from "../../lib/factory-builder";
+import {FixtureRiveter} from "../../lib/fixture-riveter";
 
 import {expect} from "chai";
 import sinon from "sinon";
 
 describe("Definition", function() {
 	const name = "definition";
-	let factoryBuilder: FactoryBuilder;
+	let fixtureRiveter: FixtureRiveter;
 	let definition: Definition;
 
 	beforeEach(function() {
-		factoryBuilder = {} as FactoryBuilder;
-		definition = new Definition(name, factoryBuilder);
+		fixtureRiveter = {} as FixtureRiveter;
+		definition = new Definition(name, fixtureRiveter);
 	});
 
 	it("can be created", function() {

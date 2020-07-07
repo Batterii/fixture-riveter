@@ -1,12 +1,12 @@
 import {Adapter} from "./adapters/adapter";
-import {AdapterHandler, FactoryNames} from "./adapter-handler";
+import {AdapterHandler, FixtureNames} from "./adapter-handler";
 import {DefinitionProxy} from "./definition-proxy";
-import {Factory} from "./factory";
+import {Fixture} from "./fixture";
 import {
 	blockFunction,
-	FactoryOptions,
-	factoryOptionsParser,
-} from "./factory-options-parser";
+	FixtureOptions,
+	fixtureOptionsParser,
+} from "./fixture-options-parser";
 import {
 	Sequence,
 	SequenceCallback,
@@ -35,8 +35,8 @@ export function extractAttributes(traitsAndOptions: any[]): Record<string, any> 
 	return {};
 }
 
-export class FactoryBuilder {
-	factories: Record<string, Factory>;
+export class FixtureRiveter {
+	factories: Record<string, Fixture>;
 	traits: Record<string, Trait>;
 	adapterHandler: any;
 	sequenceHandler: SequenceHandler;
@@ -56,59 +56,59 @@ export class FactoryBuilder {
 		this.useParentStrategy = true;
 	}
 
-	getAdapter(factoryName?: string): Adapter {
-		return this.adapterHandler.getAdapter(factoryName);
+	getAdapter(fixtureName?: string): Adapter {
+		return this.adapterHandler.getAdapter(fixtureName);
 	}
 
-	setAdapter(adapter: Adapter, factoryNames?: FactoryNames): Adapter {
-		return this.adapterHandler.setAdapter(adapter, factoryNames);
+	setAdapter(adapter: Adapter, fixtureNames?: FixtureNames): Adapter {
+		return this.adapterHandler.setAdapter(adapter, fixtureNames);
 	}
 
 	define(block: Function): void {
 		block.call(this, this);
 	}
 
-	getFactory(name: string, throws = true): Factory {
-		const factory = this.factories[name];
-		if (throws && !factory) {
+	getFixture(name: string, throws = true): Fixture {
+		const fixture = this.factories[name];
+		if (throws && !fixture) {
 			throw new Error(`${name} hasn't been defined yet`);
 		}
-		return factory;
+		return fixture;
 	}
 
-	registerFactory(factory: Factory): void {
-		for (const name of factory.names()) {
-			this.factories[name] = factory;
+	registerFixture(fixture: Fixture): void {
+		for (const name of fixture.names()) {
+			this.factories[name] = fixture;
 		}
 	}
 
-	factory(name: string, model: Function, rest?: FactoryOptions | blockFunction): Factory;
+	fixture(name: string, model: Function, rest?: FixtureOptions | blockFunction): Fixture;
 
-	factory(
+	fixture(
 		name: string,
 		model: Function,
-		options?: FactoryOptions,
+		options?: FixtureOptions,
 		block?: blockFunction,
-	): Factory;
+	): Fixture;
 
-	factory(name: string, model: Function, ...rest: any[]): Factory {
-		if (this.getFactory(name, false)) {
+	fixture(name: string, model: Function, ...rest: any[]): Fixture {
+		if (this.getFixture(name, false)) {
 			throw new Error(`${name} is already defined`);
 		}
-		const factory = new Factory(this, name, model, ...rest);
-		const proxy = new DefinitionProxy(factory);
+		const fixture = new Fixture(this, name, model, ...rest);
+		const proxy = new DefinitionProxy(fixture);
 
 		proxy.execute();
-		this.registerFactory(factory);
+		this.registerFixture(fixture);
 
 		proxy.childFactories.forEach((child: any[]) => {
 			const [childName, childModel, ...childRest] = child;
-			const [childOptions, childBlock] = factoryOptionsParser(...childRest);
+			const [childOptions, childBlock] = fixtureOptionsParser(...childRest);
 			childOptions.parent = childOptions.parent || name;
-			this.factory(childName, childModel, childOptions, childBlock);
+			this.fixture(childName, childModel, childOptions, childBlock);
 		});
 
-		return factory;
+		return fixture;
 	}
 
 	getTrait(name: string): Trait {
@@ -149,8 +149,8 @@ export class FactoryBuilder {
 
 	resetSequences(): void {
 		this.sequenceHandler.resetSequences();
-		for (const [, factory] of Object.entries(this.factories)) {
-			factory.sequenceHandler.resetSequences();
+		for (const [, fixture] of Object.entries(this.factories)) {
+			fixture.sequenceHandler.resetSequences();
 		}
 	}
 
@@ -167,18 +167,18 @@ export class FactoryBuilder {
 
 	async run(name: string, strategy: string, traits: any[]): Promise<Record<string, any>> {
 		const overrides = extractAttributes(traits);
-		let factory = this.getFactory(name);
+		let fixture = this.getFixture(name);
 
-		factory.compile();
+		fixture.compile();
 
 		if (traits.length > 0) {
-			factory = factory.copy();
-			factory.appendTraits(traits);
+			fixture = fixture.copy();
+			fixture.appendTraits(traits);
 		}
 		const adapter = this.getAdapter();
-		const StrategyBuilder = this.strategyHandler.getStrategy(strategy);
-		const buildStrategy = new StrategyBuilder(strategy, this, adapter);
-		return factory.run(buildStrategy, overrides);
+		const StrategyRiveter = this.strategyHandler.getStrategy(strategy);
+		const buildStrategy = new StrategyRiveter(strategy, this, adapter);
+		return fixture.run(buildStrategy, overrides);
 	}
 
 	async generateList(

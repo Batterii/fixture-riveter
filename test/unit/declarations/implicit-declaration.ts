@@ -1,5 +1,5 @@
-import {FactoryBuilder} from "../../../lib/factory-builder";
-import {Factory} from "../../../lib/factory";
+import {FixtureRiveter} from "../../../lib/fixture-riveter";
+import {Fixture} from "../../../lib/fixture";
 import {ImplicitDeclaration} from "../../../lib/declarations/implicit-declaration";
 import {AssociationAttribute} from "../../../lib/attributes/association-attribute";
 import {SequenceAttribute} from "../../../lib/attributes/sequence-attribute";
@@ -11,35 +11,35 @@ describe("ImplicitDeclaration", function() {
 	const name = "email";
 
 	it("creates an instance of ImplicitDeclaration", function() {
-		const factoryBuilder = {} as FactoryBuilder;
-		const factory = {} as Factory;
-		const result = new ImplicitDeclaration(name, false, factoryBuilder, factory);
+		const fixtureRiveter = {} as FixtureRiveter;
+		const fixture = {} as Fixture;
+		const result = new ImplicitDeclaration(name, false, fixtureRiveter, fixture);
 
 		expect(result).to.be.an.instanceof(ImplicitDeclaration);
 		expect(result.name).to.equal(name);
-		expect(result.factoryBuilder).to.equal(factoryBuilder);
-		expect(result.factory).to.equal(factory);
+		expect(result.fixtureRiveter).to.equal(fixtureRiveter);
+		expect(result.fixture).to.equal(fixture);
 	});
 
 	describe("#build", function() {
 		context("with a known association", function() {
-			it("calls getFactory", function() {
-				const factoryBuilder = new FactoryBuilder();
-				sinon.stub(factoryBuilder, "getFactory").returns(true as any);
-				const factory = {} as Factory;
-				const declaration = new ImplicitDeclaration(name, false, factoryBuilder, factory);
+			it("calls getFixture", function() {
+				const fixtureRiveter = new FixtureRiveter();
+				sinon.stub(fixtureRiveter, "getFixture").returns(true as any);
+				const fixture = {} as Fixture;
+				const declaration = new ImplicitDeclaration(name, false, fixtureRiveter, fixture);
 				declaration.build();
 
-				expect(factoryBuilder.getFactory).to.be.calledOnce;
-				expect(factoryBuilder.getFactory).to.be.calledWithExactly(name, false);
+				expect(fixtureRiveter.getFixture).to.be.calledOnce;
+				expect(fixtureRiveter.getFixture).to.be.calledWithExactly(name, false);
 			});
 
 			it("returns an AssociationAttribute", function() {
-				const factoryBuilder = new FactoryBuilder();
-				sinon.stub(factoryBuilder, "getFactory").returns(true as any);
+				const fixtureRiveter = new FixtureRiveter();
+				sinon.stub(fixtureRiveter, "getFixture").returns(true as any);
 
-				const factory = {} as Factory;
-				const declaration = new ImplicitDeclaration(name, false, factoryBuilder, factory);
+				const fixture = {} as Fixture;
+				const declaration = new ImplicitDeclaration(name, false, fixtureRiveter, fixture);
 				const array = declaration.build();
 				const [result] = array;
 
@@ -50,45 +50,45 @@ describe("ImplicitDeclaration", function() {
 			});
 
 			it("does not call later functions", function() {
-				const factoryBuilder = new FactoryBuilder();
-				sinon.stub(factoryBuilder, "getFactory").returns(true as any);
-				sinon.stub(factoryBuilder, "findSequence").returns(false as any);
+				const fixtureRiveter = new FixtureRiveter();
+				sinon.stub(fixtureRiveter, "getFixture").returns(true as any);
+				sinon.stub(fixtureRiveter, "findSequence").returns(false as any);
 
-				const factory = new Factory(factoryBuilder, "name", {});
-				sinon.stub(factory, "inheritTraits");
+				const fixture = new Fixture(fixtureRiveter, "name", {});
+				sinon.stub(fixture, "inheritTraits");
 
-				const declaration = new ImplicitDeclaration(name, false, factoryBuilder, factory);
+				const declaration = new ImplicitDeclaration(name, false, fixtureRiveter, fixture);
 				sinon.stub(declaration, "checkSelfReference").returns(false);
 				declaration.build();
 
-				expect(factoryBuilder.findSequence).to.not.be.called;
+				expect(fixtureRiveter.findSequence).to.not.be.called;
 				expect(declaration.checkSelfReference).to.not.be.called;
-				expect(factory.inheritTraits).to.not.be.called;
+				expect(fixture.inheritTraits).to.not.be.called;
 			});
 		});
 
 		context("with no known associations", function() {
 			it("calls findSequence", function() {
-				const factoryBuilder = new FactoryBuilder();
-				sinon.stub(factoryBuilder, "getFactory").returns(false as any);
-				sinon.stub(factoryBuilder, "findSequence").returns(true as any);
-				const factory = {} as Factory;
-				const declaration = new ImplicitDeclaration(name, false, factoryBuilder, factory);
+				const fixtureRiveter = new FixtureRiveter();
+				sinon.stub(fixtureRiveter, "getFixture").returns(false as any);
+				sinon.stub(fixtureRiveter, "findSequence").returns(true as any);
+				const fixture = {} as Fixture;
+				const declaration = new ImplicitDeclaration(name, false, fixtureRiveter, fixture);
 				declaration.build();
 
-				expect(factoryBuilder.findSequence).to.be.calledOnce;
-				expect(factoryBuilder.findSequence).to.be.calledWith(name);
+				expect(fixtureRiveter.findSequence).to.be.calledOnce;
+				expect(fixtureRiveter.findSequence).to.be.calledWith(name);
 			});
 		});
 
 		context("with a known sequence", function() {
 			it("creates a sequence attribute", function() {
-				const factoryBuilder = new FactoryBuilder();
-				sinon.stub(factoryBuilder, "getFactory").returns(false as any);
-				factoryBuilder.sequence(name, (n: number) => `Name ${n}`);
+				const fixtureRiveter = new FixtureRiveter();
+				sinon.stub(fixtureRiveter, "getFixture").returns(false as any);
+				fixtureRiveter.sequence(name, (n: number) => `Name ${n}`);
 
-				const factory = {} as Factory;
-				const declaration = new ImplicitDeclaration(name, false, factoryBuilder, factory);
+				const fixture = {} as Fixture;
+				const declaration = new ImplicitDeclaration(name, false, fixtureRiveter, fixture);
 				const array = declaration.build();
 				const [result] = array;
 
@@ -99,32 +99,32 @@ describe("ImplicitDeclaration", function() {
 			});
 
 			it("does not call later functions", function() {
-				const factoryBuilder = new FactoryBuilder();
-				sinon.stub(factoryBuilder, "getFactory").returns(false as any);
-				sinon.stub(factoryBuilder, "findSequence").returns(true as any);
+				const fixtureRiveter = new FixtureRiveter();
+				sinon.stub(fixtureRiveter, "getFixture").returns(false as any);
+				sinon.stub(fixtureRiveter, "findSequence").returns(true as any);
 
-				const factory = new Factory(factoryBuilder, "name", {});
-				sinon.stub(factory, "inheritTraits");
+				const fixture = new Fixture(fixtureRiveter, "name", {});
+				sinon.stub(fixture, "inheritTraits");
 
-				const declaration = new ImplicitDeclaration(name, false, factoryBuilder, factory);
+				const declaration = new ImplicitDeclaration(name, false, fixtureRiveter, fixture);
 				sinon.stub(declaration, "checkSelfReference").returns(false);
 				declaration.build();
 
 				expect(declaration.checkSelfReference).to.not.be.called;
-				expect(factory.inheritTraits).to.not.be.called;
+				expect(fixture.inheritTraits).to.not.be.called;
 			});
 		});
 
 		context("with no known sequences", function() {
 			it("calls checkSelfReference", function() {
-				const factoryBuilder = new FactoryBuilder();
-				sinon.stub(factoryBuilder, "getFactory").returns(false as any);
-				sinon.stub(factoryBuilder, "findSequence").returns(false as any);
+				const fixtureRiveter = new FixtureRiveter();
+				sinon.stub(fixtureRiveter, "getFixture").returns(false as any);
+				sinon.stub(fixtureRiveter, "findSequence").returns(false as any);
 
-				const factory = new Factory(factoryBuilder, "name", {});
-				sinon.stub(factory, "inheritTraits");
+				const fixture = new Fixture(fixtureRiveter, "name", {});
+				sinon.stub(fixture, "inheritTraits");
 
-				const declaration = new ImplicitDeclaration(name, false, factoryBuilder, factory);
+				const declaration = new ImplicitDeclaration(name, false, fixtureRiveter, fixture);
 				sinon.stub(declaration, "checkSelfReference");
 
 				declaration.build();
@@ -133,11 +133,11 @@ describe("ImplicitDeclaration", function() {
 			});
 
 			it("throws if checkSelfReference is true", function() {
-				const factoryBuilder = new FactoryBuilder();
-				sinon.stub(factoryBuilder, "getFactory").returns(false as any);
-				sinon.stub(factoryBuilder, "findSequence").returns(false as any);
-				const factory = {} as Factory;
-				const declaration = new ImplicitDeclaration(name, false, factoryBuilder, factory);
+				const fixtureRiveter = new FixtureRiveter();
+				sinon.stub(fixtureRiveter, "getFixture").returns(false as any);
+				sinon.stub(fixtureRiveter, "findSequence").returns(false as any);
+				const fixture = {} as Fixture;
+				const declaration = new ImplicitDeclaration(name, false, fixtureRiveter, fixture);
 				sinon.stub(declaration, "checkSelfReference").returns(true);
 				const fn = () => declaration.build();
 
@@ -145,49 +145,49 @@ describe("ImplicitDeclaration", function() {
 			});
 
 			it("does not call later functions", function() {
-				const factoryBuilder = new FactoryBuilder();
-				sinon.stub(factoryBuilder, "getFactory").returns(false as any);
-				sinon.stub(factoryBuilder, "findSequence").returns(false as any);
+				const fixtureRiveter = new FixtureRiveter();
+				sinon.stub(fixtureRiveter, "getFixture").returns(false as any);
+				sinon.stub(fixtureRiveter, "findSequence").returns(false as any);
 
-				const factory = new Factory(factoryBuilder, "name", {});
-				sinon.stub(factory, "inheritTraits");
+				const fixture = new Fixture(fixtureRiveter, "name", {});
+				sinon.stub(fixture, "inheritTraits");
 
-				const declaration = new ImplicitDeclaration(name, false, factoryBuilder, factory);
+				const declaration = new ImplicitDeclaration(name, false, fixtureRiveter, fixture);
 				sinon.stub(declaration, "checkSelfReference").returns(true);
 				const fn = () => declaration.build();
 
 				expect(fn).to.throw;
-				expect(factory.inheritTraits).to.not.be.called;
+				expect(fixture.inheritTraits).to.not.be.called;
 			});
 		});
 
 		context("when not self-referencing", function() {
 			it("inherits the name as a trait", function() {
-				const factoryBuilder = new FactoryBuilder();
-				sinon.stub(factoryBuilder, "getFactory").returns(false as any);
-				sinon.stub(factoryBuilder, "findSequence").returns(false as any);
+				const fixtureRiveter = new FixtureRiveter();
+				sinon.stub(fixtureRiveter, "getFixture").returns(false as any);
+				sinon.stub(fixtureRiveter, "findSequence").returns(false as any);
 
-				const factory = new Factory(factoryBuilder, "name", {});
-				sinon.stub(factory, "inheritTraits");
+				const fixture = new Fixture(fixtureRiveter, "name", {});
+				sinon.stub(fixture, "inheritTraits");
 
-				const declaration = new ImplicitDeclaration(name, false, factoryBuilder, factory);
+				const declaration = new ImplicitDeclaration(name, false, fixtureRiveter, fixture);
 				sinon.stub(declaration, "checkSelfReference").returns(false);
 
 				declaration.build();
 
-				expect(factory.inheritTraits).to.be.called;
-				expect(factory.inheritTraits).to.be.calledWith([name]);
+				expect(fixture.inheritTraits).to.be.called;
+				expect(fixture.inheritTraits).to.be.calledWith([name]);
 			});
 
 			it("returns an empty array", function() {
-				const factoryBuilder = new FactoryBuilder();
-				sinon.stub(factoryBuilder, "getFactory").returns(false as any);
-				sinon.stub(factoryBuilder, "findSequence").returns(false as any);
+				const fixtureRiveter = new FixtureRiveter();
+				sinon.stub(fixtureRiveter, "getFixture").returns(false as any);
+				sinon.stub(fixtureRiveter, "findSequence").returns(false as any);
 
-				const factory = new Factory(factoryBuilder, "name", {});
-				sinon.stub(factory, "inheritTraits");
+				const fixture = new Fixture(fixtureRiveter, "name", {});
+				sinon.stub(fixture, "inheritTraits");
 
-				const declaration = new ImplicitDeclaration(name, false, factoryBuilder, factory);
+				const declaration = new ImplicitDeclaration(name, false, fixtureRiveter, fixture);
 				sinon.stub(declaration, "checkSelfReference").returns(false);
 
 				const result = declaration.build();
