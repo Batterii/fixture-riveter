@@ -14,8 +14,7 @@
 	},
 	"include": [
 		"lib/**/*",
-		"./knexfile.ts",
-		"migrations/**/*",
-		"test/**/*"
+		"test/**/*",
+		"./knexfile.ts"
 	]
 }
