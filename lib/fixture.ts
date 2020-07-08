@@ -122,6 +122,7 @@ export class Fixture extends Definition {
 
 		const attributeAssigner = new AttributeAssigner(
 			this.fixtureRiveter,
+			this.name,
 			this.model,
 			evaluator,
 		);

@@ -4,13 +4,15 @@ import {FixtureRiveter} from "./fixture-riveter";
 
 export class AttributeAssigner {
 	fixtureRiveter: FixtureRiveter;
+	name: string;
 	model: any;
 	evaluator: Evaluator;
 	attributes: Attribute[];
 	attributeNamesToAssign: string[];
 
-	constructor(fixtureRiveter: FixtureRiveter, model: any, evaluator: Evaluator) {
+	constructor(fixtureRiveter: FixtureRiveter, name: string, model: any, evaluator: Evaluator) {
 		this.fixtureRiveter = fixtureRiveter;
+		this.name = name;
 		this.model = model;
 		this.evaluator = evaluator;
 		this.attributes = evaluator.attributes;
@@ -66,7 +68,7 @@ export class AttributeAssigner {
 	}
 
 	async toInstance(): Promise<Record<string, any>> {
-		const adapter = this.fixtureRiveter.getAdapter();
+		const adapter = this.fixtureRiveter.getAdapter(this.name);
 		const instance = adapter.build(this.model);
 		const associationNames = this.associationNames();
 		const attributeNames = this.attributesForInstance();

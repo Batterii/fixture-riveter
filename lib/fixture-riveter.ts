@@ -175,7 +175,7 @@ export class FixtureRiveter {
 			fixture = fixture.copy();
 			fixture.appendTraits(traits);
 		}
-		const adapter = this.getAdapter();
+		const adapter = this.getAdapter(name);
 		const StrategyRiveter = this.strategyHandler.getStrategy(strategy);
 		const buildStrategy = new StrategyRiveter(strategy, this, adapter);
 		return fixture.run(buildStrategy, overrides);
