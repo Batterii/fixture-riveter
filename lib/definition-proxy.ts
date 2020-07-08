@@ -1,3 +1,4 @@
+import {addMethodMissing} from "./method-missing";
 import {Declaration} from "./declarations/declaration";
 import {AssociationDeclaration} from "./declarations/association-declaration";
 import {DynamicDeclaration} from "./declarations/dynamic-declaration";
@@ -32,7 +33,7 @@ export class DefinitionProxy {
 
 	execute(): void {
 		if (this.definition.block) {
-			this.definition.block.call(this, this);
+			this.definition.block.call(addMethodMissing(this), addMethodMissing(this));
 		}
 	}
 
@@ -42,6 +43,10 @@ export class DefinitionProxy {
 
 	get sequenceHandler(): SequenceHandler {
 		return this.definition.sequenceHandler;
+	}
+
+	methodMissing(name: string, ...rest: any[]): void {
+		this.attr(name, ...rest);
 	}
 
 	attr(name: string, ...rest: any[]): void {

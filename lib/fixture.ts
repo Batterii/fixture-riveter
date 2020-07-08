@@ -1,3 +1,4 @@
+import {addMethodMissing} from "./method-missing";
 import {Assembler} from "./assembler";
 import {Attribute} from "./attributes/attribute";
 import {AttributeAssigner} from "./attribute-assigner";
@@ -113,11 +114,13 @@ export class Fixture extends Definition {
 	}
 
 	async run(buildStrategy: Strategy, overrides: Record<string, any> = {}): Promise<any> {
-		const evaluator = new Evaluator(
-			this.fixtureRiveter,
-			buildStrategy,
-			this.getAttributes(),
-			overrides,
+		const evaluator = addMethodMissing(
+			new Evaluator(
+				this.fixtureRiveter,
+				buildStrategy,
+				this.getAttributes(),
+				overrides,
+			),
 		);
 
 		const attributeAssigner = new AttributeAssigner(

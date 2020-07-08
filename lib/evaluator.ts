@@ -42,6 +42,10 @@ export class Evaluator {
 		}
 	}
 
+	async methodMissing(name: string): Promise<any> {
+		return this.attr(name);
+	}
+
 	async attr(name: string): Promise<any> {
 		if (!Object.prototype.hasOwnProperty.call(this.cachedValues, name)) {
 			const fn = this.attributeFns[name];
