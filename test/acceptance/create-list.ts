@@ -17,14 +17,12 @@ describe("createList", function() {
 		fr = new FixtureRiveter();
 		fr.setAdapter(new ObjectionAdapter());
 
-		fr.define(function() {
-			fr.fixture("post", Post, (f) => {
-				f.attr("author", () => "China Mieville");
-				f.attr("title", () => "The City & The City");
-				f.attr("position", () => Math.floor(Math.random() * 1001));
+		fr.fixture("post", Post, (f) => {
+			f.attr("author", () => "China Mieville");
+			f.attr("title", () => "The City & The City");
+			f.attr("position", () => Math.floor(Math.random() * 1001));
 
-				f.trait("modern", (t) => t.attr("title", () => "Kraken"));
-			});
+			f.trait("modern", (t) => t.attr("title", () => "Kraken"));
 		});
 	});
 

@@ -65,9 +65,7 @@ describe("FixtureRiveter", function() {
 		it("calls the block immediately", function() {
 			const fixtureRiveter = new FixtureRiveter();
 			const testArray = ["test"] as any;
-			fixtureRiveter.define(function() {
-				fixtureRiveter.factories = testArray;
-			});
+			fixtureRiveter.factories = testArray;
 
 			expect(fixtureRiveter.factories).to.deep.equal(testArray);
 		});

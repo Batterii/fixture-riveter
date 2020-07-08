@@ -37,8 +37,10 @@ import {fr, ObjectionAdapter} from "fixture-riveter";
 fr.setAdapter(new ObjectionAdapter());
 
 fr.fixture("user", User, (f) => {
+    // Attributes can be defined explicitly
     f.attr("name", () => "Noah");
-    f.attr("age", () => 32);
+    // or implicitly
+    f.age(() => 32);
     f.sequence("email", (n) => `test${n}@example.com`);
 });
 

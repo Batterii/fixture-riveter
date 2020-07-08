@@ -50,15 +50,13 @@ describe("Sequelize functionality", function() {
 			fr = new FixtureRiveter();
 			fr.setAdapter(new SequelizeAdapter());
 
-			fr.define(function() {
-				fr.fixture("user", User, (f: any) => {
-					f.attr("name", () => "Noah");
-					f.attr("age", () => 32);
-				});
-				fr.fixture("post", Post, (f: any) => {
-					f.association("user");
-					f.attr("title", () => "Post title");
-				});
+			fr.fixture("user", User, (f: any) => {
+				f.attr("name", () => "Noah");
+				f.attr("age", () => 32);
+			});
+			fr.fixture("post", Post, (f: any) => {
+				f.association("user");
+				f.attr("title", () => "Post title");
 			});
 		});
 
@@ -84,28 +82,26 @@ describe("Sequelize functionality", function() {
 				fr = new FixtureRiveter();
 				fr.setAdapter(new SequelizeAdapter());
 
-				fr.define(function() {
-					fr.fixture("user", User, (f: any) => {
-						f.attr("name", () => "Noah");
-						f.fixture("userWithPosts", User, (ff: any) => {
-							ff.transient((t) => {
-								t.attr("postCount", () => 5);
-							});
+				fr.fixture("user", User, (f: any) => {
+					f.attr("name", () => "Noah");
+					f.fixture("userWithPosts", User, (ff: any) => {
+						ff.transient((t) => {
+							t.attr("postCount", () => 5);
+						});
 
-							ff.after("create", async(user, evaluator) => {
-								const posts = await fr.createList(
-									"post",
-									await evaluator.attr("postCount"),
-									{user},
-								);
-								await user.addPosts(posts);
-							});
+						ff.after("create", async(user, evaluator) => {
+							const posts = await fr.createList(
+								"post",
+								await evaluator.attr("postCount"),
+								{user},
+							);
+							await user.addPosts(posts);
 						});
 					});
-					fr.fixture("post", Post, (f: any) => {
-						f.attr("title", () => "The City & The City");
-						f.attr("user");
-					});
+				});
+				fr.fixture("post", Post, (f: any) => {
+					f.attr("title", () => "The City & The City");
+					f.attr("user");
 				});
 			});
 
@@ -132,16 +128,14 @@ describe("Sequelize functionality", function() {
 			fr = new FixtureRiveter();
 			fr.setAdapter(new SequelizeAdapter());
 
-			fr.define(function() {
-				fr.fixture("user", User, (f) => {
-					f.attr("name", () => "Noah");
-					f.attr("age", () => 32);
-				});
+			fr.fixture("user", User, (f) => {
+				f.attr("name", () => "Noah");
+				f.attr("age", () => 32);
+			});
 
-				fr.fixture("post", Post, (f) => {
-					f.attr("title", () => "The City & The City");
-					f.association("user", {strategy: "build"});
-				});
+			fr.fixture("post", Post, (f) => {
+				f.attr("title", () => "The City & The City");
+				f.association("user", {strategy: "build"});
 			});
 		});
 

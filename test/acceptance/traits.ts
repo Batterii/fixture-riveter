@@ -21,15 +21,13 @@ describe("Traits", function() {
 
 		fr = new FixtureRiveter();
 
-		fr.define(function() {
-			fr.fixture("user", User, (f: any) => {
-				f.attr("name", () => "Noah");
-				f.attr("age", () => 32);
-				f.sequence("email", (n: number) => `test${n}@foo.bar`);
+		fr.fixture("user", User, (f: any) => {
+			f.attr("name", () => "Noah");
+			f.attr("age", () => 32);
+			f.sequence("email", (n: number) => `test${n}@foo.bar`);
 
-				f.trait("old", (t: any) => {
-					t.attr("age", () => 100);
-				});
+			f.trait("old", (t: any) => {
+				t.attr("age", () => 100);
 			});
 		});
 	});
@@ -62,87 +60,85 @@ describe("tests from fixture_bot", function() {
 		before(async function() {
 			fr = new FixtureRiveter();
 
-			fr.define(function() {
-				fr.fixture("userWithoutAdminScoping", User, (f: any) => {
-					f.attr("adminTrait");
+			fr.fixture("userWithoutAdminScoping", User, (f: any) => {
+				f.attr("adminTrait");
+			});
+
+			fr.fixture("user", User, (f: any) => {
+				f.attr("name", () => "John");
+
+				f.trait("great", (t: any) => {
+					t.attr("great", () => "GREAT!!!");
 				});
 
-				fr.fixture("user", User, (f: any) => {
-					f.attr("name", () => "John");
+				f.trait("great", (t: any) => {
+					t.attr("great", () => "EVEN GREATER!!!");
+				});
 
-					f.trait("great", (t: any) => {
-						t.attr("great", () => "GREAT!!!");
-					});
+				f.trait("admin", (t: any) => {
+					t.attr("admin", () => true);
+				});
 
-					f.trait("great", (t: any) => {
+				f.trait("adminTrait", (t: any) => {
+					t.attr("admin", () => true);
+				});
+
+				f.trait("male", (t: any) => {
+					t.attr("name", () => "Joe");
+					t.attr("gender", () => "Male");
+				});
+
+				f.trait("female", (t: any) => {
+					t.attr("name", () => "Jane");
+					t.attr("gender", () => "Female");
+				});
+
+				f.fixture("greatUser", User, (ff: any) => {
+					ff.attr("great");
+				});
+
+				f.fixture("evenGreaterUser", User, (ff: any) => {
+					ff.attr("great");
+
+					ff.trait("great", (t: any) => {
 						t.attr("great", () => "EVEN GREATER!!!");
 					});
+				});
 
-					f.trait("admin", (t: any) => {
+				f.fixture("admin", User, {traits: ["admin"]});
+
+				f.fixture("maleUser", User, (ff: any) => {
+					ff.attr("male");
+
+					ff.fixture("childMaleUser", User, (fff: any) => {
+						fff.attr("dateOfBirth", () => new Date("1/1/2020"));
+					});
+				});
+
+				f.fixture("female", User, {traits: ["female"]}, (ff: any) => {
+					ff.trait("admin", (t: any) => {
 						t.attr("admin", () => true);
+						t.attr("name", () => "Judy");
 					});
 
-					f.trait("adminTrait", (t: any) => {
-						t.attr("admin", () => true);
+					ff.fixture("femaleGreatUser", User, (fff: any) => {
+						fff.attr("great");
 					});
 
-					f.trait("male", (t: any) => {
-						t.attr("name", () => "Joe");
-						t.attr("gender", () => "Male");
-					});
-
-					f.trait("female", (t: any) => {
-						t.attr("name", () => "Jane");
-						t.attr("gender", () => "Female");
-					});
-
-					f.fixture("greatUser", User, (ff: any) => {
-						ff.attr("great");
-					});
-
-					f.fixture("evenGreaterUser", User, (ff: any) => {
-						ff.attr("great");
-
-						ff.trait("great", (t: any) => {
-							t.attr("great", () => "EVEN GREATER!!!");
-						});
-					});
-
-					f.fixture("admin", User, {traits: ["admin"]});
-
-					f.fixture("maleUser", User, (ff: any) => {
-						ff.attr("male");
-
-						ff.fixture("childMaleUser", User, (fff: any) => {
-							fff.attr("dateOfBirth", () => new Date("1/1/2020"));
-						});
-					});
-
-					f.fixture("female", User, {traits: ["female"]}, (ff: any) => {
-						ff.trait("admin", (t: any) => {
-							t.attr("admin", () => true);
-							t.attr("name", () => "Judy");
-						});
-
-						ff.fixture("femaleGreatUser", User, (fff: any) => {
-							fff.attr("great");
-						});
-
-						ff.fixture("femaleAdminJudy", User, {traits: ["admin"]});
-					});
-
-					f.fixture("femaleAdmin", User, {traits: ["female", "admin"]});
-					f.fixture("femaleAfterMaleAdmin", User, {traits: ["male", "female", "admin"]});
-					f.fixture("maleAfterFemaleAdmin", User, {traits: ["female", "male", "admin"]});
+					ff.fixture("femaleAdminJudy", User, {traits: ["admin"]});
 				});
 
-				fr.trait("email", (t: any) => {
-					t.attr("email", async(e: any) => `${await e.attr("name")}@example.com`);
-				});
+				f.fixture("femaleAdmin", User, {traits: ["female", "admin"]});
+				f.fixture("femaleAfterMaleAdmin", User, {traits: ["male", "female", "admin"]});
+				f.fixture("maleAfterFemaleAdmin", User, {traits: ["female", "male", "admin"]});
+			});
 
-				fr.fixture("userWithEmail", User, {traits: ["email"]}, (f: any) => {
-					f.attr("name", () => "Bill");
-				});
+			fr.trait("email", (t: any) => {
+				t.attr("email", async(e: any) => `${await e.attr("name")}@example.com`);
+			});
+
+			fr.fixture("userWithEmail", User, {traits: ["email"]}, (f: any) => {
+				f.attr("name", () => "Bill");
 			});
 		});
 
@@ -263,9 +259,7 @@ describe("tests from fixture_bot", function() {
 		it("raises an error", async function() {
 			const fr = new FixtureRiveter();
 
-			fr.define(function() {
-				fr.fixture("user", User);
-			});
+			fr.fixture("user", User);
 
 			const fn = async() => fr.build("user", "missing trait");
 
@@ -276,17 +270,15 @@ describe("tests from fixture_bot", function() {
 	specify("traits and dynamic attributes that are applied simultaneously", async function() {
 		const fr = new FixtureRiveter();
 
-		fr.define(function() {
-			fr.trait("email", (f: any) => {
-				f.attr("email", async(e) => `${await e.attr("name")}@example.com`);
-			});
+		fr.trait("email", (f: any) => {
+			f.attr("email", async(e) => `${await e.attr("name")}@example.com`);
+		});
 
-			fr.fixture("user", User, (f: any) => {
-				f.attr("name", () => "John");
-				f.attr("email");
-				f.attr("combined", async(e) => {
-					return `${await e.attr("name")} <${await e.attr("email")}>`;
-				});
+		fr.fixture("user", User, (f: any) => {
+			f.attr("name", () => "John");
+			f.attr("email");
+			f.attr("combined", async(e) => {
+				return `${await e.attr("name")} <${await e.attr("email")}>`;
 			});
 		});
 
@@ -307,22 +299,20 @@ describe("tests from fixture_bot", function() {
 
 			fr = new FixtureRiveter();
 
-			fr.define(function() {
-				fr.fixture("action", Action, (f) => {
-					f.attr("status", () => "pending");
+			fr.fixture("action", Action, (f) => {
+				f.attr("status", () => "pending");
 
-					f.trait("accepted", (t) => {
-						t.attr("status", () => "accepted");
-					});
+				f.trait("accepted", (t) => {
+					t.attr("status", () => "accepted");
+				});
 
-					f.trait("declined", (t) => {
-						t.attr("status", () => "declined");
-					});
+				f.trait("declined", (t) => {
+					t.attr("status", () => "declined");
+				});
 
-					f.fixture("declinedAction", Action, {traits: ["declined"]});
-					f.fixture("extendedDeclinedAction", Action, {traits: ["declined"]}, (ff) => {
-						ff.attr("status", () => "extended declined");
-					});
+				f.fixture("declinedAction", Action, {traits: ["declined"]});
+				f.fixture("extendedDeclinedAction", Action, {traits: ["declined"]}, (ff) => {
+					ff.attr("status", () => "extended declined");
 				});
 			});
 		});
@@ -386,14 +376,12 @@ describe("tests from fixture_bot", function() {
 
 			fr = new FixtureRiveter();
 
-			fr.define(function() {
-				fr.fixture("user", User, (f: any) => {
-					f.trait("female", (t) => t.attr("gender", () => "female"));
-					f.trait("admin", (t) => t.attr("role", () => "admin"));
+			fr.fixture("user", User, (f: any) => {
+				f.trait("female", (t) => t.attr("gender", () => "female"));
+				f.trait("admin", (t) => t.attr("role", () => "admin"));
 
-					f.fixture("femaleUser", User, (ff) => {
-						ff.attr("female");
-					});
+				f.fixture("femaleUser", User, (ff) => {
+					ff.attr("female");
 				});
 			});
 		});

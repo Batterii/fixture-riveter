@@ -64,10 +64,6 @@ export class FixtureRiveter {
 		return this.adapterHandler.setAdapter(adapter, fixtureNames);
 	}
 
-	define(block: Function): void {
-		block.call(this, this);
-	}
-
 	getFixture(name: string, throws = true): Fixture {
 		const fixture = this.factories[name];
 		if (throws && !fixture) {

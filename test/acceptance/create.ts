@@ -78,16 +78,14 @@ describe("a created instance, with strategy build", function() {
 		fr = new FixtureRiveter();
 		fr.setAdapter(new ObjectionAdapter());
 
-		fr.define(function() {
-			fr.fixture("user", User, (f) => {
-				f.attr("name", () => "Noah");
-				f.attr("age", () => 32);
-				f.sequence("email", (n) => `test${n}@foo.bar`);
-			});
+		fr.fixture("user", User, (f) => {
+			f.attr("name", () => "Noah");
+			f.attr("age", () => 32);
+			f.sequence("email", (n) => `test${n}@foo.bar`);
+		});
 
-			fr.fixture("post", Post, (f) => {
-				f.association("user", {strategy: "build"});
-			});
+		fr.fixture("post", Post, (f) => {
+			f.association("user", {strategy: "build"});
 		});
 	});
 

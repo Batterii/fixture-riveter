@@ -25,17 +25,15 @@ describe("Custom strategies", function() {
 		fr.setAdapter(new ObjectionAdapter());
 		fr.registerStrategy("json", JsonStrategy);
 
-		fr.define(function() {
-			fr.fixture("post", Post, (f) => {
-				f.attr("title", () => "The City & The City");
+		fr.fixture("post", Post, (f) => {
+			f.attr("title", () => "The City & The City");
 
-				f.trait("modern", (t) => t.attr("title", () => "Kraken"));
-			});
+			f.trait("modern", (t) => t.attr("title", () => "Kraken"));
 		});
 	});
 
 	it("works", async function() {
-		const post = await fr["json"]("post", "modern");
+		const post = await (fr as any).json("post", "modern");
 		const builtPost = await fr.build("post", "modern");
 
 		expect(typeof post).to.equal("string");

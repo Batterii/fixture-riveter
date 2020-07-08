@@ -15,13 +15,11 @@ describe("createPair", function() {
 		fr = new FixtureRiveter();
 		fr.setAdapter(new ObjectionAdapter());
 
-		fr.define(function() {
-			fr.fixture("post", Post, (f) => {
-				f.attr("author", () => "China Mieville");
-				f.attr("title", () => "The City & The City");
+		fr.fixture("post", Post, (f) => {
+			f.attr("author", () => "China Mieville");
+			f.attr("title", () => "The City & The City");
 
-				f.trait("modern", (t) => t.attr("title", () => "Kraken"));
-			});
+			f.trait("modern", (t) => t.attr("title", () => "Kraken"));
 		});
 	});
 

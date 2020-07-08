@@ -17,35 +17,33 @@ describe("transient attributes", function() {
 		fr = new FixtureRiveter();
 		fr.setAdapter(new ObjectionAdapter());
 
-		fr.define(function() {
-			fr.sequence("name", (n: number) => `Noah ${n}`);
+		fr.sequence("name", (n: number) => `Noah ${n}`);
 
-			fr.fixture("user", User, (f) => {
-				f.transient((t: any) => {
-					t.attr("four", () => 2 + 2);
-					t.attr("rockstar", () => true);
-					t.attr("upcased", () => false);
-				});
+		fr.fixture("user", User, (f) => {
+			f.transient((t: any) => {
+				t.attr("four", () => 2 + 2);
+				t.attr("rockstar", () => true);
+				t.attr("upcased", () => false);
+			});
 
-				f.attr("name", async(a: any) => {
-					let rockstar = "";
-					if (await a.attr("rockstar")) {
-						rockstar = " - Rockstar";
-					}
-					return `${fr.generate("name")}${rockstar}`;
-				});
+			f.attr("name", async(a: any) => {
+				let rockstar = "";
+				if (await a.attr("rockstar")) {
+					rockstar = " - Rockstar";
+				}
+				return `${fr.generate("name")}${rockstar}`;
+			});
 
-				f.attr("email", async(a: any) => {
-					const name = await a.attr("name");
-					const four = await a.attr("four");
-					return `${name.toLowerCase()}${four}@example.com`;
-				});
+			f.attr("email", async(a: any) => {
+				const name = await a.attr("name");
+				const four = await a.attr("four");
+				return `${name.toLowerCase()}${four}@example.com`;
+			});
 
-				f.after("create", async(user, evaluator) => {
-					if (await evaluator.attr("upcased")) {
-						user.name = user.name.toUpperCase();
-					}
-				});
+			f.after("create", async(user, evaluator) => {
+				if (await evaluator.attr("upcased")) {
+					user.name = user.name.toUpperCase();
+				}
 			});
 		});
 	});
@@ -110,14 +108,12 @@ describe("transient sequences", function() {
 		fr = new FixtureRiveter();
 		fr.setAdapter(new ObjectionAdapter());
 
-		fr.define(function() {
-			fr.fixture("user", User, (f) => {
-				f.transient((t: any) => {
-					t.sequence("counter");
-				});
-
-				f.attr("name", async(a: any) => `Noah ${await a.attr("counter")}`);
+		fr.fixture("user", User, (f) => {
+			f.transient((t: any) => {
+				t.sequence("counter");
 			});
+
+			f.attr("name", async(a: any) => `Noah ${await a.attr("counter")}`);
 		});
 	});
 
