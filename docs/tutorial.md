@@ -1,3 +1,0 @@
-# fixture_riveter tutorial
-
-

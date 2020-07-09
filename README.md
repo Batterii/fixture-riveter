@@ -26,10 +26,10 @@ npm install --save-dev fixture-riveter
 
 ## Documentation
 
-A complete guide to using fixture-riveter can be found in the [tutorial][tutorial]
+A complete guide to using fixture-riveter can be found in the [guide][guide]
 guide. For those interested in code first, here is a simple demonstration:
 
-[tutorial]: docs/tutorial.md
+[guide]: docs/GUIDE.md
 
 ```javascript
 import {fr, ObjectionAdapter} from "fixture-riveter";
@@ -37,9 +37,7 @@ import {fr, ObjectionAdapter} from "fixture-riveter";
 fr.setAdapter(new ObjectionAdapter());
 
 fr.fixture("user", User, (f) => {
-    // Attributes can be defined explicitly
     f.attr("name", () => "Noah");
-    // or implicitly
     f.age(() => 32);
     f.sequence("email", (n) => `test${n}@example.com`);
 });
@@ -49,6 +47,7 @@ const user = await fr.create("user", {name: "Bogart"});
 expect(user).to.be.an.instanceof(User);
 expect(user.id).to.exist;
 expect(user.name).to.equal("Bogart");
+expect(user.age).to.equal(32);
 expect(user.email).to.equal("test1@example.com");
 ```
 
