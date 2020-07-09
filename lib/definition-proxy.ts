@@ -6,17 +6,13 @@ import {ImplicitDeclaration} from "./declarations/implicit-declaration";
 import {Trait} from "./trait";
 import {Definition} from "./definition";
 import {Fixture} from "./fixture";
-import {
-	blockFunction,
-	FixtureOptions,
-} from "./fixture-options-parser";
+import {blockFunction, FixtureOptions} from "./fixture-options-parser";
 import {callbackFunction} from "./callback";
 import {FixtureRiveter} from "./fixture-riveter";
-import {
-	Sequence,
-	SequenceCallback,
-} from "./sequences/sequence";
-import {SequenceHandler} from "./sequence-handler";
+
+import {SequenceCallback} from "./sequences/sequence";
+import {OneOfSequence} from "./sequences/one-of-sequence";
+import {SequenceHandler, optionsParser} from "./sequence-handler";
 
 import {isFunction, last} from "lodash";
 
@@ -84,12 +80,19 @@ export class DefinitionProxy {
 	sequence(
 		name: string,
 		initial?: string | number | {aliases: string[]} | SequenceCallback,
-	): Sequence;
+	): void;
 
-	sequence(name: string, ...rest: any[]): Sequence {
+	sequence(name: string, ...rest: any[]): void {
 		const sequence = this.sequenceHandler.registerSequence(name, ...rest);
 		this.attr(name, () => sequence.next());
-		return sequence;
+	}
+
+	oneOf(name: string, choices: any[]): void;
+	oneOf(name: string, choices: any[], ...rest: any[]): void {
+		const options = optionsParser(...rest);
+		const sequence = new OneOfSequence(name, choices, options);
+		this.sequenceHandler.sequences.push(sequence);
+		this.attr(name, () => sequence.next());
 	}
 
 	trait(name: string, block?: blockFunction): void {

@@ -107,8 +107,9 @@ describe("DefinitionProxy", function() {
 			const fixtureRiveter = new FixtureRiveter();
 			const fixture = new Fixture(fixtureRiveter, "dummy", DummyModel);
 			const proxy = new DefinitionProxy(fixture);
-			const result = proxy.sequence("email");
-			expect(result).to.be.an.instanceof(Sequence);
+			proxy.sequence("email");
+			expect(proxy.sequenceHandler.sequences).to.have.length(1);
+			expect(proxy.sequenceHandler.sequences[0].name).to.equal("email");
 		});
 
 		it("adds the sequence as an attribute", function() {
@@ -117,13 +118,12 @@ describe("DefinitionProxy", function() {
 			const proxy = new DefinitionProxy(fixture);
 			sinon.spy(fixture, "declareAttribute");
 			const name = "email";
-			const result = proxy.sequence(name);
+			proxy.sequence(name);
 			const {declarations} = fixture.declarationHandler;
 
 			expect(declarations).to.be.length(1);
 			expect(declarations[0].name).to.equal(name);
 			expect(fixture.declareAttribute).to.be.calledOnce;
-			expect(declarations[0].name).to.equal(result.name);
 		});
 
 		it("delegates sequence creation to sequenceHandler", function() {

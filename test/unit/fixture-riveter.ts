@@ -251,15 +251,17 @@ describe("FixtureRiveter", function() {
 			const fr = new FixtureRiveter();
 			let sequenceInFixture = new IntegerSequence("temp");
 			fr.fixture(name, DummyModel, (f: any) => {
-				sequenceInFixture = f.sequence("email") as IntegerSequence;
+				f.sequence("email");
+				sequenceInFixture = f.sequenceHandler.sequences.find((s) => s.name === "email");
 			});
-			const globalSeq: any = fr.sequence("usernames");
-			globalSeq.next();
-			globalSeq.next();
+			fr.sequence("usernames");
+			const globalSeq = fr.sequenceHandler.sequences.find((s) => s.name === "usernames");
+			globalSeq?.next();
+			globalSeq?.next();
 			sequenceInFixture.next();
 			sequenceInFixture.next();
 			fr.resetSequences();
-			expect(globalSeq.index).to.equal(1);
+			expect((globalSeq as any).index).to.equal(1);
 			expect(sequenceInFixture.index).to.equal(1);
 		});
 	});

@@ -11,7 +11,11 @@ import {
 	Sequence,
 	SequenceCallback,
 } from "./sequences/sequence";
-import {SequenceHandler} from "./sequence-handler";
+import {OneOfSequence} from "./sequences/one-of-sequence";
+import {
+	optionsParser,
+	SequenceHandler,
+} from "./sequence-handler";
 import {Trait} from "./trait";
 import {
 	callbackFunction,
@@ -159,6 +163,13 @@ export class FixtureRiveter {
 		if (sequence) {
 			return sequence.next();
 		}
+	}
+
+	oneOf(name: string, choices: any[]): void;
+	oneOf(name: string, choices: any[], ...rest: any[]): void {
+		const options = optionsParser(...rest);
+		const sequence = new OneOfSequence(name, choices, options);
+		this.sequenceHandler.sequences.push(sequence);
 	}
 
 	async run(name: string, strategy: string, traits: any[]): Promise<Record<string, any>> {
