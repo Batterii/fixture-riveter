@@ -4,6 +4,6 @@
 		"multiline-comment-style": "off",
 		"sort-imports": "off",
 		"max-len": ["error", {"code": 100}],
-		"quotes": ["error", "double"]
+		"quotes": ["error", "double", {"avoidEscape": true}]
 	}
 }

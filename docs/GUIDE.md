@@ -95,6 +95,10 @@ fr.fixture("user", User, (f) => {
     });
     f.lastName(() => "Bogart");
 });
+
+const user = await fr.create("user");
+user.email === "noah-bogart@example.com";
+// > true
 ```
 
 ### Argument passing vs Context
@@ -106,7 +110,7 @@ complain about an invalid use of `this`), but it simplifies having to track whic
 NOTE: this only works with "normal" function expressions, not arrow functions.
 
 ```javascript
-fr.fixture("user", User, (f) => {
+fr.fixture("user", User, function() {
     this.firstName(() => "Noah");
     this.lastName(() => "Bogart");
     this.email(async function() {
@@ -178,4 +182,33 @@ fr.fixture("user", User, (f) => {
 const user = await fr.build("user", {cool: true});
 user.name === 'Noah "The Coolest Dude" Bogart';
 // > true
+Reflect.has(user, "cool");
+// > false
+```
+
+Transient attributes are available in callbacks as well (which will be discussed at
+length later on). During a callback, the transient attribute is available on the second
+argument, the evaluator:
+
+```javascript
+fr.fixture("user", User, (f) => {
+    f.transient((t) => {
+        t.attr("cool", () => false);
+    });
+
+    f.name(() => "Noah Bogart");
+
+    f.after("build", async(user: any, evaluator: any) => {
+        let cool = "";
+        if (await evaluator.attr("cool")) cool = '"The Coolest Dude"';
+        const [first, last] = user.name.split(" ");
+        user.name = [first, cool, last].join(" ");
+    });
+});
+
+const user = await fr.build("user", {cool: true});
+user.name === 'Noah "The Coolest Dude" Bogart';
+// > true
+Reflect.has(user, "cool");
+// > false
 ```
