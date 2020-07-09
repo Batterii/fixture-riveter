@@ -13,7 +13,7 @@
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "http://github.com/Batterrii/fixture-riveter.git"
+		"url": "http://github.com/Batterii/fixture-riveter.git"
 	},
 	"files": [
 		"dist/lib",
