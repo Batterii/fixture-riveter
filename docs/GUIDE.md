@@ -45,13 +45,6 @@ expect(user.email).to.equal("test1@example.com");
 As seen above, each fixture has a name, a model class, and a function for defining the
 attributes.
 
-```javascript
-fr.fixture("post", Post, (f) => {
-    f.attr("title", () => "First post!");
-    f.attr("body", () => "Thank you for reading.");
-});
-```
-
 ### Explicit vs Implicit attributes
 When defining attributes, you can use the explicit function `attr`, which takes the
 attribute name as the first argument:
@@ -96,7 +89,7 @@ fr.fixture("user", User, (f) => {
     f.lastName(() => "Bogart");
 });
 
-const user = await fr.create("user");
+const user = await fr.build("user");
 user.email === "noah-bogart@example.com";
 // > true
 ```
@@ -121,32 +114,6 @@ fr.fixture("user", User, function() {
 });
 ```
 
-## Using fixtures
-A defined fixture can be instanced by calling one of the strategies (attributesFor,
-build, create):
-
-```javascript
-// This will create a plain javascript object with all of the defined attributes
-const post = await fr.attributesFor("post");
-
-// This will instantiate the class Post and assign all defined attributes onto it
-const post = await fr.build("post");
-
-// This will instantiate the class Post, assign all defined attributes as build does,
-// and then save the instance to the database, according to the `save` function in the
-// chosen adapter
-const post = await fr.create("post");
-```
-
-Regardless of which strategy is used, the defined attributes can be overridden by
-passing in an object as the final argument:
-
-```javascript
-const post = await fr.build("post", {title: "The best post in the universe"});
-post.title === "The best post in the universe";
-// > true
-```
-
 ### Aliases
 To make fixture reuse and specificity easier, fixtures can be defined with aliases:
 
@@ -156,7 +123,7 @@ fr.fixture("post", Post, {aliases: ["twit", "comment"]}, (f) => {
     f.attr("body", () => "Thank you for reading.");
 });
 
-const comment = await fr.create("comment");
+const comment = await fr.build("comment");
 comment.title === "First post!";
 // > true
 ```
@@ -207,8 +174,84 @@ fr.fixture("user", User, (f) => {
 });
 
 const user = await fr.build("user", {cool: true});
-user.name === 'Noah "The Coolest Dude" Bogart';
-// > true
+user.name
+// => 'Noah "The Coolest Dude" Bogart'
 Reflect.has(user, "cool");
-// > false
+// => false
+```
+
+### Nested fixtures
+By defining a fixture within a fixture, the child fixture will inherit and override any
+declared attributes on the parent, all the way up the inheritance chain.
+
+```javascript
+fr.fixture("grandparentList", List, (f) => {
+    f.entry1(() => "100");
+    f.entry2(() => "200");
+
+    f.fixture("parentList", List, (ff) => {
+        ff.entry2(() => "20");
+        ff.entry3(() => "30");
+
+        ff.fixture("childList", List, (fff) => {
+            fff.entry3(() => "3");
+        });
+    });
+});
+
+const list = await fr.build("childList");
+list.entry1
+// => 100
+list.entry2
+// => 20
+list.entry3
+// => 3
+```
+
+The parent fixture can be specified instead of nesting:
+
+```javascript
+fr.fixture("parentList", List, (f) => {
+    f.attr("entry1", () => "10");
+    f.attr("entry2", () => "20");
+});
+
+fr.fixture("childList", List, {parent: "parentList"}, (f) => {
+    f.attr("entry2", () => "2");
+    f.attr("entry3", () => "3");
+});
+
+const list = await fr.build("childList");
+list.entry1
+// => 10
+list.entry2
+// => 2
+list.entry3
+// => 3
+```
+
+## Using fixtures
+A defined fixture can be instanced by calling one of the strategies (attributesFor,
+build, create):
+
+```javascript
+// This will create a plain javascript object with all of the defined attributes
+const post = await fr.attributesFor("post");
+
+// This will instantiate the class Post and assign all defined attributes onto it
+const post = await fr.build("post");
+
+// This will instantiate the class Post, assign all defined attributes as build does,
+// and then save the instance to the database, according to the `save` function in the
+// chosen adapter
+const post = await fr.create("post");
+```
+
+Regardless of which strategy is used, the defined attributes can be overridden by
+passing in an object as the final argument:
+
+```javascript
+const post = await fr.build("post", {title: "The best post in the universe"});
+post.title
+// => "The best post in the universe"
 ```

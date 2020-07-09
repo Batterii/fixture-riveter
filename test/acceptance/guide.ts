@@ -37,15 +37,18 @@ describe.only("All of the code from the guide", function() {
 	});
 
 	describe("Defining fixtures", function() {
-		before(async function() {
+		beforeEach(async function() {
 			fr = new FixtureRiveter();
 			fr.setAdapter(new ObjectionAdapter());
+		});
 
+		specify("Explicit vs Implicit", async function() {
 			Post = await defineModel("Post", {
 				title: "string",
 				body: "string",
 				sequence: "string",
 			});
+
 
 			fr.fixture("post", Post, (f: any) => {
 				f.attr("title", () => "First post!");
@@ -53,6 +56,14 @@ describe.only("All of the code from the guide", function() {
 				f.attr("sequence", () => "12345");
 			});
 
+			const post = await fr.create("post");
+
+			expect(post.title).to.equal("First post!");
+			expect(post.body).to.equal("Thank you for reading.");
+			expect(post.sequence).to.equal("12345");
+		});
+
+		specify("Dependent attributes", async function() {
 			User = await defineModel("User", {
 				firstName: "string",
 				lastName: "string",
@@ -71,6 +82,17 @@ describe.only("All of the code from the guide", function() {
 				f.lastName(() => "Bogart");
 			});
 
+			const user = await fr.create("user");
+			expect(user.email).to.equal("noah-bogart@example.com");
+		});
+
+		specify("Argument passing vs Context", async function() {
+			User = await defineModel("User", {
+				firstName: "string",
+				lastName: "string",
+				email: "string",
+			});
+
 			fr.fixture("contextUser", User, function() {
 				// eslint-disable-next-line no-invalid-this
 				this.firstName(() => "Noah");
@@ -85,55 +107,27 @@ describe.only("All of the code from the guide", function() {
 					return `${firstName}-${lastName}@example.com`.toLowerCase();
 				});
 			});
-		});
 
-		specify("Explicit vs Implicit", async function() {
-			const post = await fr.create("post");
-
-			expect(post.title).to.equal("First post!");
-			expect(post.body).to.equal("Thank you for reading.");
-			expect(post.sequence).to.equal("12345");
-		});
-
-		specify("Dependent attributes", async function() {
-			const user = await fr.create("user");
-			expect(user.email).to.equal("noah-bogart@example.com");
-		});
-
-		specify("Argument passing vs Context", async function() {
 			const user = await fr.create("contextUser");
 			expect(user.email).to.equal("noah-bogart@example.com");
 		});
-	});
 
-	describe("Using fixtures", function() {
-		beforeEach(async function() {
-			fr = new FixtureRiveter();
-			fr.setAdapter(new ObjectionAdapter());
-			Post = await defineModel("Post", {title: "string"});
-			fr.fixture("post", Post, (f: any) => f.title(() => "First post!"));
-		});
+		specify("aliases", async function() {
+			Post = await defineModel("Post", {
+				title: "string",
+				body: "string",
+			});
 
-		specify("attributesFor", async function() {
-			const post = await fr.attributesFor("post");
-			expect(post).to.not.be.an.instanceof(Post);
-		});
+			fr.fixture("post", Post, {aliases: ["twit", "comment"]}, (f) => {
+				f.attr("title", () => "First post!");
+				f.attr("body", () => "Thank you for reading.");
+			});
 
-		specify("build", async function() {
-			const post = await fr.build("post");
-			expect(post).to.be.an.instanceof(Post);
-			expect(post.id).to.be.undefined;
-		});
+			const twit = await fr.build("twit");
+			expect(twit.title).to.equal("First post!");
 
-		specify("create", async function() {
-			const post = await fr.create("post");
-			expect(post).to.be.an.instanceof(Post);
-			expect(post.id).to.exist;
-		});
-
-		specify("overriding attributes", async function() {
-			const post = await fr.build("post", {title: "The best post in the universe"});
-			expect(post.title).to.equal("The best post in the universe");
+			const comment = await fr.build("comment");
+			expect(comment.body).to.equal("Thank you for reading.");
 		});
 
 		specify("transient attributes", async function() {
@@ -178,5 +172,87 @@ describe.only("All of the code from the guide", function() {
 			expect(user.name).to.equal('Noah "The Coolest Dude" Bogart');
 			expect(Reflect.has(user, "cool")).to.be.false;
 		});
+
+		specify("nested fixtures", async function() {
+			const List = await defineModel("List", {
+				entry1: "string",
+				entry2: "string",
+				entry3: "string",
+			});
+
+			fr.fixture("grandparentList", List, (f: any) => {
+				f.attr("entry1", () => "100");
+				f.attr("entry2", () => "200");
+
+				f.fixture("parentList", List, (ff: any) => {
+					ff.entry2(() => "20");
+					ff.entry3(() => "30");
+
+					ff.fixture("childList", List, (fff: any) => {
+						fff.entry3(() => "3");
+					});
+				});
+			});
+
+			const list = await fr.build("childList");
+			expect(list.entry1).to.equal("100");
+			expect(list.entry2).to.equal("20");
+			expect(list.entry3).to.equal("3");
+		});
+
+		specify("nested fixtures with explicit parent", async function() {
+			const List = await defineModel("List", {
+				entry1: "string",
+				entry2: "string",
+				entry3: "string",
+			});
+
+			fr.fixture("parentList", List, (f) => {
+				f.attr("entry1", () => "10");
+				f.attr("entry2", () => "20");
+			});
+
+			fr.fixture("childList", List, {parent: "parentList"}, (f) => {
+				f.attr("entry2", () => "2");
+				f.attr("entry3", () => "3");
+			});
+
+			const list = await fr.build("childList");
+			expect(list.entry1).to.equal("10");
+			expect(list.entry2).to.equal("2");
+			expect(list.entry3).to.equal("3");
+		});
+	});
+
+	describe("Using fixtures", function() {
+		beforeEach(async function() {
+			fr = new FixtureRiveter();
+			fr.setAdapter(new ObjectionAdapter());
+			Post = await defineModel("Post", {title: "string"});
+			fr.fixture("post", Post, (f: any) => f.title(() => "First post!"));
+		});
+
+		specify("attributesFor", async function() {
+			const post = await fr.attributesFor("post");
+			expect(post).to.not.be.an.instanceof(Post);
+		});
+
+		specify("build", async function() {
+			const post = await fr.build("post");
+			expect(post).to.be.an.instanceof(Post);
+			expect(post.id).to.be.undefined;
+		});
+
+		specify("create", async function() {
+			const post = await fr.create("post");
+			expect(post).to.be.an.instanceof(Post);
+			expect(post.id).to.exist;
+		});
+
+		specify("overriding attributes", async function() {
+			const post = await fr.build("post", {title: "The best post in the universe"});
+			expect(post.title).to.equal("The best post in the universe");
+		});
+
 	});
 });
