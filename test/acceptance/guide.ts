@@ -4,7 +4,7 @@ import {FixtureRiveter} from "../../lib/fixture-riveter";
 
 import {expect} from "chai";
 
-describe("All of the code from the guide", function() {
+describe.only("All of the code from the guide", function() {
 	let fr: FixtureRiveter;
 	let User: any;
 	let Post: any;
