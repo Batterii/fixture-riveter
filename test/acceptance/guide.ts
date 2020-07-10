@@ -4,7 +4,7 @@ import {FixtureRiveter} from "../../lib/fixture-riveter";
 
 import {expect} from "chai";
 
-describe.only("All of the code from the guide", function() {
+describe("All of the code from the guide", function() {
 	let fr: FixtureRiveter;
 	let User: any;
 	let Post: any;
@@ -253,6 +253,5 @@ describe.only("All of the code from the guide", function() {
 			const post = await fr.build("post", {title: "The best post in the universe"});
 			expect(post.title).to.equal("The best post in the universe");
 		});
-
 	});
 });
