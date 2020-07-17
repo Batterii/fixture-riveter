@@ -33,7 +33,8 @@ export class DefinitionProxy {
 
 	execute(): void {
 		if (this.definition.block) {
-			this.definition.block.call(addMethodMissing(this), addMethodMissing(this));
+			const wrappedThis = addMethodMissing(this);
+			this.definition.block.call(wrappedThis, wrappedThis);
 		}
 	}
 
@@ -93,11 +94,8 @@ export class DefinitionProxy {
 	}
 
 	trait(name: string, block?: blockFunction): void {
-		if (block && isFunction(block)) {
-			this.definition.defineTrait(new Trait(name, this.fixtureRiveter, block));
-		} else {
-			throw new Error(`wrong options, bruh: ${name}, ${block}`);
-		}
+		const newTrait = new Trait(name, this.fixtureRiveter, block);
+		this.definition.defineTrait(newTrait);
 	}
 
 	transient(block: blockFunction): void {

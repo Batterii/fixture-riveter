@@ -115,16 +115,9 @@ export class FixtureRiveter {
 		return trait;
 	}
 
-	registerTrait(trait: Trait): void {
-		for (const name of trait.names()) {
-			this.traits[name] = trait;
-		}
-	}
-
-	trait(name: string, block?: blockFunction): Trait {
+	trait(name: string, block: blockFunction): void {
 		const trait = new Trait(name, this, block);
-		this.registerTrait(trait);
-		return trait;
+		this.traits[trait.name] = trait;
 	}
 
 	sequence(

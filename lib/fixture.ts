@@ -12,6 +12,7 @@ import {
 	fixtureOptionsParser,
 } from "./fixture-options-parser";
 import {Strategy} from "./strategies/strategy";
+import {Trait} from "./trait";
 
 import {isFunction} from "lodash";
 import {Callback} from "./callback";
@@ -77,32 +78,35 @@ export class Fixture extends Definition {
 
 	compile(): void {
 		if (!this.compiled) {
-			const parentFixture = this.parentFixture();
-			parentFixture.compile();
-			for (const definedTrait of parentFixture.definedTraits) {
-				this.defineTrait(definedTrait);
-			}
+			this.parentFixture().compile();
 			super.compile();
 			this.compiled = true;
 		}
 	}
 
-	getParentAttributes(): Attribute[] {
-		const attributeNames = this.attributeNames();
-
-		return this.parentFixture()
-			.getAttributes()
-			.filter((attribute) => !attributeNames.includes(attribute.name));
+	mapTraitToThis(t: Trait): Trait {
+		t.fixture = this;
+		return t;
 	}
 
 	getAttributes(): Attribute[] {
 		this.compile();
 
-		// Need to generate child attributes before parent attributes
-		const definitionAttributes = super.getAttributes();
-		const attributesToKeep = this.getParentAttributes();
+		const attributesToKeep = this.parentFixture().getAttributes();
 
-		return attributesToKeep.concat(definitionAttributes);
+		if (!this.attributes || this.attributes.length === 0) {
+			this.attributes = [
+				this.getBaseTraits()
+					.map((t) => this.mapTraitToThis(t))
+					.map((t) => t.getAttributes()),
+				this.declarationHandler.getAttributes(),
+				this.getAdditionalTraits()
+					.map((t) => this.mapTraitToThis(t))
+					.map((t) => t.getAttributes()),
+			].flat(Infinity).filter(Boolean);
+		}
+
+		return attributesToKeep.concat(this.attributes);
 	}
 
 	getCallbacks(): Callback[] {
@@ -111,6 +115,12 @@ export class Fixture extends Definition {
 		const definedCallbacks = super.getCallbacks();
 
 		return globalCallbacks.concat(parentCallbacks, definedCallbacks);
+	}
+
+	traitByName(name: string): Trait {
+		return this.traits[name] ||
+			this.parentFixture().traitByName(name) ||
+			this.fixtureRiveter.getTrait(name);
 	}
 
 	async run(buildStrategy: Strategy, overrides: Record<string, any> = {}): Promise<any> {
