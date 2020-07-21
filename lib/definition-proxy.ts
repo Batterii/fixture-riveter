@@ -100,7 +100,7 @@ export class DefinitionProxy {
 
 	transient(block: blockFunction): void {
 		const proxy = new DefinitionProxy(this.definition, true);
-		block(proxy);
+		block(addMethodMissing(proxy));
 	}
 
 	before(name: string, block: callbackFunction): void;

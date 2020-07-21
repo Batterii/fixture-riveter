@@ -155,14 +155,14 @@ describe("All of the code from the guide", function() {
 
 			fr.fixture("user", User, (f: any) => {
 				f.transient((t: any) => {
-					t.attr("cool", () => false);
+					t.cool(() => false);
 				});
 
 				f.name(() => "Noah Bogart");
 
 				f.after("build", async(user: any, evaluator: any) => {
 					let cool = "";
-					if (await evaluator.attr("cool")) cool = '"The Coolest Dude"';
+					if (await evaluator.cool()) cool = '"The Coolest Dude"';
 					const [first, last] = user.name.split(" ");
 					user.name = [first, cool, last].join(" ");
 				});

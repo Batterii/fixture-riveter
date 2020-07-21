@@ -160,14 +160,14 @@ argument, the evaluator:
 ```javascript
 fr.fixture("user", User, (f) => {
     f.transient((t) => {
-        t.attr("cool", () => false);
+        t.cool(() => false);
     });
 
     f.name(() => "Noah Bogart");
 
     f.after("build", async(user: any, evaluator: any) => {
         let cool = "";
-        if (await evaluator.attr("cool")) cool = '"The Coolest Dude"';
+        if (await evaluator.cool()) cool = '"The Coolest Dude"';
         const [first, last] = user.name.split(" ");
         user.name = [first, cool, last].join(" ");
     });
