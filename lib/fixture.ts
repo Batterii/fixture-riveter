@@ -89,10 +89,14 @@ export class Fixture extends Definition {
 		return t;
 	}
 
+	getParentAttributes(): Attribute[] {
+		return this.parentFixture().getAttributes();
+	}
+
 	getAttributes(): Attribute[] {
 		this.compile();
 
-		const attributesToKeep = this.parentFixture().getAttributes();
+		const attributesToKeep = this.getParentAttributes();
 
 		if (!this.attributes || this.attributes.length === 0) {
 			this.attributes = [

@@ -34,7 +34,7 @@ describe("Fixture", function() {
 	it("defines default options", function() {
 		const noOptions = new Fixture(fixtureRiveter, "name", DummyModel);
 		expect(noOptions.aliases).to.deep.equal([]);
-		expect(noOptions.definedTraits).to.deep.equal([]);
+		expect(noOptions.traits).to.deep.equal({});
 	});
 
 	it("accepts aliases", function() {
@@ -144,17 +144,6 @@ describe("Fixture", function() {
 			fixtureRiveter = new FixtureRiveter();
 		});
 
-		it("calls attributeNames", function() {
-			const parentFixture = new Fixture(fixtureRiveter, "parent", DummyModel);
-			const childFixture = new Fixture(fixtureRiveter, "child", DummyModel);
-			sinon.stub(childFixture, "parentFixture")
-				.returns(parentFixture);
-			sinon.spy(childFixture, "attributeNames");
-
-			childFixture.getParentAttributes();
-			expect(childFixture.attributeNames).to.be.calledOnce;
-		});
-
 		it("calls parentFixture", function() {
 			const parentFixture = new Fixture(fixtureRiveter, "parent", DummyModel);
 			const childFixture = new Fixture(fixtureRiveter, "child", DummyModel);
@@ -192,22 +181,6 @@ describe("Fixture", function() {
 
 			const result = childFixture.getParentAttributes();
 			expect(result).to.deep.equal([attr]);
-		});
-
-		it("filters existing attributes", function() {
-			const parentFixture = new Fixture(fixtureRiveter, "parent", DummyModel);
-			const attr = new DynamicAttribute("attr", false, () => true);
-			sinon.stub(parentFixture, "getAttributes")
-				.returns([attr]);
-
-			const childFixture = new Fixture(fixtureRiveter, "child", DummyModel);
-			sinon.stub(childFixture, "parentFixture")
-				.returns(parentFixture);
-			sinon.stub(childFixture, "attributeNames")
-				.returns(["attr"]);
-
-			const result = childFixture.getParentAttributes();
-			expect(result).to.deep.equal([]);
 		});
 	});
 

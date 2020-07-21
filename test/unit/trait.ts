@@ -19,7 +19,7 @@ describe("Trait", function() {
 	it("creates an instance with the correct initial values", function() {
 		const result = new Trait("trait", fixtureRiveter);
 		expect(result.attributes).to.deep.equal([]);
-		expect(result.definedTraits).to.deep.equal([]);
+		expect(result.traits).to.deep.equal({});
 	});
 
 	it("executes the given block immediately", function() {
