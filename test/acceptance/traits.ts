@@ -404,3 +404,45 @@ describe("tests from fixture_bot", function() {
 		});
 	});
 });
+
+describe("#968", function() {
+	let fr: FixtureRiveter;
+	let Demo: any;
+
+	beforeEach(async function() {
+		Demo = await defineModel("Demo", {value: "string"});
+		fr = new FixtureRiveter();
+
+		fr.fixture("parent", Demo, (f: any) => {
+			f.trait("y", (t: any) => {
+				t.value(() => "parent value");
+			});
+
+			f.trait("z", (t: any) => {
+				t.y();
+			});
+
+			f.fixture("child", Demo, (ff: any) => {
+				ff.trait("y", (t: any) => {
+					t.value(() => "child value");
+				});
+			});
+		});
+	});
+
+	specify("parent first", async function() {
+		const parent = await fr.build("parent", "z");
+		const child = await fr.build("child", "z");
+
+		expect(parent.value).to.equal("parent value");
+		expect(child.value).to.equal("child value");
+	});
+
+	specify("child first", async function() {
+		const child = await fr.build("child", "z");
+		const parent = await fr.build("parent", "z");
+
+		expect(parent.value).to.equal("parent value");
+		expect(child.value).to.equal("child value");
+	});
+});

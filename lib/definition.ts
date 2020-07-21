@@ -16,7 +16,6 @@ export class Definition {
 	name: string;
 	aliases: string[];
 	attributes: Attribute[];
-	definedTraits: Trait[];
 	baseTraits: string[];
 	additionalTraits: string[];
 	traitsCache?: Record<string, Trait>;
@@ -27,13 +26,14 @@ export class Definition {
 	sequenceHandler: SequenceHandler;
 	declarationHandler: DeclarationHandler;
 
+	traits: any;
+
 	constructor(name: string, fixtureRiveter: FixtureRiveter) {
 		this.name = name;
 		this.fixtureRiveter = fixtureRiveter;
 
 		this.aliases = [];
 		this.attributes = [];
-		this.definedTraits = [];
 		this.baseTraits = [];
 		this.additionalTraits = [];
 		this.compiled = false;
@@ -41,6 +41,8 @@ export class Definition {
 		this.sequenceHandler = new SequenceHandler();
 		this.declarationHandler = new DeclarationHandler(name);
 		this.callbackHandler = new CallbackHandler(fixtureRiveter);
+
+		this.traits = {};
 	}
 
 	names(): string[] {
@@ -49,17 +51,7 @@ export class Definition {
 
 	compile(): void {
 		if (!this.compiled) {
-			// Generates the list of attributes
 			this.declarationHandler.getAttributes();
-
-			for (const definedTrait of this.definedTraits) {
-				for (const baseTrait of this.getBaseTraits()) {
-					baseTrait.defineTrait(definedTrait);
-				}
-				for (const additionalTraits of this.getAdditionalTraits()) {
-					additionalTraits.defineTrait(definedTrait);
-				}
-			}
 			this.compiled = true;
 		}
 	}
@@ -73,8 +65,8 @@ export class Definition {
 	}
 
 	defineTrait(newTrait: Trait): void {
-		if (!this.definedTraits.map((t) => t.name).includes(newTrait.name)) {
-			this.definedTraits.push(newTrait);
+		if (!this.traits[newTrait.name]) {
+			this.traits[newTrait.name] = newTrait;
 		}
 	}
 
@@ -86,24 +78,10 @@ export class Definition {
 		this.baseTraits = this.baseTraits.concat(traits);
 	}
 
-	populateTraitsCache(): Record<string, Trait> {
-		if (!this.traitsCache || Object.keys(this.traitsCache).length === 0) {
-			const cache = {};
-			for (const trait of this.definedTraits) {
-				cache[trait.name] = trait;
-			}
-			this.traitsCache = cache;
-		}
-		return this.traitsCache;
-	}
-
-	traitFor(name: string): Trait | undefined {
-		const traitsCache = this.populateTraitsCache();
-		return traitsCache[name];
-	}
-
 	traitByName(name: string): Trait {
-		return this.traitFor(name) || this.fixtureRiveter.getTrait(name);
+		// This is overridden by both Fixture and Trait, so ignore it please
+		// I've only written this out so Typescript will shut up lol
+		return this.traits[name] || this.fixtureRiveter.getTrait(name);
 	}
 
 	getInternalTraits(internalTraits: string[]): Trait[] {
@@ -130,16 +108,6 @@ export class Definition {
 			block(),
 			this.getAdditionalTraits().map((t) => t[methodName]()),
 		].flat(Infinity).filter(Boolean);
-	}
-
-	getAttributes(): Attribute[] {
-		if (!this.attributes || this.attributes.length === 0) {
-			this.attributes = this.aggregateFromTraitsAndSelf(
-				"getAttributes",
-				() => this.declarationHandler.getAttributes(),
-			);
-		}
-		return this.attributes;
 	}
 
 	copy<T>(): T {

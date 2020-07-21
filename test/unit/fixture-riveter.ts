@@ -265,43 +265,15 @@ describe("FixtureRiveter", function() {
 	});
 
 	describe("#trait", function() {
-		it("returns a new trait", function() {
-			const fr = new FixtureRiveter();
-			const result = fr.trait("email");
-
-			expect(result).to.be.an.instanceof(Trait);
-		});
-
 		it("passes both arguments through to Trait", function() {
 			const fr = new FixtureRiveter();
 			const name = "email";
 			const block = identity;
-			const result = fr.trait(name, block);
+			fr.trait(name, block);
+			const result = fr.traits[name];
 
 			expect(result.name).to.equal(name);
 			expect(result.block).to.equal(block);
-		});
-
-		it("calls registerTrait", function() {
-			const fr = new FixtureRiveter();
-			sinon.stub(fr, "registerTrait");
-			fr.trait("email");
-
-			expect(fr.registerTrait).to.be.called;
-		});
-	});
-
-	describe("#registerTrait", function() {
-		it("adds the trait for all names", function() {
-			const fr = new FixtureRiveter();
-			const name = "email";
-			const trait = new Trait(name, fr, identity);
-			sinon.stub(trait, "names").returns(["temp", name]);
-			fr.registerTrait(trait);
-
-			expect(Object.keys(fr.traits)).to.have.length(2);
-			expect(fr.traits.temp).to.equal(trait);
-			expect(fr.traits[name]).to.equal(trait);
 		});
 	});
 

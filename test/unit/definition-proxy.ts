@@ -140,30 +140,16 @@ describe("DefinitionProxy", function() {
 	});
 
 	describe("#trait", function() {
-		context("when given a block function", function() {
-			it("calls defineTrait", function() {
-				const fixtureRiveter = new FixtureRiveter();
-				const fixture = new Fixture(fixtureRiveter, "dummy", DummyModel);
-				const proxy = new DefinitionProxy(fixture);
-				sinon.stub(fixture, "defineTrait");
-				const name = "email";
-				const block = () => 1;
-				proxy.trait(name, block);
+		it("calls defineTrait", function() {
+			const fixtureRiveter = new FixtureRiveter();
+			const fixture = new Fixture(fixtureRiveter, "dummy", DummyModel);
+			const proxy = new DefinitionProxy(fixture);
+			sinon.stub(fixture, "defineTrait");
+			const name = "email";
+			const block = () => 1;
+			proxy.trait(name, block);
 
-				expect(fixture.defineTrait).to.be.calledOnce;
-			});
-		});
-
-		context("when given no block", function() {
-			it("throws an error", function() {
-				const fixtureRiveter = new FixtureRiveter();
-				const fixture = new Fixture(fixtureRiveter, "dummy", DummyModel);
-				const proxy = new DefinitionProxy(fixture);
-				const name = "email";
-				const fn = () => proxy.trait(name);
-
-				expect(fn).to.throw("wrong options");
-			});
+			expect(fixture.defineTrait).to.be.calledOnce;
 		});
 	});
 });
