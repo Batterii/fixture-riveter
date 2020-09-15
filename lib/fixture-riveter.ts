@@ -38,6 +38,7 @@ export function extractAttributes(traitsAndOptions: any[]): Record<string, any> 
 export class FixtureRiveter {
 	fixtures: Record<string, Fixture>;
 	traits: Record<string, Trait>;
+	instances: [string, any][];
 	adapterHandler: any;
 	sequenceHandler: SequenceHandler;
 	useParentStrategy: boolean;
@@ -47,6 +48,7 @@ export class FixtureRiveter {
 	constructor() {
 		this.fixtures = {};
 		this.traits = {};
+		this.instances = [];
 		this.adapterHandler = new AdapterHandler();
 		this.sequenceHandler = new SequenceHandler();
 		this.callbackHandler = new CallbackHandler(this);
@@ -167,7 +169,9 @@ export class FixtureRiveter {
 		const adapter = this.getAdapter(name);
 		const StrategyRiveter = this.strategyHandler.getStrategy(strategy);
 		const buildStrategy = new StrategyRiveter(strategy, this, adapter);
-		return fixture.run(buildStrategy, overrides);
+		const instance = await fixture.run(buildStrategy, overrides);
+		this.instances.push([name, instance]);
+		return instance;
 	}
 
 	async generateList(
@@ -213,6 +217,16 @@ export class FixtureRiveter {
 
 	getCallbacks(): Callback[] {
 		return this.callbackHandler.callbacks;
+	}
+
+	async cleanUp(): Promise<void> {
+		for (const [name, instance] of this.instances) {
+			const fixture = this.getFixture(name);
+			const adapter = this.getAdapter(name);
+			// eslint-disable-next-line no-await-in-loop
+			await adapter.destroy(instance, fixture.model);
+		}
+		this.instances = [];
 	}
 
 	// Typescript sucks for dynamically defined methods lol

@@ -11,6 +11,10 @@ export class DefaultAdapter implements Adapter {
 		return instance.save();
 	}
 
+	async destroy(instance: any, Model?: any): Promise<void> {
+		await instance.destroy();
+	}
+
 	async associate(instance: any, name: string, other: any): Promise<any> {
 		return this.set(instance, name, other);
 	}

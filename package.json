@@ -23,7 +23,7 @@
 		"coverage": "npm run build && nyc --reporter=html mocha dist/test",
 		"lint": "eslint . --ext .ts --cache",
 		"lintf": "eslint . --ext .ts --fix --cache",
-		"build": "rm -rf dist && tsc && tsc --project tsconfig-types.json",
+		"build": "tsc && tsc --project tsconfig-types.json",
 		"clean": "rm -rf dist",
 		"test": "npm run build && mocha dist/test",
 		"test:unit": "npm run build && mocha dist/test/unit",

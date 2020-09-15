@@ -6,6 +6,10 @@ export class ObjectionAdapter extends DefaultAdapter {
 		return Model.query().upsertGraph(instance, {relate: true, insertMissing: true});
 	}
 
+	async destroy(instance: any): Promise<void> {
+		await instance.$query().delete();
+	}
+
 	async associate(instance: any, name: string, other: any): Promise<any> {
 		instance.$setRelated(name, other);
 	}
