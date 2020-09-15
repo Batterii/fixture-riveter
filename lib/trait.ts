@@ -20,9 +20,9 @@ export class Trait extends Definition {
 		const proxy = new DefinitionProxy(this);
 		proxy.execute();
 
-		if (proxy.childFactories.length > 0) {
-			const [factory] = proxy.childFactories;
-			throw new Error(`Can't define a factory (${factory.name}) inside trait (${this.name})`);
+		if (proxy.childFixtures.length > 0) {
+			const [fixture] = proxy.childFixtures;
+			throw new Error(`Can't define a fixture (${fixture.name}) inside trait (${this.name})`);
 		}
 	}
 

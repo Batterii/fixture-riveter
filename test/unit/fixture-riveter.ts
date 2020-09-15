@@ -31,7 +31,7 @@ describe("FixtureRiveter", function() {
 	it("can be built", function() {
 		const fixtureRiveter = new FixtureRiveter();
 		expect(fixtureRiveter).to.exist;
-		expect(fixtureRiveter.factories).to.exist.and.to.be.empty;
+		expect(fixtureRiveter.fixtures).to.exist.and.to.be.empty;
 	});
 
 	describe("#getAdapter", function() {
@@ -65,9 +65,9 @@ describe("FixtureRiveter", function() {
 		it("calls the block immediately", function() {
 			const fixtureRiveter = new FixtureRiveter();
 			const testArray = ["test"] as any;
-			fixtureRiveter.factories = testArray;
+			fixtureRiveter.fixtures = testArray;
 
-			expect(fixtureRiveter.factories).to.deep.equal(testArray);
+			expect(fixtureRiveter.fixtures).to.deep.equal(testArray);
 		});
 	});
 
@@ -79,7 +79,7 @@ describe("FixtureRiveter", function() {
 
 			fixtureRiveter.registerFixture(fixture);
 
-			expect(fixtureRiveter.factories[name]).to.equal(fixture);
+			expect(fixtureRiveter.fixtures[name]).to.equal(fixture);
 		});
 
 		it("adds the fixture by alias", function() {
@@ -90,8 +90,8 @@ describe("FixtureRiveter", function() {
 
 			fixtureRiveter.registerFixture(fixture);
 
-			expect(fixtureRiveter.factories[aliases[0]]).to.equal(fixture);
-			expect(fixtureRiveter.factories[aliases[1]]).to.equal(fixture);
+			expect(fixtureRiveter.fixtures[aliases[0]]).to.equal(fixture);
+			expect(fixtureRiveter.fixtures[aliases[1]]).to.equal(fixture);
 		});
 
 		it("adds the same fixture multiples times", function() {
@@ -102,9 +102,9 @@ describe("FixtureRiveter", function() {
 
 			fixtureRiveter.registerFixture(fixture);
 
-			const {factories} = fixtureRiveter;
+			const {fixtures} = fixtureRiveter;
 
-			expect(factories[name]).to.deep.equal(factories[alias]);
+			expect(fixtures[name]).to.deep.equal(fixtures[alias]);
 		});
 	});
 
@@ -114,9 +114,9 @@ describe("FixtureRiveter", function() {
 			const name = "testFixture";
 			fixtureRiveter.fixture(name, DummyModel);
 
-			const fixture = fixtureRiveter.factories[name];
+			const fixture = fixtureRiveter.fixtures[name];
 
-			expect(fixtureRiveter.factories).to.not.be.empty;
+			expect(fixtureRiveter.fixtures).to.not.be.empty;
 			expect(fixture).to.exist;
 			expect(fixture.name).to.equal(name);
 		});
@@ -158,14 +158,14 @@ describe("FixtureRiveter", function() {
 			expect(testFn).to.throw();
 		});
 
-		it("creates child factories", function() {
+		it("creates child fixtures", function() {
 			const fixtureRiveter = new FixtureRiveter();
 			fixtureRiveter.fixture("user", DummyModel, (f: any) => {
 				f.fixture("oldUser", DummyModel);
 			});
 			const result = Object
-				.keys(fixtureRiveter.factories)
-				.map((name: string) => fixtureRiveter.factories[name])
+				.keys(fixtureRiveter.fixtures)
+				.map((name: string) => fixtureRiveter.fixtures[name])
 				.map((f: Fixture) => f.name);
 			expect(result).to.deep.equal(["user", "oldUser"]);
 		});
@@ -177,7 +177,7 @@ describe("FixtureRiveter", function() {
 			const fixture = new FixtureRiveter();
 			fixture.fixture(name, DummyModel);
 			const t = fixture.getFixture(name);
-			const result = fixture.factories[name];
+			const result = fixture.fixtures[name];
 			expect(t).to.equal(result);
 		});
 

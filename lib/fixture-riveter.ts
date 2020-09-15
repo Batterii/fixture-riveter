@@ -36,7 +36,7 @@ export function extractAttributes(traitsAndOptions: any[]): Record<string, any> 
 }
 
 export class FixtureRiveter {
-	factories: Record<string, Fixture>;
+	fixtures: Record<string, Fixture>;
 	traits: Record<string, Trait>;
 	adapterHandler: any;
 	sequenceHandler: SequenceHandler;
@@ -45,7 +45,7 @@ export class FixtureRiveter {
 	strategyHandler: StrategyHandler;
 
 	constructor() {
-		this.factories = {};
+		this.fixtures = {};
 		this.traits = {};
 		this.adapterHandler = new AdapterHandler();
 		this.sequenceHandler = new SequenceHandler();
@@ -65,7 +65,7 @@ export class FixtureRiveter {
 	}
 
 	getFixture(name: string, throws = true): Fixture {
-		const fixture = this.factories[name];
+		const fixture = this.fixtures[name];
 		if (throws && !fixture) {
 			throw new Error(`${name} hasn't been defined yet`);
 		}
@@ -74,7 +74,7 @@ export class FixtureRiveter {
 
 	registerFixture(fixture: Fixture): void {
 		for (const name of fixture.names()) {
-			this.factories[name] = fixture;
+			this.fixtures[name] = fixture;
 		}
 	}
 
@@ -97,7 +97,7 @@ export class FixtureRiveter {
 		proxy.execute();
 		this.registerFixture(fixture);
 
-		proxy.childFactories.forEach((child: any[]) => {
+		proxy.childFixtures.forEach((child: any[]) => {
 			const [childName, childModel, ...childRest] = child;
 			const [childOptions, childBlock] = fixtureOptionsParser(...childRest);
 			childOptions.parent = childOptions.parent || name;
@@ -138,7 +138,7 @@ export class FixtureRiveter {
 
 	resetSequences(): void {
 		this.sequenceHandler.resetSequences();
-		for (const [, fixture] of Object.entries(this.factories)) {
+		for (const [, fixture] of Object.entries(this.fixtures)) {
 			fixture.sequenceHandler.resetSequences();
 		}
 	}

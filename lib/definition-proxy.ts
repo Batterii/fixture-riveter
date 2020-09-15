@@ -22,12 +22,12 @@ import {isFunction, last} from "lodash";
 
 export class DefinitionProxy {
 	definition: Definition;
-	childFactories: any[];
+	childFixtures: any[];
 	ignore: boolean;
 
 	constructor(definition: Definition, ignore = false) {
 		this.definition = definition;
-		this.childFactories = [];
+		this.childFixtures = [];
 		this.ignore = ignore;
 	}
 
@@ -74,7 +74,7 @@ export class DefinitionProxy {
 	fixture(name: string, model: object, rest?: FixtureOptions | blockFunction): void;
 	fixture(name: string, model: object, options: FixtureOptions, block?: blockFunction): void;
 	fixture(name: string, model: object, ...rest: any[]): void {
-		this.childFactories.push([name, model, ...rest]);
+		this.childFixtures.push([name, model, ...rest]);
 	}
 
 	association(name: string, ...rest: any[]): void {

@@ -25,11 +25,11 @@ describe("DefinitionProxy", function() {
 		expect(proxy.definition).to.equal(fixture);
 	});
 
-	it("creates an array for child factories", function() {
+	it("creates an array for child fixtures", function() {
 		const fixtureRiveter = new FixtureRiveter();
 		const fixture = new Fixture(fixtureRiveter, "dummy", DummyModel);
 		const proxy = new DefinitionProxy(fixture);
-		expect(proxy.childFactories).to.deep.equal([]);
+		expect(proxy.childFixtures).to.deep.equal([]);
 	});
 
 	describe("#execute", function() {
@@ -98,7 +98,7 @@ describe("DefinitionProxy", function() {
 			const proxy = new DefinitionProxy(fixture);
 			proxy.fixture("newFixture", DummyModel);
 
-			expect(proxy.childFactories).to.deep.equal([["newFixture", DummyModel]]);
+			expect(proxy.childFixtures).to.deep.equal([["newFixture", DummyModel]]);
 		});
 	});
 
