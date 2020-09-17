@@ -232,13 +232,13 @@ export class FixtureRiveter {
 	// Typescript sucks for dynamically defined methods lol
 	// All of these will be overwritten on instantiation
 	/* eslint-disable */
-	attributesFor(...rest): any {}
-	attributesForList(...rest): any {}
-	attributesForPair(...rest): any {}
-	build(...rest): any {}
-	buildList(...rest): any {}
-	buildPair(...rest): any {}
-	create(...rest): any {}
-	createList(...rest): any {}
-	createPair(...rest): any {}
+	attributesFor(name: string, ...traits: any[]): any {}
+	attributesForList(name: string, count: number, ...traits: any[]): any {}
+	attributesForPair(name: string, ...traits: any[]): any {}
+	build(name: string, ...traits: any[]): any {}
+	buildList(name: string, count: number, ...traits: any[]): any {}
+	buildPair(name: string, ...traits: any[]): any {}
+	create(name: string, ...traits: any[]): any {}
+	createList(name: string, count: number, ...traits: any[]): any {}
+	createPair(name: string, ...traits: any[]): any {}
 }
