@@ -4,7 +4,7 @@ import {Declaration} from "./declarations/declaration";
 export class DeclarationHandler {
 	name: string;
 	declarations: Declaration[];
-	attributes: Attribute[];
+	attributes?: Attribute[];
 
 	constructor(name: string) {
 		this.name = name;

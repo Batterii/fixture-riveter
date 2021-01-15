@@ -153,7 +153,7 @@ describe("global callbacks", function() {
 		expect(user.name).to.equal("john doe");
 		user = await fr.create("user");
 		expect(user.name).to.equal("john doe!!!");
-		user = await fr.create("user", "awesome");
+		user = await fr.create("user", ["awesome"]);
 		expect(user.name).to.equal("A___john doe___!!!Z");
 		const company = await fr.build("company");
 		expect(company.name).to.equal("ACME SUPPLIERS");

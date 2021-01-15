@@ -46,7 +46,7 @@ export function extractCallbackFunction(rest: any[]): any {
 		throw new Error("Callback needs to be a function");
 	}
 	if (rest.length === 0) {
-		throw new Error("Calback needs a name");
+		throw new Error("Callback needs a name");
 	}
 	return block;
 }

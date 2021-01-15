@@ -35,7 +35,7 @@ describe("createPair", function() {
 	});
 
 	it("applies traits and overrides", async function() {
-		const posts = await fr.createPair("post", "modern", {author: "Noah"});
+		const posts = await fr.createPair("post", ["modern"], {author: "Noah"});
 
 		for (const post of posts) {
 			expect(post.author).to.equal("Noah");

@@ -21,7 +21,6 @@ import {CallbackHandler} from "./callback-handler";
 import {StrategyHandler} from "./strategy-handler";
 
 import {
-	isFunction,
 	isPlainObject,
 	last,
 	cloneDeep,
@@ -156,7 +155,11 @@ export class FixtureRiveter {
 		}
 	}
 
-	async run(name: string, strategy: string, traits: any[]): Promise<Record<string, any>> {
+	async run<T = Instance>(
+		name: string,
+		strategy: string,
+		traits: any[],
+	): Promise<T> {
 		const overrides = extractAttributes(traits);
 		let fixture = this.getFixture(name);
 
@@ -174,22 +177,16 @@ export class FixtureRiveter {
 		return instance;
 	}
 
-	async generateList(
+	async runList<T = Instance>(
 		name: string,
 		strategy: string,
 		count: number,
 		traits: any[],
-	): Promise<Record<string, any>[]> {
-		let fn = (instance: any, index: number): any => [index, instance];
-		if (isFunction(last(traits))) {
-			fn = traits.pop();
-		}
-		const instances: any[] = [];
+	): Promise<T[]> {
+		const instances: T[] = [];
 		for (let idx = 0; idx < count; idx += 1) {
 			// eslint-disable-next-line no-await-in-loop
-			const instance = await this.run(name, strategy, cloneDeep(traits));
-			// eslint-disable-next-line no-await-in-loop
-			await fn(instance, idx);
+			const instance = await this.run<T>(name, strategy, cloneDeep(traits));
 			instances.push(instance);
 		}
 		return instances;
@@ -229,16 +226,151 @@ export class FixtureRiveter {
 		this.instances = [];
 	}
 
+	/* eslint-disable */
+
 	// Typescript sucks for dynamically defined methods lol
 	// All of these will be overwritten on instantiation
-	/* eslint-disable */
-	attributesFor(name: string, ...traits: any[]): any {}
-	attributesForList(name: string, count: number, ...traits: any[]): any {}
-	attributesForPair(name: string, ...traits: any[]): any {}
-	build(name: string, ...traits: any[]): any {}
-	buildList(name: string, count: number, ...traits: any[]): any {}
-	buildPair(name: string, ...traits: any[]): any {}
-	create(name: string, ...traits: any[]): any {}
-	createList(name: string, count: number, ...traits: any[]): any {}
-	createPair(name: string, ...traits: any[]): any {}
+	async attributesFor<T = Instance>(
+		name: string,
+		traits?: string[],
+		overrides?: Partial<T extends Instance ? T : Instance>,
+	): Promise<T>;
+
+	async attributesFor<T = Instance>(
+		name: string,
+		traits?: string[]|Partial<T extends Instance ? T : Instance>,
+	): Promise<T>;
+
+	async attributesFor<T>(..._args: any[]): Promise<T> {
+		return undefined as any;
+	}
+
+	async attributesForList<T = Instance>(
+		name: string,
+		count: number,
+		traits?: string[],
+		overrides?: Partial<T extends Instance ? T : Instance>,
+	): Promise<T[]>;
+
+	async attributesForList<T = Instance>(
+		name: string,
+		count: number,
+		traits?: string[]|Partial<T extends Instance ? T : Instance>,
+	): Promise<T[]>;
+
+	async attributesForList<T>(..._args: any[]): Promise<T> {
+		return undefined as any;
+	}
+
+	async attributesForPair<T = Instance>(
+		name: string,
+		traits?: string[],
+		overrides?: Partial<T extends Instance ? T : Instance>,
+	): Promise<[T, T]>;
+
+	async attributesForPair<T = Instance>(
+		name: string,
+		traits?: string[]|Partial<T extends Instance ? T : Instance>,
+	): Promise<[T, T]>;
+
+	async attributesForPair<T>(..._args: any[]): Promise<T> {
+		return undefined as any;
+	}
+
+	async build<T = Instance>(
+		name: string,
+		traits?: string[]|Partial<T extends Instance ? T : Instance>,
+	): Promise<T>;
+
+	async build<T = Instance>(
+		name: string,
+		traits?: string[],
+		overrides?: Partial<T extends Instance ? T : Instance>,
+	): Promise<T>;
+
+	async build<T = Instance>(..._args: any[]): Promise<T> {
+		return undefined as any;
+	}
+
+	async buildList<T = Instance>(
+		name: string,
+		count: number,
+		traits?: string[],
+		overrides?: Partial<T extends Instance ? T : Instance>,
+	): Promise<T[]>;
+
+	async buildList<T = Instance>(
+		name: string,
+		count: number,
+		traits?: string[]|Partial<T extends Instance ? T : Instance>,
+	): Promise<T[]>;
+
+	async buildList<T = Instance>(..._args: any[]): Promise<T> {
+		return undefined as any;
+	}
+
+	async buildPair<T = Instance>(
+		name: string,
+		traits?: string[],
+		overrides?: Partial<T extends Instance ? T : Instance>,
+	): Promise<[T, T]>;
+
+	async buildPair<T = Instance>(
+		name: string,
+		traits?: string[]|Partial<T extends Instance ? T : Instance>,
+	): Promise<[T, T]>;
+
+	async buildPair<T = Instance>(..._args: any[]): Promise<T> {
+		return undefined as any;
+	}
+
+	async create<T = Instance>(
+		name: string,
+		traits?: string[],
+		overrides?: Partial<T extends Instance ? T : Instance>,
+	): Promise<T>;
+
+	async create<T = Instance>(
+		name: string,
+		traits?: string[]|Partial<T extends Instance ? T : Instance>,
+	): Promise<T>;
+
+	async create<T = Instance>(..._args: any[]): Promise<T> {
+		return undefined as any;
+	}
+
+	async createList<T = Instance>(
+		name: string,
+		count: number,
+		traits?: string[],
+		overrides?: Partial<T extends Instance ? T : Instance>,
+	): Promise<[T, T]>;
+
+	async createList<T = Instance>(
+		name: string,
+		count: number,
+		traits?: string[]|Partial<T extends Instance ? T : Instance>,
+	): Promise<[T, T]>;
+
+	async createList<T = Instance>(..._args: any[]): Promise<T> {
+		return undefined as any;
+	}
+
+	async createPair<T = Instance>(
+		name: string,
+		traits?: string[],
+		overrides?: Partial<T extends Instance ? T : Instance>,
+	): Promise<T[]>;
+
+	async createPair<T = Instance>(
+		name: string,
+		traits?: string[]|Partial<T extends Instance ? T : Instance>,
+	): Promise<T[]>;
+
+	async createPair<T = Instance>(..._args: any[]): Promise<T> {
+		return undefined as any;
+	}
+	/* eslint-enable */
 }
+
+type Instance = Record<string, any>;

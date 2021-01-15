@@ -1,6 +1,4 @@
-import {Model as ObjectionModel} from "objection";
-
-import {createTable, defineModel} from "../test-fixtures/define-helpers";
+import {defineModel} from "../test-fixtures/define-helpers";
 
 import {ObjectionAdapter} from "../../lib/adapters/objection-adapter";
 import {FixtureRiveter} from "../../lib/fixture-riveter";
@@ -38,33 +36,11 @@ describe("createList", function() {
 	});
 
 	it("applies traits and overrides", async function() {
-		const posts = await fr.createList("post", 3, "modern", {author: "Noah"});
+		const posts = await fr.createList("post", 3, ["modern"], {author: "Noah"});
 
 		for (const post of posts) {
 			expect(post.author).to.equal("Noah");
 			expect(post.title).to.equal("Kraken");
 		}
-	});
-
-	describe("callback", function() {
-		it("it works on both object and index", async function() {
-			const posts = await fr.createList("post", 5, (post) => {
-				post.position = post.id;
-			});
-
-			posts.forEach((post) => {
-				expect(post.position).to.equal(post.id);
-			});
-		});
-
-		it("it works on both object and index", async function() {
-			const posts = await fr.createList("post", 5, (post, idx) => {
-				post.position = idx;
-			});
-
-			posts.forEach((post, idx) => {
-				expect(post.position).to.equal(idx);
-			});
-		});
 	});
 });

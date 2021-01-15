@@ -33,7 +33,7 @@ describe("Traits", function() {
 	});
 
 	it("can apply traits to a fixture instance", async function() {
-		const model = await fr.build("user", "old", {name: "Bogart"});
+		const model = await fr.build("user", ["old"], {name: "Bogart"});
 		expect(model.age).to.equal(100);
 		expect(model.name).to.equal("Bogart");
 	});
@@ -261,7 +261,7 @@ describe("tests from fixture_bot", function() {
 
 			fr.fixture("user", User);
 
-			const fn = async() => fr.build("user", "missing trait");
+			const fn = async() => fr.build("user", ["missing trait"]);
 
 			return expect(Promise.resolve(fn())).to.eventually.be.rejected;
 		});
@@ -323,7 +323,7 @@ describe("tests from fixture_bot", function() {
 		});
 
 		it("prefers inline trait attributes over default attributes", async function() {
-			const action = await fr.build("action", "accepted");
+			const action = await fr.build("action", ["accepted"]);
 			expect(action.status).to.equal("accepted");
 		});
 
@@ -333,7 +333,7 @@ describe("tests from fixture_bot", function() {
 		});
 
 		it("prefers inline trait attributes over traits on a fixture", async function() {
-			const action = await fr.build("declinedAction", "accepted");
+			const action = await fr.build("declinedAction", ["accepted"]);
 			expect(action.status).to.equal("accepted");
 		});
 
@@ -346,7 +346,7 @@ describe("tests from fixture_bot", function() {
 		);
 
 		it("prefers inline traits over attributes on factories", async function() {
-			const action = await fr.build("extendedDeclinedAction", "accepted");
+			const action = await fr.build("extendedDeclinedAction", ["accepted"]);
 			expect(action.status).to.equal("accepted");
 		});
 
@@ -356,7 +356,7 @@ describe("tests from fixture_bot", function() {
 			async function() {
 				const action = await fr.build(
 					"extendedDeclinedAction",
-					"accepted",
+					["accepted"],
 					{status: "completely overriden"},
 				);
 				expect(action.status).to.equal("completely overriden");
@@ -387,7 +387,7 @@ describe("tests from fixture_bot", function() {
 		});
 
 		it("can honor traits on the very first call", async function() {
-			const user = await fr.build("femaleUser", "admin", {age: 30});
+			const user = await fr.build("femaleUser", ["admin"], {age: 30});
 			expect(user.gender).to.equal("female");
 			expect(user.age).to.equal(30);
 			expect(user.role).to.equal("admin");
@@ -431,16 +431,16 @@ describe("#968", function() {
 	});
 
 	specify("parent first", async function() {
-		const parent = await fr.build("parent", "z");
-		const child = await fr.build("child", "z");
+		const parent = await fr.build("parent", ["z"]);
+		const child = await fr.build("child", ["z"]);
 
 		expect(parent.value).to.equal("parent value");
 		expect(child.value).to.equal("child value");
 	});
 
 	specify("child first", async function() {
-		const child = await fr.build("child", "z");
-		const parent = await fr.build("parent", "z");
+		const child = await fr.build("child", ["z"]);
+		const parent = await fr.build("parent", ["z"]);
 
 		expect(parent.value).to.equal("parent value");
 		expect(child.value).to.equal("child value");

@@ -48,7 +48,7 @@ export class StrategyHandler {
 			count: number,
 			...traits: any[]
 		) => {
-			return this.fixtureRiveter.generateList(name, strategyName, count, traits);
+			return this.fixtureRiveter.runList(name, strategyName, count, traits);
 		};
 	}
 
@@ -57,7 +57,7 @@ export class StrategyHandler {
 			name: string,
 			...traits: any[]
 		) => {
-			return this.fixtureRiveter.generateList(name, strategyName, 2, traits);
+			return this.fixtureRiveter.runList(name, strategyName, 2, traits);
 		};
 	}
 }

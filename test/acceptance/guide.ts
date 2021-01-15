@@ -1,4 +1,5 @@
 import {defineModel} from "../test-fixtures/define-helpers";
+import {DummyModel} from "../test-fixtures/dummy-model";
 import {ObjectionAdapter} from "../../lib/adapters/objection-adapter";
 import {FixtureRiveter} from "../../lib/fixture-riveter";
 

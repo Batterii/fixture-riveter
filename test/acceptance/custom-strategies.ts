@@ -34,7 +34,15 @@ describe("Custom strategies", function() {
 
 	it("works", async function() {
 		const post = await (fr as any).json("post", "modern");
-		const builtPost = await fr.build("post", "modern");
+		const builtPost = await fr.build("post", ["modern"]);
+
+		expect(typeof post).to.equal("string");
+		expect(JSON.parse(post)).to.deep.equal(builtPost);
+	});
+
+	it("works with run", async function() {
+		const post = await fr.run<string>("post", "json", ["modern"]);
+		const builtPost = await fr.build("post", ["modern"]);
 
 		expect(typeof post).to.equal("string");
 		expect(JSON.parse(post)).to.deep.equal(builtPost);

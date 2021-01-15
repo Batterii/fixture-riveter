@@ -107,7 +107,7 @@ export class Fixture extends Definition {
 				this.getAdditionalTraits()
 					.map((t) => this.mapTraitToThis(t))
 					.map((t) => t.getAttributes()),
-			].flat(Infinity).filter(Boolean);
+			].flat(Infinity).filter(Boolean) as Attribute[];
 		}
 
 		return attributesToKeep.concat(this.attributes);
