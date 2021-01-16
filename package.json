@@ -1,6 +1,6 @@
 {
 	"name": "fixture-riveter",
-	"version": "0.4.0",
+	"version": "1.0.0",
 	"description": "Fixture replacement inspired by thoughtbot's fixture_bot",
 	"author": "Batterii, LLC",
 	"contributors": [
