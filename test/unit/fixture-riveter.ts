@@ -5,7 +5,6 @@ import {Fixture} from "../../lib/fixture";
 import {extractAttributes, FixtureRiveter} from "../../lib/fixture-riveter";
 import {Sequence} from "../../lib/sequences/sequence";
 import {IntegerSequence} from "../../lib/sequences/integer-sequence";
-import {Trait} from "../../lib/trait";
 
 import {identity} from "lodash";
 import {expect} from "chai";
@@ -166,7 +165,7 @@ describe("FixtureRiveter", function() {
 			const result = Object
 				.keys(fixtureRiveter.fixtures)
 				.map((name: string) => fixtureRiveter.fixtures[name])
-				.map((f: Fixture) => f.name);
+				.map((f) => f.name);
 			expect(result).to.deep.equal(["user", "oldUser"]);
 		});
 	});

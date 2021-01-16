@@ -1,14 +1,13 @@
-import {DynamicDeclaration} from "../../lib/declarations/dynamic-declaration";
 import {Definition} from "../../lib/definition";
+import {DummyModel} from "../test-fixtures/dummy-model";
 import {FixtureRiveter} from "../../lib/fixture-riveter";
 
 import {expect} from "chai";
-import sinon from "sinon";
 
 describe("Definition", function() {
 	const name = "definition";
 	let fixtureRiveter: FixtureRiveter;
-	let definition: Definition;
+	let definition: Definition<DummyModel>;
 
 	beforeEach(function() {
 		fixtureRiveter = {} as FixtureRiveter;
@@ -19,17 +18,4 @@ describe("Definition", function() {
 		expect(definition).to.exist;
 		expect(definition).to.be.an.instanceof(Definition);
 	});
-
-	// describe("#getAttributes", function() {
-	// 	it("works", function() {
-	// 		sinon.stub(definition, "compile");
-
-	// 		const dName = "dName";
-	// 		definition.declareAttribute(new DynamicDeclaration(dName, () => dName));
-
-	// 		const result = definition.getAttributes();
-
-	// 		expect(result).to.equal("heck");
-	// 	});
-	// });
 });

@@ -49,13 +49,13 @@ export class SequenceHandler {
 	}
 }
 
-type initial = string | number;
-type options = {aliases: string[]};
+type Initial = string | number;
+type Options = {aliases: string[]};
 
 export function optionsParser(
-	initial?: initial | options | SequenceCallback,
-	options?: initial | options | SequenceCallback,
-	callback?: initial | options | SequenceCallback,
+	initial?: Initial | Options | SequenceCallback,
+	options?: Initial | Options | SequenceCallback,
+	callback?: Initial | Options | SequenceCallback,
 ): SequenceOptions;
 
 export function optionsParser(...args: any[]): SequenceOptions {

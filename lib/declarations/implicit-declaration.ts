@@ -5,15 +5,15 @@ import {FixtureRiveter} from "../fixture-riveter";
 import {AssociationAttribute} from "../attributes/association-attribute";
 import {SequenceAttribute} from "../attributes/sequence-attribute";
 
-export class ImplicitDeclaration extends Declaration {
+export class ImplicitDeclaration<T> extends Declaration {
 	fixtureRiveter: FixtureRiveter;
-	fixture: Fixture;
+	fixture: Fixture<T>;
 
 	constructor(
 		name: string,
 		ignored: boolean,
 		fixtureRiveter: FixtureRiveter,
-		fixture: Fixture,
+		fixture: Fixture<T>,
 	) {
 		super(name, ignored);
 		this.fixtureRiveter = fixtureRiveter;

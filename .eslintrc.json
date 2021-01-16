@@ -1,6 +1,11 @@
 {
 	"extends": "@batterii/eslint-config-ts",
 	"rules": {
-		"sort-imports": "off"
+		"sort-imports": "off",
+		"@typescript-eslint/generic-type-naming": "off",
+		"@typescript-eslint/ban-ts-ignore": "off",
+		"@typescript-eslint/camelcase": "off",
+		"@typescript-eslint/explicit-module-boundary-types": "off",
+		"@typescript-eslint/member-naming": "off"
 	}
 }

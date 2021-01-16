@@ -5,7 +5,7 @@ import {FixtureRiveter} from "./fixture-riveter";
 
 /* eslint-disable class-methods-use-this */
 /* eslint-disable @typescript-eslint/no-empty-function */
-export class NullFixture extends Definition {
+export class NullFixture<T> extends Definition<T> {
 	model: any;
 
 	constructor(fixtureRiveter: FixtureRiveter) {

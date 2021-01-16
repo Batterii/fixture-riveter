@@ -139,12 +139,15 @@ describe("Sequelize functionality", function() {
 			});
 		});
 
-		it("saves associations (strategy: :build only affects build, not create)", async function() {
-			const post = await fr.create("post");
-			const user = await post.getUser();
+		it(
+			"saves associations (strategy: :build only affects build, not create)",
+			async function() {
+				const post = await fr.create("post");
+				const user = await post.getUser();
 
-			expect(user).to.be.an.instanceof(User);
-			expect(user.id).to.exist;
-		});
+				expect(user).to.be.an.instanceof(User);
+				expect(user.id).to.exist;
+			},
+		);
 	});
 });

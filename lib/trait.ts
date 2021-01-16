@@ -5,13 +5,13 @@ import {FixtureRiveter} from "./fixture-riveter";
 import {blockFunction} from "./fixture-options-parser";
 
 /* eslint-disable class-methods-use-this */
-export class Trait extends Definition {
+export class Trait<T> extends Definition<T> {
 	fixture: any;
 
 	constructor(
 		name: string,
 		fixtureRiveter: FixtureRiveter,
-		block?: blockFunction,
+		block?: blockFunction<T>,
 	) {
 		super(name, fixtureRiveter);
 
@@ -26,11 +26,11 @@ export class Trait extends Definition {
 		}
 	}
 
-	defineTrait(newTrait: Trait): void {
+	defineTrait(newTrait: Trait<T>): void {
 		throw new Error(`Can't define nested traits: ${newTrait.name} inside ${this.name}`);
 	}
 
-	traitByName(name: string): Trait {
+	traitByName(name: string): Trait<T> {
 		if (this.fixture) {
 			return this.fixture.traitByName(name);
 		}

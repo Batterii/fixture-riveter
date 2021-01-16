@@ -11,16 +11,16 @@ import {Trait} from "./trait";
 import {FixtureRiveter} from "./fixture-riveter";
 import {SequenceHandler} from "./sequence-handler";
 
-export class Definition {
+export class Definition<T> {
 	fixtureRiveter: FixtureRiveter;
 	name: string;
 	aliases: string[];
 	attributes: Attribute[];
 	baseTraits: string[];
 	additionalTraits: string[];
-	traitsCache?: Record<string, Trait>;
+	traitsCache?: Record<string, Trait<T>>;
 	compiled: boolean;
-	block?: blockFunction;
+	block?: blockFunction<T>;
 	callbackHandler: CallbackHandler;
 
 	sequenceHandler: SequenceHandler;
@@ -64,7 +64,7 @@ export class Definition {
 		this.declarationHandler.declareAttribute(declaration);
 	}
 
-	defineTrait(newTrait: Trait): void {
+	defineTrait(newTrait: Trait<T>): void {
 		if (!this.traits[newTrait.name]) {
 			this.traits[newTrait.name] = newTrait;
 		}
@@ -78,29 +78,29 @@ export class Definition {
 		this.baseTraits = this.baseTraits.concat(traits);
 	}
 
-	traitByName(name: string): Trait {
+	traitByName(name: string): Trait<T> {
 		// This is overridden by both Fixture and Trait, so ignore it please
 		// I've only written this out so Typescript will shut up lol
 		return this.traits[name] || this.fixtureRiveter.getTrait(name);
 	}
 
-	getInternalTraits(internalTraits: string[]): Trait[] {
-		const traits: Trait[] = [];
+	getInternalTraits(internalTraits: string[]): Trait<T>[] {
+		const traits: Trait<T>[] = [];
 		for (const name of internalTraits) {
 			traits.push(this.traitByName(name));
 		}
 		return traits;
 	}
 
-	getBaseTraits(): Trait[] {
+	getBaseTraits(): Trait<T>[] {
 		return this.getInternalTraits(this.baseTraits);
 	}
 
-	getAdditionalTraits(): Trait[] {
+	getAdditionalTraits(): Trait<T>[] {
 		return this.getInternalTraits(this.additionalTraits);
 	}
 
-	aggregateFromTraitsAndSelf(methodName: string, block: Function): any[] {
+	aggregateFromTraitsAndSelf(methodName: string, block: () => any): any[] {
 		this.compile();
 
 		return [
@@ -110,7 +110,7 @@ export class Definition {
 		].flat(Infinity).filter(Boolean);
 	}
 
-	copy<T>(): T {
+	copy<C>(): C {
 		const copy = Object.assign(Object.create(Object.getPrototypeOf(this)), this);
 
 		copy.compiled = false;

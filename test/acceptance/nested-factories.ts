@@ -1,5 +1,4 @@
 import {FixtureRiveter} from "../../lib/fixture-riveter";
-import {DefinitionProxy} from "../../lib/definition-proxy";
 
 import {expect} from "chai";
 import {defineModel} from "../test-fixtures/define-helpers";

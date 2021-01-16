@@ -35,8 +35,8 @@ export function extractAttributes(traitsAndOptions: any[]): Record<string, any> 
 }
 
 export class FixtureRiveter {
-	fixtures: Record<string, Fixture>;
-	traits: Record<string, Trait>;
+	fixtures: Record<string, Fixture<any>>;
+	traits: Record<string, Trait<any>>;
 	instances: [string, any][];
 	adapterHandler: any;
 	sequenceHandler: SequenceHandler;
@@ -65,7 +65,7 @@ export class FixtureRiveter {
 		return this.adapterHandler.setAdapter(adapter, fixtureNames);
 	}
 
-	getFixture(name: string, throws = true): Fixture {
+	getFixture(name: string, throws = true): Fixture<any> {
 		const fixture = this.fixtures[name];
 		if (throws && !fixture) {
 			throw new Error(`${name} hasn't been defined yet`);
@@ -73,27 +73,31 @@ export class FixtureRiveter {
 		return fixture;
 	}
 
-	registerFixture(fixture: Fixture): void {
+	registerFixture(fixture: Fixture<any>): void {
 		for (const name of fixture.names()) {
 			this.fixtures[name] = fixture;
 		}
 	}
 
-	fixture(name: string, model: Function, rest?: FixtureOptions | blockFunction): Fixture;
-
-	fixture(
+	fixture<T>(
 		name: string,
-		model: Function,
-		options?: FixtureOptions,
-		block?: blockFunction,
-	): Fixture;
+		model: ModelConstructor<T>,
+		rest?: FixtureOptions | blockFunction<T>,
+	): Fixture<T>;
 
-	fixture(name: string, model: Function, ...rest: any[]): Fixture {
+	fixture<T>(
+		name: string,
+		model: ModelConstructor<T>,
+		options?: FixtureOptions,
+		block?: blockFunction<T>,
+	): Fixture<T>;
+
+	fixture<T>(name: string, model: ModelConstructor<T>, ...rest: any[]): Fixture<T> {
 		if (this.getFixture(name, false)) {
 			throw new Error(`${name} is already defined`);
 		}
 		const fixture = new Fixture(this, name, model, ...rest);
-		const proxy = new DefinitionProxy(fixture);
+		const proxy = new DefinitionProxy<T>(fixture);
 
 		proxy.execute();
 		this.registerFixture(fixture);
@@ -108,7 +112,7 @@ export class FixtureRiveter {
 		return fixture;
 	}
 
-	getTrait(name: string): Trait {
+	getTrait<T>(name: string): Trait<T> {
 		const trait = this.traits[name];
 		if (!trait) {
 			throw new Error(`Trait ${name} hasn't been defined yet`);
@@ -116,7 +120,7 @@ export class FixtureRiveter {
 		return trait;
 	}
 
-	trait(name: string, block: blockFunction): void {
+	trait<T>(name: string, block: blockFunction<T>): void {
 		const trait = new Trait(name, this, block);
 		this.traits[trait.name] = trait;
 	}
@@ -130,7 +134,7 @@ export class FixtureRiveter {
 		name: string,
 		initial?: string | number,
 		options?: {aliases: string[]},
-		callback?: Function,
+		callback?: SequenceCallback,
 	): Sequence;
 
 	sequence(name: string, ...rest: any[]): Sequence {
@@ -374,3 +378,7 @@ export class FixtureRiveter {
 }
 
 type Instance = Record<string, any>;
+
+interface ModelConstructor<T> {
+	new(): T
+}

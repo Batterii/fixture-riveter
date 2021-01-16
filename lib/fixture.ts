@@ -22,30 +22,30 @@ export interface ExtraAttributes {
 	attrs?: Record<string, any>;
 }
 
-export class Fixture extends Definition {
+export class Fixture<T> extends Definition<T> {
 	fixtureRiveter: FixtureRiveter;
-	model: any;
+	model: ModelConstructor<T>;
 	parent?: string;
 
 	constructor(
 		fixtureRiveter: FixtureRiveter,
 		name: string,
-		model: any,
-		rest?: FixtureOptions | blockFunction,
+		model: ModelConstructor<T>,
+		rest?: FixtureOptions | blockFunction<T>,
 	);
 
 	constructor(
 		fixtureRiveter: FixtureRiveter,
 		name: string,
-		model: any,
+		model: ModelConstructor<T>,
 		options?: FixtureOptions,
-		block?: blockFunction,
+		block?: blockFunction<T>,
 	);
 
 	constructor(
 		fixtureRiveter: FixtureRiveter,
 		name: string,
-		model: any,
+		model: ModelConstructor<T>,
 		...rest: any[]
 	) {
 		super(name, fixtureRiveter);
@@ -69,11 +69,11 @@ export class Fixture extends Definition {
 		}
 	}
 
-	parentFixture(): Fixture {
+	parentFixture(): Fixture<T> {
 		if (this.parent) {
 			return this.fixtureRiveter.getFixture(this.parent, false);
 		}
-		return new NullFixture(this.fixtureRiveter) as Fixture;
+		return new NullFixture(this.fixtureRiveter) as Fixture<T>;
 	}
 
 	compile(): void {
@@ -84,7 +84,7 @@ export class Fixture extends Definition {
 		}
 	}
 
-	mapTraitToThis(t: Trait): Trait {
+	mapTraitToThis(t: Trait<T>): Trait<T> {
 		t.fixture = this;
 		return t;
 	}
@@ -121,7 +121,7 @@ export class Fixture extends Definition {
 		return globalCallbacks.concat(parentCallbacks, definedCallbacks);
 	}
 
-	traitByName(name: string): Trait {
+	traitByName(name: string): Trait<T> {
 		return this.traits[name] ||
 			this.parentFixture().traitByName(name) ||
 			this.fixtureRiveter.getTrait(name);
@@ -148,4 +148,8 @@ export class Fixture extends Definition {
 
 		return buildStrategy.result(assembler, this.model);
 	}
+}
+
+interface ModelConstructor<T> {
+	new(): T
 }

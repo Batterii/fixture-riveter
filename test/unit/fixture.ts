@@ -3,7 +3,6 @@ import {DynamicDeclaration} from "../../lib/declarations/dynamic-declaration";
 import {Fixture} from "../../lib/fixture";
 import {FixtureRiveter} from "../../lib/fixture-riveter";
 import {DefaultAdapter} from "../../lib/adapters/default-adapter";
-import {DefinitionProxy} from "../../lib/definition-proxy";
 import {NullFixture} from "../../lib/null-fixture";
 
 import {AttributesForStrategy} from "../../lib/strategies/attributes-for-strategy";
@@ -65,10 +64,10 @@ describe("Fixture", function() {
 	it("can take a block", function() {
 		const withBlock = new Fixture(fixtureRiveter, "name", DummyModel, function() {
 			return 1;
-		}) as Required<Fixture>;
+		}) as Required<Fixture<any>>;
 		expect(withBlock.block).to.exist;
 		expect(withBlock.block).to.be.a("function");
-		expect(withBlock.block({} as DefinitionProxy)).to.equal(1);
+		expect(withBlock.block({} as any)).to.equal(1);
 	});
 
 	describe("#names", function() {

@@ -1,4 +1,5 @@
 import {DefinitionProxy} from "./definition-proxy";
+import {Evaluator} from "./evaluator";
 
 import {first, isFunction, isPlainObject, last} from "lodash";
 
@@ -8,20 +9,26 @@ export interface FixtureOptions {
 	parent?: string;
 }
 
-export type blockFunction = (f: DefinitionProxy) => any;
+type ConvertToFn<T, FN = () => any> = {
+	[P in keyof T]: (fn?: FN) => Promise<T[P]>;
+};
 
-export function fixtureOptionsParser(
-	option?: FixtureOptions | blockFunction,
-): [Record<string, any>, blockFunction | undefined];
+type EvaluatorFn<T> = (evaluator: ConvertToFn<T> & Evaluator) => any;
 
-export function fixtureOptionsParser(
+export type blockFunction<T> = (f: ConvertToFn<T, EvaluatorFn<T>> & DefinitionProxy<T>) => void;
+
+export function fixtureOptionsParser<T>(
+	option?: FixtureOptions | blockFunction<T>,
+): [Record<string, any>, blockFunction<T> | undefined];
+
+export function fixtureOptionsParser<T>(
 	objOption: FixtureOptions,
-	fnOption: blockFunction,
-): [Record<string, any>, blockFunction | undefined];
+	fnOption: blockFunction<T>,
+): [Record<string, any>, blockFunction<T> | undefined];
 
-export function fixtureOptionsParser(
+export function fixtureOptionsParser<T>(
 	...rest: any[]
-): [Record<string, any>, blockFunction | undefined] {
+): [Record<string, any>, blockFunction<T> | undefined] {
 	let options = first(rest);
 	if (!isPlainObject(options)) {
 		options = {};

@@ -5,7 +5,7 @@ import {expect} from "chai";
 
 describe("NullFixture", function() {
 	let fixtureRiveter: FixtureRiveter;
-	let nullFixture: NullFixture;
+	let nullFixture: NullFixture<any>;
 
 	beforeEach(function() {
 		fixtureRiveter = new FixtureRiveter();

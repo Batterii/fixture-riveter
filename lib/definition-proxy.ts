@@ -20,12 +20,12 @@ import {SequenceHandler} from "./sequence-handler";
 
 import {isFunction, last} from "lodash";
 
-export class DefinitionProxy {
-	definition: Definition;
+export class DefinitionProxy<T> {
+	definition: Definition<T>;
 	childFixtures: any[];
 	ignore: boolean;
 
-	constructor(definition: Definition, ignore = false) {
+	constructor(definition: Definition<T>, ignore = false) {
 		this.definition = definition;
 		this.childFixtures = [];
 		this.ignore = ignore;
@@ -65,15 +65,26 @@ export class DefinitionProxy {
 				name,
 				this.ignore,
 				this.fixtureRiveter,
-				this.definition as Fixture,
+				this.definition as Fixture<T>,
 			);
 		}
 		this.definition.declareAttribute(declaration);
 	}
 
-	fixture(name: string, model: object, rest?: FixtureOptions | blockFunction): void;
-	fixture(name: string, model: object, options: FixtureOptions, block?: blockFunction): void;
-	fixture(name: string, model: object, ...rest: any[]): void {
+	fixture(
+		name: string,
+		model: ModelConstructor<T>,
+		rest?: FixtureOptions | blockFunction<T>,
+	): void;
+
+	fixture(
+		name: string,
+		model: ModelConstructor<T>,
+		options: FixtureOptions,
+		block?: blockFunction<T>,
+	): void;
+
+	fixture(name: string, model: ModelConstructor<T>, ...rest: any[]): void {
 		this.childFixtures.push([name, model, ...rest]);
 	}
 
@@ -93,12 +104,12 @@ export class DefinitionProxy {
 		return sequence;
 	}
 
-	trait(name: string, block?: blockFunction): void {
+	trait(name: string, block?: blockFunction<T>): void {
 		const newTrait = new Trait(name, this.fixtureRiveter, block);
 		this.definition.defineTrait(newTrait);
 	}
 
-	transient(block: blockFunction): void {
+	transient(block: blockFunction<T>): void {
 		const proxy = new DefinitionProxy(this.definition, true);
 		block(addMethodMissing(proxy));
 	}
@@ -117,4 +128,8 @@ export class DefinitionProxy {
 	after(...rest: any[]): void {
 		this.definition.after(...rest);
 	}
+}
+
+interface ModelConstructor<T> {
+	new(): T
 }

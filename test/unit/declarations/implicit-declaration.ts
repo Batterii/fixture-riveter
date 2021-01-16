@@ -1,3 +1,4 @@
+import {DummyModel} from "../../test-fixtures/dummy-model";
 import {FixtureRiveter} from "../../../lib/fixture-riveter";
 import {Fixture} from "../../../lib/fixture";
 import {ImplicitDeclaration} from "../../../lib/declarations/implicit-declaration";
@@ -12,7 +13,7 @@ describe("ImplicitDeclaration", function() {
 
 	it("creates an instance of ImplicitDeclaration", function() {
 		const fixtureRiveter = {} as FixtureRiveter;
-		const fixture = {} as Fixture;
+		const fixture = {} as Fixture<any>;
 		const result = new ImplicitDeclaration(name, false, fixtureRiveter, fixture);
 
 		expect(result).to.be.an.instanceof(ImplicitDeclaration);
@@ -26,7 +27,7 @@ describe("ImplicitDeclaration", function() {
 			it("calls getFixture", function() {
 				const fixtureRiveter = new FixtureRiveter();
 				sinon.stub(fixtureRiveter, "getFixture").returns(true as any);
-				const fixture = {} as Fixture;
+				const fixture = {} as Fixture<any>;
 				const declaration = new ImplicitDeclaration(name, false, fixtureRiveter, fixture);
 				declaration.build();
 
@@ -38,7 +39,7 @@ describe("ImplicitDeclaration", function() {
 				const fixtureRiveter = new FixtureRiveter();
 				sinon.stub(fixtureRiveter, "getFixture").returns(true as any);
 
-				const fixture = {} as Fixture;
+				const fixture = {} as Fixture<any>;
 				const declaration = new ImplicitDeclaration(name, false, fixtureRiveter, fixture);
 				const array = declaration.build();
 				const [result] = array;
@@ -54,7 +55,7 @@ describe("ImplicitDeclaration", function() {
 				sinon.stub(fixtureRiveter, "getFixture").returns(true as any);
 				sinon.stub(fixtureRiveter, "findSequence").returns(false as any);
 
-				const fixture = new Fixture(fixtureRiveter, "name", {});
+				const fixture = new Fixture(fixtureRiveter, "name", DummyModel);
 				sinon.stub(fixture, "inheritTraits");
 
 				const declaration = new ImplicitDeclaration(name, false, fixtureRiveter, fixture);
@@ -72,7 +73,7 @@ describe("ImplicitDeclaration", function() {
 				const fixtureRiveter = new FixtureRiveter();
 				sinon.stub(fixtureRiveter, "getFixture").returns(false as any);
 				sinon.stub(fixtureRiveter, "findSequence").returns(true as any);
-				const fixture = {} as Fixture;
+				const fixture = {} as Fixture<any>;
 				const declaration = new ImplicitDeclaration(name, false, fixtureRiveter, fixture);
 				declaration.build();
 
@@ -87,7 +88,7 @@ describe("ImplicitDeclaration", function() {
 				sinon.stub(fixtureRiveter, "getFixture").returns(false as any);
 				fixtureRiveter.sequence(name, (n: number) => `Name ${n}`);
 
-				const fixture = {} as Fixture;
+				const fixture = {} as Fixture<any>;
 				const declaration = new ImplicitDeclaration(name, false, fixtureRiveter, fixture);
 				const array = declaration.build();
 				const [result] = array;
@@ -103,7 +104,7 @@ describe("ImplicitDeclaration", function() {
 				sinon.stub(fixtureRiveter, "getFixture").returns(false as any);
 				sinon.stub(fixtureRiveter, "findSequence").returns(true as any);
 
-				const fixture = new Fixture(fixtureRiveter, "name", {});
+				const fixture = new Fixture(fixtureRiveter, "name", DummyModel);
 				sinon.stub(fixture, "inheritTraits");
 
 				const declaration = new ImplicitDeclaration(name, false, fixtureRiveter, fixture);
@@ -121,7 +122,7 @@ describe("ImplicitDeclaration", function() {
 				sinon.stub(fixtureRiveter, "getFixture").returns(false as any);
 				sinon.stub(fixtureRiveter, "findSequence").returns(false as any);
 
-				const fixture = new Fixture(fixtureRiveter, "name", {});
+				const fixture = new Fixture(fixtureRiveter, "name", DummyModel);
 				sinon.stub(fixture, "inheritTraits");
 
 				const declaration = new ImplicitDeclaration(name, false, fixtureRiveter, fixture);
@@ -136,7 +137,7 @@ describe("ImplicitDeclaration", function() {
 				const fixtureRiveter = new FixtureRiveter();
 				sinon.stub(fixtureRiveter, "getFixture").returns(false as any);
 				sinon.stub(fixtureRiveter, "findSequence").returns(false as any);
-				const fixture = {} as Fixture;
+				const fixture = {} as Fixture<any>;
 				const declaration = new ImplicitDeclaration(name, false, fixtureRiveter, fixture);
 				sinon.stub(declaration, "checkSelfReference").returns(true);
 				const fn = () => declaration.build();
@@ -149,7 +150,7 @@ describe("ImplicitDeclaration", function() {
 				sinon.stub(fixtureRiveter, "getFixture").returns(false as any);
 				sinon.stub(fixtureRiveter, "findSequence").returns(false as any);
 
-				const fixture = new Fixture(fixtureRiveter, "name", {});
+				const fixture = new Fixture(fixtureRiveter, "name", DummyModel);
 				sinon.stub(fixture, "inheritTraits");
 
 				const declaration = new ImplicitDeclaration(name, false, fixtureRiveter, fixture);
@@ -167,7 +168,7 @@ describe("ImplicitDeclaration", function() {
 				sinon.stub(fixtureRiveter, "getFixture").returns(false as any);
 				sinon.stub(fixtureRiveter, "findSequence").returns(false as any);
 
-				const fixture = new Fixture(fixtureRiveter, "name", {});
+				const fixture = new Fixture(fixtureRiveter, "name", DummyModel);
 				sinon.stub(fixture, "inheritTraits");
 
 				const declaration = new ImplicitDeclaration(name, false, fixtureRiveter, fixture);
@@ -184,7 +185,7 @@ describe("ImplicitDeclaration", function() {
 				sinon.stub(fixtureRiveter, "getFixture").returns(false as any);
 				sinon.stub(fixtureRiveter, "findSequence").returns(false as any);
 
-				const fixture = new Fixture(fixtureRiveter, "name", {});
+				const fixture = new Fixture(fixtureRiveter, "name", DummyModel);
 				sinon.stub(fixture, "inheritTraits");
 
 				const declaration = new ImplicitDeclaration(name, false, fixtureRiveter, fixture);
