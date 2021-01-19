@@ -354,7 +354,7 @@ export class FixtureRiveter {
 		name: string,
 		count: number,
 		traits?: string[]|Partial<T extends Instance ? T : Instance>,
-	): Promise<[T, T]>;
+	): Promise<T[]>;
 
 	async createList<T = Instance>(..._args: any[]): Promise<T> {
 		return undefined as any;
