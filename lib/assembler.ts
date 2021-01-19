@@ -3,9 +3,9 @@ import {Callback} from "./callback";
 
 export class Assembler<T> {
 	attributeAssigner: AttributeAssigner<T>;
-	callbacks: Callback[];
+	callbacks: Callback<T>[];
 
-	constructor(attributeAssigner: AttributeAssigner<T>, callbacks: Callback[]) {
+	constructor(attributeAssigner: AttributeAssigner<T>, callbacks: Callback<T>[]) {
 		this.attributeAssigner = attributeAssigner;
 		this.callbacks = callbacks;
 	}

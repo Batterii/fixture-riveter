@@ -14,6 +14,7 @@ describe("simple associations", function() {
 		id: number;
 		name: string;
 		age: number;
+		admin: boolean;
 	}
 
 	class Post extends ObjectionModel {
@@ -38,6 +39,7 @@ describe("simple associations", function() {
 		await createTable(User, {
 			name: "string",
 			age: "integer",
+			admin: "boolean",
 		});
 
 		await createTable(Post, {
@@ -48,13 +50,26 @@ describe("simple associations", function() {
 		fr = new FixtureRiveter();
 		fr.setAdapter(new ObjectionAdapter());
 
-		fr.fixture("user", User, (f: any) => {
+		fr.fixture("user", User, (f) => {
 			f.attr("name", () => "Noah");
 			f.attr("age", () => 32);
+
+			f.trait("admin", (t) => {
+				t.admin(() => true);
+			});
 		});
-		fr.fixture("post", Post, (f: any) => {
+
+		fr.fixture("post", Post, (f) => {
 			f.association("user");
 			f.attr("body", () => "Post body");
+
+			f.trait("admin", (t) => {
+				t.user(["admin"]);
+			});
+
+			f.trait("old admin", (t) => {
+				t.user<User>(["admin"], {age: 100});
+			});
 		});
 	});
 
@@ -85,6 +100,13 @@ describe("simple associations", function() {
 		const model = await User.query().findById(post.userId);
 		expect(model.id).to.equal(post.userId);
 		expect(model.id).to.equal(post.user.id);
+	});
+
+	it("can handle traits and overrides", async function() {
+		const post = await fr.build("post", ["old admin"]);
+
+		expect(post.user.age).to.equal(100);
+		expect(post.user.admin).to.be.true;
 	});
 });
 
@@ -149,20 +171,20 @@ describe("Complex associations", function() {
 				fr = new FixtureRiveter();
 				fr.setAdapter(new ObjectionAdapter());
 
-				fr.fixture("user", User, (f: any) => {
+				fr.fixture("user", User, (f) => {
 					f.attr("name", () => "Noah");
-					f.fixture("userWithPosts", User, (ff: any) => {
+					f.fixture("userWithPosts", User, (ff) => {
 						ff.transient((t) => {
 							t.attr("postCount", () => 5);
 						});
 
 						ff.after("create", async(user, evaluator) => {
-							const posts = await fr.createList(
+							const posts = await fr.createList<Post>(
 								"post",
 								await evaluator.attr("postCount"),
 								{user},
 							);
-							await user.$appendRelated("posts", posts);
+							user.$appendRelated("posts", posts);
 						});
 					});
 				});

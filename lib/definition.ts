@@ -118,11 +118,11 @@ export class Definition<T> {
 		this.callbackHandler.after(...rest);
 	}
 
-	addCallback(names: string[], block: callbackFunction): void {
+	addCallback(names: string[], block: callbackFunction<T>): void {
 		this.callbackHandler.addCallback(names, block);
 	}
 
-	getCallbacks(): Callback[] {
+	getCallbacks(): Callback<T>[] {
 		this.compile();
 
 		return [

@@ -8,7 +8,7 @@ import {expect} from "chai";
 
 /* eslint-disable class-methods-use-this */
 export class JsonStrategy extends CreateStrategy {
-	async result(assembler: any): Promise<any> {
+	async result(assembler): Promise<any> {
 		const instance = await assembler.toInstance();
 		return JSON.stringify(instance);
 	}

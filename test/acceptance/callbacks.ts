@@ -1,4 +1,5 @@
-import {defineModel} from "../test-fixtures/define-helpers";
+import {Model as ObjectionModel} from "objection";
+import {createTable} from "../test-fixtures/define-helpers";
 
 import {ObjectionAdapter} from "../../lib/adapters/objection-adapter";
 import {FixtureRiveter} from "../../lib/fixture-riveter";
@@ -7,10 +8,16 @@ import {expect} from "chai";
 
 describe("Callbacks", function() {
 	let fr: FixtureRiveter;
-	let User: any;
+
+	class User extends ObjectionModel {
+		static tableName = "users";
+		id: number;
+		name: string;
+		age: number;
+	}
 
 	before(async function() {
-		User = await defineModel("User", {
+		await createTable(User, {
 			name: "string",
 			age: "integer",
 		});
@@ -57,10 +64,16 @@ describe("Callbacks", function() {
 describe("binding a callback to multiple callbacks", function() {
 	let fr: FixtureRiveter;
 	let counter: number;
-	let User: any;
+
+	class User extends ObjectionModel {
+		static tableName = "users";
+		id: number;
+		name: string;
+		age: number;
+	}
 
 	beforeEach(async function() {
-		User = await defineModel("User", {
+		await createTable(User, {
 			name: "string",
 			age: "integer",
 		});
@@ -96,16 +109,28 @@ describe("binding a callback to multiple callbacks", function() {
 
 describe("global callbacks", function() {
 	let fr: FixtureRiveter;
-	let User: any;
-	let Company: any;
+
+	class User extends ObjectionModel {
+		static tableName = "user";
+		id: number;
+		name: string;
+		age: number;
+	}
+
+	class Company extends ObjectionModel {
+		static tableName = "company";
+		id: number;
+		name: string;
+		type: string;
+	}
 
 	before(async function() {
-		User = await defineModel("User", {
+		await createTable(User, {
 			name: "string",
 			age: "integer",
 		});
 
-		Company = await defineModel("Company", {
+		await createTable(Company, {
 			name: "string",
 			type: "string",
 		});
@@ -113,7 +138,7 @@ describe("global callbacks", function() {
 		fr = new FixtureRiveter();
 		fr.setAdapter(new ObjectionAdapter());
 
-		fr.after("build", (object) => {
+		fr.after("build", (object: any) => {
 			if (object.constructor.tableName === "company") {
 				object.name = "Acme Suppliers";
 			} else {
@@ -121,16 +146,16 @@ describe("global callbacks", function() {
 			}
 		});
 
-		fr.after("create", (object) => {
+		fr.after("create", (object: any) => {
 			object.name = `${object.name}!!!`;
 		});
 
 		fr.trait("awesome", (t) => {
-			t.after("build", (object) => {
+			t.after("build", (object: any) => {
 				object.name = `___${object.name}___`;
 			});
 
-			t.after("create", (object) => {
+			t.after("create", (object: any) => {
 				object.name = `A${object.name}Z`;
 			});
 		});

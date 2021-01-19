@@ -118,17 +118,16 @@ export class DefinitionProxy<T> {
 		block(addMethodMissing(proxy));
 	}
 
-	before(name: string, name2: string, name3: string, block: callbackFunction): void;
-	before(name: string, name2: string, block: callbackFunction): void;
-	before(name: string, block: callbackFunction): void;
+	before(name: string, block: callbackFunction<T>): void;
+	before(name: string, name2: string, block: callbackFunction<T>): void;
+	before(name: string, name2: string, name3: string, block: callbackFunction<T>): void;
 	before(...rest: any[]): void {
 		this.definition.before(...rest);
 	}
 
-	after(name: string, name2: string, name3: string, block: callbackFunction): void;
-	after(name: string, name2: string, block: callbackFunction): void;
-	after(name: string, block: callbackFunction): void;
-	after(name: string, ...block: any[]): void;
+	after(name: string, block: callbackFunction<T>): void;
+	after(name: string, name2: string, block: callbackFunction<T>): void;
+	after(name: string, name2: string, name3: string, block: callbackFunction<T>): void;
 	after(...rest: any[]): void {
 		this.definition.after(...rest);
 	}

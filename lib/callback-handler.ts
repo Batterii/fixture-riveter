@@ -7,7 +7,7 @@ import {FixtureRiveter} from "./fixture-riveter";
 import {isFunction} from "lodash";
 
 export class CallbackHandler {
-	callbacks: Callback[];
+	callbacks: Callback<any>[];
 	fixtureRiveter: FixtureRiveter;
 
 	constructor(fixtureRiveter: FixtureRiveter) {
@@ -15,28 +15,28 @@ export class CallbackHandler {
 		this.fixtureRiveter = fixtureRiveter;
 	}
 
-	addCallback(names: string[], block: callbackFunction): void {
+	addCallback<T>(names: string[], block: callbackFunction<T>): void {
 		for (const name of names) {
 			this.callbacks.push(new Callback(this.fixtureRiveter, name, block));
 		}
 	}
 
-	before(...rest: any[]): void {
+	before<T>(...rest: any[]): void {
 		const block = extractCallbackFunction(rest);
 		const names = rest.map((n: string) => {
 			const string = n.charAt(0).toUpperCase() + n.slice(1);
 			return `before${string}`;
 		});
-		this.addCallback(names, block);
+		this.addCallback<T>(names, block);
 	}
 
-	after(...rest: any[]): void {
+	after<T>(...rest: any[]): void {
 		const block = extractCallbackFunction(rest);
 		const names = rest.map((n: string) => {
 			const string = n.charAt(0).toUpperCase() + n.slice(1);
 			return `after${string}`;
 		});
-		this.addCallback(names, block);
+		this.addCallback<T>(names, block);
 	}
 }
 

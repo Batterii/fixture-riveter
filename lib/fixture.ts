@@ -114,7 +114,7 @@ export class Fixture<T> extends Definition<T> {
 		return attributesToKeep.concat(this.attributes);
 	}
 
-	getCallbacks(): Callback[] {
+	getCallbacks(): Callback<T>[] {
 		const globalCallbacks = this.fixtureRiveter.getCallbacks();
 		const parentCallbacks = this.parentFixture().getCallbacks();
 		const definedCallbacks = super.getCallbacks();

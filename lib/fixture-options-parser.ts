@@ -1,5 +1,6 @@
 import {DefinitionProxy} from "./definition-proxy";
 import {Evaluator} from "./evaluator";
+import {Instance} from "./fixture-riveter";
 
 import {first, isFunction, isPlainObject, last} from "lodash";
 
@@ -9,11 +10,17 @@ export interface FixtureOptions {
 	parent?: string;
 }
 
-type ConvertToFn<T, FN = () => Promise<any>> = {
-	[P in keyof T]: (fn: FN) => Promise<T[P]>;
+type ConvertToFn<T, FN = () => any> = {
+	[P in keyof T]-?: <Q = undefined>(
+		fn: FN,
+		overrides?: Partial<Q extends undefined ? T extends Instance ? T : Instance : Q>,
+	) => Promise<T[P]>;
 };
 
-type EvaluatorFn<T> = (evaluator: ConvertToFn<T> & Evaluator) => Promise<any> | any;
+type EvaluatorFn<T> =
+	((evaluator: ConvertToFn<T> & Evaluator) => Promise<any> | any) |
+	string[] |
+	Partial<T extends Instance ? T : Instance>;
 
 export type AttrFunction<T> = (f: ConvertToFn<T, EvaluatorFn<T>> & Evaluator) => Promise<any> | any;
 

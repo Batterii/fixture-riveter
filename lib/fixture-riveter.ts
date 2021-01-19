@@ -74,7 +74,7 @@ export class FixtureRiveter {
 		return fixture;
 	}
 
-	registerFixture(fixture: Fixture<any>): void {
+	registerFixture<T>(fixture: Fixture<T>): void {
 		for (const name of fixture.names()) {
 			this.fixtures[name] = fixture;
 		}
@@ -201,25 +201,25 @@ export class FixtureRiveter {
 		this.strategyHandler.registerStrategy(strategyName, strategyClass);
 	}
 
-	before(name: string, name2: string, name3: string, block: callbackFunction): void;
-	before(name: string, name2: string, block: callbackFunction): void;
-	before(name: string, block?: callbackFunction): void;
+	before<T>(name: string, block?: callbackFunction<T>): void;
+	before<T>(name: string, name2: string, block: callbackFunction<T>): void;
+	before<T>(name: string, name2: string, name3: string, block: callbackFunction<T>): void;
 	before(...rest: any[]): void {
 		this.callbackHandler.before(...rest);
 	}
 
-	after(name: string, name2: string, name3: string, block: callbackFunction): void;
-	after(name: string, name2: string, block: callbackFunction): void;
-	after(name: string, block?: callbackFunction): void;
+	after<T>(name: string, block?: callbackFunction<T>): void;
+	after<T>(name: string, name2: string, block: callbackFunction<T>): void;
+	after<T>(name: string, name2: string, name3: string, block: callbackFunction<T>): void;
 	after(...rest: any[]): void {
 		this.callbackHandler.after(...rest);
 	}
 
-	addCallback(names: string[], block: callbackFunction): void {
+	addCallback<T>(names: string[], block: callbackFunction<T>): void {
 		this.callbackHandler.addCallback(names, block);
 	}
 
-	getCallbacks(): Callback[] {
+	getCallbacks<T>(): Callback<T>[] {
 		return this.callbackHandler.callbacks;
 	}
 
@@ -380,7 +380,7 @@ export class FixtureRiveter {
 	/* eslint-enable */
 }
 
-type Instance = Record<string, any>;
+export type Instance = Record<string, any>;
 
 type Pair<T> = [T, T];
 type List<T> = T[];

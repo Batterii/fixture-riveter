@@ -18,7 +18,7 @@ export class NullFixture<T> extends Definition<T> {
 		return [];
 	}
 
-	getCallbacks(): Callback[] {
+	getCallbacks(): Callback<T>[] {
 		return [];
 	}
 }
