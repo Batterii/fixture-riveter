@@ -3,7 +3,7 @@ import {Adapter} from "./adapter";
 /* eslint-disable class-methods-use-this */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export class DefaultAdapter implements Adapter {
-	build(Model: any): any {
+	build<T>(Model: any): T {
 		return new Model();
 	}
 

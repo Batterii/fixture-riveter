@@ -7,7 +7,7 @@ export class BuildStrategy extends Strategy {
 		return this.fixtureRiveter.run(fixtureName, "build", traitsAndOverrides);
 	}
 
-	async result(assembler: Assembler): Promise<any> {
+	async result<T>(assembler: Assembler<T>): Promise<T> {
 		const instance = await assembler.toInstance();
 		await assembler.runCallbacks("afterBuild", instance);
 

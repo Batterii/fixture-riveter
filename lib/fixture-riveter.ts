@@ -201,14 +201,16 @@ export class FixtureRiveter {
 		this.strategyHandler.registerStrategy(strategyName, strategyClass);
 	}
 
-	before(name: string, block: callbackFunction): void;
-	before(name: string, ...rest: any[]): void;
+	before(name: string, name2: string, name3: string, block: callbackFunction): void;
+	before(name: string, name2: string, block: callbackFunction): void;
+	before(name: string, block?: callbackFunction): void;
 	before(...rest: any[]): void {
 		this.callbackHandler.before(...rest);
 	}
 
-	after(name: string, block: callbackFunction): void;
-	after(name: string, ...rest: any[]): void;
+	after(name: string, name2: string, name3: string, block: callbackFunction): void;
+	after(name: string, name2: string, block: callbackFunction): void;
+	after(name: string, block?: callbackFunction): void;
 	after(...rest: any[]): void {
 		this.callbackHandler.after(...rest);
 	}

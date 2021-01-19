@@ -1,4 +1,5 @@
 import {Assembler} from "../assembler";
+import {ModelConstructor} from "../fixture-riveter";
 import {Strategy} from "./strategy";
 
 /* eslint-disable class-methods-use-this */
@@ -7,7 +8,7 @@ export class CreateStrategy extends Strategy {
 		return this.fixtureRiveter.run(fixtureName, "create", traitsAndOverrides);
 	}
 
-	async result(assembler: Assembler, model: any): Promise<any> {
+	async result<T>(assembler: Assembler<T>, model: ModelConstructor<T>): Promise<T> {
 		let instance = await assembler.toInstance();
 		await assembler.runCallbacks("afterBuild", instance);
 		await assembler.runCallbacks("beforeCreate", instance);

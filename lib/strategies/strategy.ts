@@ -1,6 +1,6 @@
 import {Adapter} from "../adapters/adapter";
 import {Assembler} from "../assembler";
-import {FixtureRiveter} from "../fixture-riveter";
+import {FixtureRiveter, ModelConstructor} from "../fixture-riveter";
 
 export abstract class Strategy {
 	adapter: Adapter;
@@ -14,5 +14,5 @@ export abstract class Strategy {
 	}
 
 	abstract association(fixtureName: string, traitsAndOverrides: any[]): Promise<any>;
-	abstract result(assembler: Assembler, model?: any): Promise<any>;
+	abstract result<T>(assembler: Assembler<T>, model?: ModelConstructor<T>): Promise<any>;
 }

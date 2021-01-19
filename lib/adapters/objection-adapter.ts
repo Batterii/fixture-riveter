@@ -2,7 +2,7 @@ import {DefaultAdapter} from "./default-adapter";
 
 /* eslint-disable class-methods-use-this */
 export class ObjectionAdapter extends DefaultAdapter {
-	async save(instance: any, Model: any): Promise<any> {
+	async save<T>(instance: T, Model: any): Promise<T> {
 		return Model.query().upsertGraph(instance, {relate: true, insertMissing: true});
 	}
 

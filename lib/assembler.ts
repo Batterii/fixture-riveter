@@ -1,24 +1,24 @@
 import {AttributeAssigner} from "./attribute-assigner";
 import {Callback} from "./callback";
 
-export class Assembler {
-	attributeAssigner: AttributeAssigner;
+export class Assembler<T> {
+	attributeAssigner: AttributeAssigner<T>;
 	callbacks: Callback[];
 
-	constructor(attributeAssigner: AttributeAssigner, callbacks: Callback[]) {
+	constructor(attributeAssigner: AttributeAssigner<T>, callbacks: Callback[]) {
 		this.attributeAssigner = attributeAssigner;
 		this.callbacks = callbacks;
 	}
 
-	async toObject(): Promise<any> {
+	async toObject(): Promise<Record<string, any>> {
 		return this.attributeAssigner.toObject();
 	}
 
-	async toInstance(): Promise<any> {
+	async toInstance(): Promise<T> {
 		return this.attributeAssigner.toInstance();
 	}
 
-	async runCallbacks(name: string, instance: any): Promise<void> {
+	async runCallbacks(name: string, instance: T): Promise<void> {
 		const callbacks = this.callbacks.filter((c) => c.name === name);
 
 		for (const callback of callbacks) {

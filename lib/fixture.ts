@@ -128,7 +128,10 @@ export class Fixture<T> extends Definition<T> {
 			this.fixtureRiveter.getTrait(name);
 	}
 
-	async run(buildStrategy: Strategy, overrides: Record<string, any> = {}): Promise<any> {
+	async run(
+		buildStrategy: Strategy,
+		overrides: Record<string, any> = {},
+	): Promise<T | Record<string, any>> {
 		const evaluator = addMethodMissing(
 			new Evaluator(
 				this.fixtureRiveter,
@@ -138,15 +141,15 @@ export class Fixture<T> extends Definition<T> {
 			),
 		);
 
-		const attributeAssigner = new AttributeAssigner(
+		const attributeAssigner = new AttributeAssigner<T>(
 			this.fixtureRiveter,
 			this.name,
 			this.model,
 			evaluator,
 		);
 
-		const assembler = new Assembler(attributeAssigner, this.getCallbacks());
+		const assembler = new Assembler<T>(attributeAssigner, this.getCallbacks());
 
-		return buildStrategy.result(assembler, this.model);
+		return buildStrategy.result<T>(assembler, this.model);
 	}
 }

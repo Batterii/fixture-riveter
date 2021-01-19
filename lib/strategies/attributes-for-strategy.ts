@@ -7,7 +7,7 @@ export class AttributesForStrategy extends Strategy {
 		return this.fixtureRiveter.run(fixtureName, "null", traitsAndOverrides);
 	}
 
-	async result(assembler: Assembler): Promise<any> {
+	async result<T>(assembler: Assembler<T>): Promise<Record<string, any>> {
 		return assembler.toObject();
 	}
 }

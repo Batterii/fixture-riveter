@@ -4,13 +4,10 @@ import {
 	FixtureRiveter,
 } from "./fixture-riveter";
 import {Strategy} from "./strategies/strategy";
-
 import {omit} from "lodash";
 
-type AttributeFuncs = Record<string, (e: Evaluator) => any>;
-
 export class Evaluator {
-	attributeFns: AttributeFuncs;
+	attributeFns: Record<string, (e: Evaluator) => any>;
 	attributes: Attribute[];
 	buildStrategy: Strategy;
 	cachedValues: Record<string, any>;
