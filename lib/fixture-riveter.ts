@@ -186,7 +186,7 @@ export class FixtureRiveter {
 		strategy: string,
 		count: number,
 		traits: any[],
-	): Promise<T[]> {
+	): Promise<List<T>> {
 		const instances: T[] = [];
 		for (let idx = 0; idx < count; idx += 1) {
 			// eslint-disable-next-line no-await-in-loop
@@ -254,15 +254,15 @@ export class FixtureRiveter {
 		count: number,
 		traits?: string[],
 		overrides?: Partial<T extends Instance ? T : Instance>,
-	): Promise<T[]>;
+	): Promise<List<T>>;
 
 	async attributesForList<T = Instance>(
 		name: string,
 		count: number,
 		traits?: string[]|Partial<T extends Instance ? T : Instance>,
-	): Promise<T[]>;
+	): Promise<List<T>>;
 
-	async attributesForList<T>(..._args: any[]): Promise<T> {
+	async attributesForList<T>(..._args: any[]): Promise<List<T>> {
 		return undefined as any;
 	}
 
@@ -270,14 +270,14 @@ export class FixtureRiveter {
 		name: string,
 		traits?: string[],
 		overrides?: Partial<T extends Instance ? T : Instance>,
-	): Promise<[T, T]>;
+	): Promise<Pair<T>>;
 
 	async attributesForPair<T = Instance>(
 		name: string,
 		traits?: string[]|Partial<T extends Instance ? T : Instance>,
-	): Promise<[T, T]>;
+	): Promise<Pair<T>>;
 
-	async attributesForPair<T>(..._args: any[]): Promise<T> {
+	async attributesForPair<T>(..._args: any[]): Promise<Pair<T>> {
 		return undefined as any;
 	}
 
@@ -301,15 +301,15 @@ export class FixtureRiveter {
 		count: number,
 		traits?: string[],
 		overrides?: Partial<T extends Instance ? T : Instance>,
-	): Promise<T[]>;
+	): Promise<List<T>>;
 
 	async buildList<T = Instance>(
 		name: string,
 		count: number,
 		traits?: string[]|Partial<T extends Instance ? T : Instance>,
-	): Promise<T[]>;
+	): Promise<List<T>>;
 
-	async buildList<T = Instance>(..._args: any[]): Promise<T> {
+	async buildList<T = Instance>(..._args: any[]): Promise<List<T>> {
 		return undefined as any;
 	}
 
@@ -317,14 +317,14 @@ export class FixtureRiveter {
 		name: string,
 		traits?: string[],
 		overrides?: Partial<T extends Instance ? T : Instance>,
-	): Promise<[T, T]>;
+	): Promise<Pair<T>>;
 
 	async buildPair<T = Instance>(
 		name: string,
 		traits?: string[]|Partial<T extends Instance ? T : Instance>,
-	): Promise<[T, T]>;
+	): Promise<Pair<T>>;
 
-	async buildPair<T = Instance>(..._args: any[]): Promise<T> {
+	async buildPair<T = Instance>(..._args: any[]): Promise<Pair<T>> {
 		return undefined as any;
 	}
 
@@ -348,15 +348,15 @@ export class FixtureRiveter {
 		count: number,
 		traits?: string[],
 		overrides?: Partial<T extends Instance ? T : Instance>,
-	): Promise<[T, T]>;
+	): Promise<List<T>>;
 
 	async createList<T = Instance>(
 		name: string,
 		count: number,
 		traits?: string[]|Partial<T extends Instance ? T : Instance>,
-	): Promise<T[]>;
+	): Promise<List<T>>;
 
-	async createList<T = Instance>(..._args: any[]): Promise<T> {
+	async createList<T = Instance>(..._args: any[]): Promise<List<T>> {
 		return undefined as any;
 	}
 
@@ -364,20 +364,23 @@ export class FixtureRiveter {
 		name: string,
 		traits?: string[],
 		overrides?: Partial<T extends Instance ? T : Instance>,
-	): Promise<T[]>;
+	): Promise<Pair<T>>;
 
 	async createPair<T = Instance>(
 		name: string,
 		traits?: string[]|Partial<T extends Instance ? T : Instance>,
-	): Promise<T[]>;
+	): Promise<Pair<T>>;
 
-	async createPair<T = Instance>(..._args: any[]): Promise<T> {
+	async createPair<T = Instance>(..._args: any[]): Promise<Pair<T>> {
 		return undefined as any;
 	}
 	/* eslint-enable */
 }
 
 type Instance = Record<string, any>;
+
+type Pair<T> = [T, T];
+type List<T> = T[];
 
 interface ModelConstructor<T> {
 	new(): T
