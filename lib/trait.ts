@@ -1,17 +1,18 @@
 import {Attribute} from "./attributes/attribute";
 import {Definition} from "./definition";
 import {DefinitionProxy} from "./definition-proxy";
+import {Fixture} from "./fixture";
 import {FixtureRiveter} from "./fixture-riveter";
-import {blockFunction} from "./fixture-options-parser";
+import {BlockFunction} from "./fixture-options-parser";
 
 /* eslint-disable class-methods-use-this */
 export class Trait<T> extends Definition<T> {
-	fixture: any;
+	fixture: Fixture<T>;
 
 	constructor(
 		name: string,
 		fixtureRiveter: FixtureRiveter,
-		block?: blockFunction<T>,
+		block?: BlockFunction<T>,
 	) {
 		super(name, fixtureRiveter);
 
@@ -21,8 +22,8 @@ export class Trait<T> extends Definition<T> {
 		proxy.execute();
 
 		if (proxy.childFixtures.length > 0) {
-			const [fixture] = proxy.childFixtures;
-			throw new Error(`Can't define a fixture (${fixture.name}) inside trait (${this.name})`);
+			const [[fixtureName]] = proxy.childFixtures;
+			throw new Error(`Can't define a fixture (${fixtureName}) inside trait (${this.name})`);
 		}
 	}
 
@@ -38,9 +39,12 @@ export class Trait<T> extends Definition<T> {
 	}
 
 	getAttributes(): Attribute[] {
-		return this.aggregateFromTraitsAndSelf(
-			"getAttributes",
-			() => this.declarationHandler.getAttributes(),
-		);
+		this.compile();
+
+		return [
+			this.getBaseTraits().map((t) => t.getAttributes()),
+			this.declarationHandler.getAttributes(),
+			this.getAdditionalTraits().map((t) => t.getAttributes()),
+		].flat(2).filter(Boolean);
 	}
 }

@@ -4,30 +4,42 @@ import {expect} from "chai";
 
 import {defineModel} from "../test-fixtures/define-helpers";
 
+class User {
+	name?: string;
+	age?: number;
+	admin?: boolean;
+	gender?: string;
+	email?: string;
+	dateOfBirth?: Date;
+	great?: string;
+	role?: string;
+}
+
 describe("Traits", function() {
 	let fr: FixtureRiveter;
-	let User: any;
 
 	before(async function() {
-		User = await defineModel("User", {
+		await defineModel("User", {
 			name: "string",
 			age: "integer",
 			admin: "boolean",
-			gender: "string",
 			email: "string",
-			dateOfBirth: "date",
-			great: "string",
 		});
 
 		fr = new FixtureRiveter();
 
-		fr.fixture("user", User, (f: any) => {
+		fr.fixture("user", User, (f) => {
 			f.attr("name", () => "Noah");
 			f.attr("age", () => 32);
+			f.attr("admin", () => false);
 			f.sequence("email", (n: number) => `test${n}@foo.bar`);
 
 			f.trait("old", (t: any) => {
 				t.attr("age", () => 100);
+			});
+
+			f.trait("admin", (t: any) => {
+				t.attr("admin", () => true);
 			});
 		});
 	});
@@ -37,13 +49,17 @@ describe("Traits", function() {
 		expect(model.age).to.equal(100);
 		expect(model.name).to.equal("Bogart");
 	});
+
+	it("can apply multiple traits to a fixture instance", async function() {
+		const model = await fr.build("user", ["old", "admin"], {name: "Bogart"});
+		expect(model.age).to.equal(100);
+		expect(model.name).to.equal("Bogart");
+	});
 });
 
 describe("tests from fixture_bot", function() {
-	let User: any;
-
 	before(async function() {
-		User = await defineModel("User", {
+		await defineModel("User", {
 			name: "string",
 			age: "integer",
 			admin: "boolean",
@@ -270,11 +286,11 @@ describe("tests from fixture_bot", function() {
 	specify("traits and dynamic attributes that are applied simultaneously", async function() {
 		const fr = new FixtureRiveter();
 
-		fr.trait("email", (f: any) => {
+		fr.trait("email", (f) => {
 			f.attr("email", async(e) => `${await e.attr("name")}@example.com`);
 		});
 
-		fr.fixture("user", User, (f: any) => {
+		fr.fixture("user", User, (f) => {
 			f.attr("name", () => "John");
 			f.attr("email");
 			f.attr("combined", async(e) => {
@@ -368,7 +384,7 @@ describe("tests from fixture_bot", function() {
 		let fr: FixtureRiveter;
 
 		before(async function() {
-			User = await defineModel("User", {
+			await defineModel("User", {
 				role: "string",
 				gender: "string",
 				age: "integer",

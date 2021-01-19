@@ -6,7 +6,7 @@ import {
 import {CallbackHandler} from "./callback-handler";
 import {Declaration} from "./declarations/declaration";
 import {DeclarationHandler} from "./declaration-handler";
-import {blockFunction} from "./fixture-options-parser";
+import {BlockFunction} from "./fixture-options-parser";
 import {Trait} from "./trait";
 import {FixtureRiveter} from "./fixture-riveter";
 import {SequenceHandler} from "./sequence-handler";
@@ -20,13 +20,13 @@ export class Definition<T> {
 	additionalTraits: string[];
 	traitsCache?: Record<string, Trait<T>>;
 	compiled: boolean;
-	block?: blockFunction<T>;
+	block?: BlockFunction<T>;
 	callbackHandler: CallbackHandler;
 
 	sequenceHandler: SequenceHandler;
 	declarationHandler: DeclarationHandler;
 
-	traits: any;
+	traits: Record<string, Trait<T>>;
 
 	constructor(name: string, fixtureRiveter: FixtureRiveter) {
 		this.name = name;
@@ -100,16 +100,6 @@ export class Definition<T> {
 		return this.getInternalTraits(this.additionalTraits);
 	}
 
-	aggregateFromTraitsAndSelf(methodName: string, block: () => any): any[] {
-		this.compile();
-
-		return [
-			this.getBaseTraits().map((t) => t[methodName]()),
-			block(),
-			this.getAdditionalTraits().map((t) => t[methodName]()),
-		].flat(Infinity).filter(Boolean);
-	}
-
 	copy<C>(): C {
 		const copy = Object.assign(Object.create(Object.getPrototypeOf(this)), this);
 
@@ -133,9 +123,12 @@ export class Definition<T> {
 	}
 
 	getCallbacks(): Callback[] {
-		return this.aggregateFromTraitsAndSelf(
-			"getCallbacks",
-			() => this.callbackHandler.callbacks,
-		);
+		this.compile();
+
+		return [
+			this.getBaseTraits().map((t) => t.getCallbacks()),
+			this.callbackHandler.callbacks,
+			this.getAdditionalTraits().map((t) => t.getCallbacks()),
+		].flat(2).filter(Boolean);
 	}
 }

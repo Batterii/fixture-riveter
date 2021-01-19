@@ -4,10 +4,11 @@ import {Attribute} from "./attributes/attribute";
 import {AttributeAssigner} from "./attribute-assigner";
 import {Definition} from "./definition";
 import {Evaluator} from "./evaluator";
-import {FixtureRiveter} from "./fixture-riveter";
+import {FixtureRiveter, ModelConstructor} from "./fixture-riveter";
 import {NullFixture} from "./null-fixture";
 import {
-	blockFunction,
+	BlockFunction,
+	FixtureArgs,
 	FixtureOptions,
 	fixtureOptionsParser,
 } from "./fixture-options-parser";
@@ -31,15 +32,15 @@ export class Fixture<T> extends Definition<T> {
 		fixtureRiveter: FixtureRiveter,
 		name: string,
 		model: ModelConstructor<T>,
-		rest?: FixtureOptions | blockFunction<T>,
+		options?: FixtureOptions,
+		block?: BlockFunction<T>,
 	);
 
 	constructor(
 		fixtureRiveter: FixtureRiveter,
 		name: string,
 		model: ModelConstructor<T>,
-		options?: FixtureOptions,
-		block?: blockFunction<T>,
+		rest?: FixtureArgs<T>,
 	);
 
 	constructor(
@@ -107,7 +108,7 @@ export class Fixture<T> extends Definition<T> {
 				this.getAdditionalTraits()
 					.map((t) => this.mapTraitToThis(t))
 					.map((t) => t.getAttributes()),
-			].flat(Infinity).filter(Boolean) as Attribute[];
+			].flat(2).filter(Boolean);
 		}
 
 		return attributesToKeep.concat(this.attributes);
@@ -148,8 +149,4 @@ export class Fixture<T> extends Definition<T> {
 
 		return buildStrategy.result(assembler, this.model);
 	}
-}
-
-interface ModelConstructor<T> {
-	new(): T
 }

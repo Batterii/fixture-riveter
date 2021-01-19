@@ -3,7 +3,8 @@ import {AdapterHandler, FixtureNames} from "./adapter-handler";
 import {DefinitionProxy} from "./definition-proxy";
 import {Fixture} from "./fixture";
 import {
-	blockFunction,
+	BlockFunction,
+	FixtureArgs,
 	FixtureOptions,
 	fixtureOptionsParser,
 } from "./fixture-options-parser";
@@ -82,14 +83,14 @@ export class FixtureRiveter {
 	fixture<T>(
 		name: string,
 		model: ModelConstructor<T>,
-		rest?: FixtureOptions | blockFunction<T>,
+		options: FixtureOptions,
+		block?: BlockFunction<T>,
 	): Fixture<T>;
 
 	fixture<T>(
 		name: string,
 		model: ModelConstructor<T>,
-		options?: FixtureOptions,
-		block?: blockFunction<T>,
+		rest?: FixtureArgs<T>,
 	): Fixture<T>;
 
 	fixture<T>(name: string, model: ModelConstructor<T>, ...rest: any[]): Fixture<T> {
@@ -120,7 +121,7 @@ export class FixtureRiveter {
 		return trait;
 	}
 
-	trait<T>(name: string, block: blockFunction<T>): void {
+	trait<T>(name: string, block: BlockFunction<T>): void {
 		const trait = new Trait(name, this, block);
 		this.traits[trait.name] = trait;
 	}
@@ -171,7 +172,7 @@ export class FixtureRiveter {
 
 		if (traits.length > 0) {
 			fixture = fixture.copy();
-			fixture.appendTraits(traits);
+			fixture.appendTraits(traits[0]);
 		}
 		const adapter = this.getAdapter(name);
 		const StrategyRiveter = this.strategyHandler.getStrategy(strategy);
@@ -382,6 +383,6 @@ type Instance = Record<string, any>;
 type Pair<T> = [T, T];
 type List<T> = T[];
 
-interface ModelConstructor<T> {
+export interface ModelConstructor<T> {
 	new(): T
 }

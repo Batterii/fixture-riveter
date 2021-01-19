@@ -7,7 +7,9 @@ import {Trait} from "./trait";
 import {Definition} from "./definition";
 import {Fixture} from "./fixture";
 import {
-	blockFunction,
+	AttrFunction,
+	BlockFunction,
+	FixtureArgs,
 	FixtureOptions,
 } from "./fixture-options-parser";
 import {callbackFunction} from "./callback";
@@ -22,7 +24,7 @@ import {isFunction, last} from "lodash";
 
 export class DefinitionProxy<T> {
 	definition: Definition<T>;
-	childFixtures: any[];
+	childFixtures: [string, ModelConstructor<T>, ...any][];
 	ignore: boolean;
 
 	constructor(definition: Definition<T>, ignore = false) {
@@ -50,6 +52,8 @@ export class DefinitionProxy<T> {
 		this.attr(name, ...rest);
 	}
 
+	attr(name: string, rest?: FixtureOptions | AttrFunction<T>): void;
+
 	attr(name: string, ...rest: any[]): void {
 		let declaration: Declaration;
 
@@ -74,14 +78,14 @@ export class DefinitionProxy<T> {
 	fixture(
 		name: string,
 		model: ModelConstructor<T>,
-		rest?: FixtureOptions | blockFunction<T>,
+		options: FixtureOptions,
+		block?: BlockFunction<T>,
 	): void;
 
 	fixture(
 		name: string,
 		model: ModelConstructor<T>,
-		options: FixtureOptions,
-		block?: blockFunction<T>,
+		rest?: FixtureArgs<T>,
 	): void;
 
 	fixture(name: string, model: ModelConstructor<T>, ...rest: any[]): void {
@@ -104,26 +108,26 @@ export class DefinitionProxy<T> {
 		return sequence;
 	}
 
-	trait(name: string, block?: blockFunction<T>): void {
+	trait(name: string, block: BlockFunction<T>): void {
 		const newTrait = new Trait(name, this.fixtureRiveter, block);
 		this.definition.defineTrait(newTrait);
 	}
 
-	transient(block: blockFunction<T>): void {
+	transient(block: BlockFunction<T>): void {
 		const proxy = new DefinitionProxy(this.definition, true);
 		block(addMethodMissing(proxy));
 	}
 
-	before(name: string, block: callbackFunction): void;
-	before(name: string, name2: string, block: callbackFunction): void;
 	before(name: string, name2: string, name3: string, block: callbackFunction): void;
+	before(name: string, name2: string, block: callbackFunction): void;
+	before(name: string, block: callbackFunction): void;
 	before(...rest: any[]): void {
 		this.definition.before(...rest);
 	}
 
-	after(name: string, block: callbackFunction): void;
-	after(name: string, name2: string, block: callbackFunction): void;
 	after(name: string, name2: string, name3: string, block: callbackFunction): void;
+	after(name: string, name2: string, block: callbackFunction): void;
+	after(name: string, block: callbackFunction): void;
 	after(name: string, ...block: any[]): void;
 	after(...rest: any[]): void {
 		this.definition.after(...rest);

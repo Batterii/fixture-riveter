@@ -5,7 +5,7 @@ import {extractAttributes} from "../fixture-riveter";
 import {omit} from "lodash";
 
 export class AssociationDeclaration extends Declaration {
-	overrides: any;
+	overrides: Record<string, any>;
 	traits: string[];
 
 	constructor(name: string, traitsAndOptions: any[]) {

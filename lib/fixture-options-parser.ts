@@ -9,26 +9,30 @@ export interface FixtureOptions {
 	parent?: string;
 }
 
-type ConvertToFn<T, FN = () => any> = {
-	[P in keyof T]: (fn?: FN) => Promise<T[P]>;
+type ConvertToFn<T, FN = () => Promise<any>> = {
+	[P in keyof T]: (fn: FN) => Promise<T[P]>;
 };
 
-type EvaluatorFn<T> = (evaluator: ConvertToFn<T> & Evaluator) => any;
+type EvaluatorFn<T> = (evaluator: ConvertToFn<T> & Evaluator) => Promise<any> | any;
 
-export type blockFunction<T> = (f: ConvertToFn<T, EvaluatorFn<T>> & DefinitionProxy<T>) => void;
+export type AttrFunction<T> = (f: ConvertToFn<T, EvaluatorFn<T>> & Evaluator) => Promise<any> | any;
+
+export type BlockFunction<T> = (f: ConvertToFn<T, EvaluatorFn<T>> & DefinitionProxy<T>) => void;
+
+export type FixtureArgs<T> = FixtureOptions | BlockFunction<T>;
 
 export function fixtureOptionsParser<T>(
-	option?: FixtureOptions | blockFunction<T>,
-): [Record<string, any>, blockFunction<T> | undefined];
+	options?: FixtureArgs<T>,
+): [FixtureOptions, BlockFunction<T> | undefined];
 
 export function fixtureOptionsParser<T>(
-	objOption: FixtureOptions,
-	fnOption: blockFunction<T>,
-): [Record<string, any>, blockFunction<T> | undefined];
+	fixtureOptions: FixtureOptions,
+	block?: BlockFunction<T>,
+): [FixtureOptions, BlockFunction<T> | undefined];
 
 export function fixtureOptionsParser<T>(
 	...rest: any[]
-): [Record<string, any>, blockFunction<T> | undefined] {
+): [FixtureOptions, BlockFunction<T> | undefined] {
 	let options = first(rest);
 	if (!isPlainObject(options)) {
 		options = {};
