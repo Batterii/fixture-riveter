@@ -1,4 +1,5 @@
-import {defineModel} from "../test-fixtures/define-helpers";
+import {Model as ObjectionModel} from "objection";
+import {createTable} from "../test-fixtures/define-helpers";
 import {ObjectionAdapter} from "../../lib/adapters/objection-adapter";
 import {FixtureRiveter} from "../../lib/fixture-riveter";
 
@@ -6,10 +7,17 @@ import {expect} from "chai";
 
 describe("method missing functionality", function() {
 	let fr: FixtureRiveter;
-	let User: any;
+
+	class User extends ObjectionModel {
+		static tableName = "users";
+		id: number;
+		name: string;
+		age: number;
+		email: string;
+	}
 
 	before(async function() {
-		User = await defineModel("User", {
+		await createTable(User, {
 			name: "string",
 			age: "integer",
 			email: "string",
@@ -18,10 +26,10 @@ describe("method missing functionality", function() {
 		fr = new FixtureRiveter();
 		fr.setAdapter(new ObjectionAdapter());
 
-		fr.fixture("user", User, (f: any) => {
+		fr.fixture("user", User, (f) => {
 			f.name(() => "Noah");
 			f.age(() => 32);
-			f.email(async(e: any) => `${await e.name()}@example.com`);
+			f.email(async(e) => `${await e.name()}@example.com`);
 		});
 	});
 

@@ -1,7 +1,7 @@
 import {Evaluator} from "./evaluator";
 import {FixtureRiveter} from "./fixture-riveter";
 
-export type callbackFunction<T> = (instance: T, evaluator: Evaluator) => any;
+export type callbackFunction<T> = (instance: T, evaluator: T & Evaluator) => any;
 
 export class Callback<T> {
 	fixtureRiveter: FixtureRiveter;

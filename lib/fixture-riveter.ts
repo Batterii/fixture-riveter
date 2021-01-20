@@ -170,9 +170,10 @@ export class FixtureRiveter {
 
 		fixture.compile();
 
+		traits = traits.flat(2);
 		if (traits.length > 0) {
 			fixture = fixture.copy();
-			fixture.appendTraits(traits[0]);
+			fixture.appendTraits(traits);
 		}
 		const adapter = this.getAdapter(name);
 		const StrategyRiveter = this.strategyHandler.getStrategy(strategy);

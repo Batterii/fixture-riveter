@@ -159,7 +159,7 @@ describe("FixtureRiveter", function() {
 
 		it("creates child fixtures", function() {
 			const fixtureRiveter = new FixtureRiveter();
-			fixtureRiveter.fixture("user", DummyModel, (f: any) => {
+			fixtureRiveter.fixture("user", DummyModel, (f) => {
 				f.fixture("oldUser", DummyModel);
 			});
 			const result = Object
@@ -249,10 +249,10 @@ describe("FixtureRiveter", function() {
 			const name = "user";
 			const fr = new FixtureRiveter();
 			let sequenceInFixture = new IntegerSequence("temp");
-			fr.fixture(name, DummyModel, (f: any) => {
+			fr.fixture(name, DummyModel, (f) => {
 				sequenceInFixture = f.sequence("email") as IntegerSequence;
 			});
-			const globalSeq: any = fr.sequence("usernames");
+			const globalSeq = fr.sequence("usernames") as IntegerSequence;
 			globalSeq.next();
 			globalSeq.next();
 			sequenceInFixture.next();

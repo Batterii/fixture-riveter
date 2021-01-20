@@ -1,4 +1,5 @@
-import {defineModel} from "../test-fixtures/define-helpers";
+import {Model as ObjectionModel} from "objection";
+import {createTable} from "../test-fixtures/define-helpers";
 import {FixtureRiveter} from "../../lib/fixture-riveter";
 import {ObjectionAdapter} from "../../lib/adapters/objection-adapter";
 
@@ -6,10 +7,15 @@ import {expect} from "chai";
 
 describe("transient attributes", function() {
 	let fr: FixtureRiveter;
-	let User: any;
+
+	class User extends ObjectionModel {
+		static tableName = "user";
+		name: string;
+		email: string;
+	}
 
 	before(async function() {
-		User = await defineModel("User", {
+		await createTable(User, {
 			name: "string",
 			email: "string",
 		});
@@ -20,13 +26,13 @@ describe("transient attributes", function() {
 		fr.sequence("name", (n: number) => `Noah ${n}`);
 
 		fr.fixture("user", User, (f) => {
-			f.transient((t: any) => {
+			f.transient((t) => {
 				t.attr("four", () => 2 + 2);
 				t.attr("rockstar", () => true);
 				t.attr("upcased", () => false);
 			});
 
-			f.attr("name", async(a: any) => {
+			f.attr("name", async(a) => {
 				let rockstar = "";
 				if (await a.attr("rockstar")) {
 					rockstar = " - Rockstar";
@@ -34,7 +40,7 @@ describe("transient attributes", function() {
 				return `${fr.generate("name")}${rockstar}`;
 			});
 
-			f.attr("email", async(a: any) => {
+			f.attr("email", async(a) => {
 				const name = await a.attr("name");
 				const four = await a.attr("four");
 				return `${name.toLowerCase()}${four}@example.com`;
@@ -100,20 +106,23 @@ describe("transient attributes", function() {
 
 describe("transient sequences", function() {
 	let fr: FixtureRiveter;
-	let User: any;
+	class User extends ObjectionModel {
+		static tableName = "user";
+		name: string;
+	}
 
 	before(async function() {
-		User = await defineModel("User", {name: "string"});
+		await createTable(User, {name: "string"});
 
 		fr = new FixtureRiveter();
 		fr.setAdapter(new ObjectionAdapter());
 
 		fr.fixture("user", User, (f) => {
-			f.transient((t: any) => {
+			f.transient((t) => {
 				t.sequence("counter");
 			});
 
-			f.attr("name", async(a: any) => `Noah ${await a.attr("counter")}`);
+			f.attr("name", async(a) => `Noah ${await a.attr("counter")}`);
 		});
 	});
 

@@ -1,5 +1,8 @@
-import {CreateStrategy} from "../../lib/strategies/create-strategy";
-import {defineModel} from "../test-fixtures/define-helpers";
+import {Model as ObjectionModel} from "objection";
+import {createTable} from "../test-fixtures/define-helpers";
+
+import {Assembler} from "../../lib/assembler";
+import {Strategy} from "../../lib/strategies/strategy";
 
 import {ObjectionAdapter} from "../../lib/adapters/objection-adapter";
 import {FixtureRiveter} from "../../lib/fixture-riveter";
@@ -7,8 +10,12 @@ import {FixtureRiveter} from "../../lib/fixture-riveter";
 import {expect} from "chai";
 
 /* eslint-disable class-methods-use-this */
-export class JsonStrategy extends CreateStrategy {
-	async result(assembler): Promise<any> {
+export class JsonStrategy extends Strategy {
+	async association(fixtureName: string, traitsAndOverrides: any[]): Promise<any> {
+		return this.fixtureRiveter.run(fixtureName, "create", traitsAndOverrides);
+	}
+
+	async result<T>(assembler: Assembler<T>): Promise<string> {
 		const instance = await assembler.toInstance();
 		return JSON.stringify(instance);
 	}
@@ -16,10 +23,15 @@ export class JsonStrategy extends CreateStrategy {
 
 describe("Custom strategies", function() {
 	let fr: FixtureRiveter;
-	let Post: any;
+
+	class Post extends ObjectionModel {
+		static tableName = "posts";
+		id: number;
+		title: string;
+	}
 
 	before(async function() {
-		Post = await defineModel("Post", {title: "string"});
+		await createTable(Post, {title: "string"});
 
 		fr = new FixtureRiveter();
 		fr.setAdapter(new ObjectionAdapter());

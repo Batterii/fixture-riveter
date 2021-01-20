@@ -34,7 +34,7 @@ describe("DefinitionProxy", function() {
 
 	describe("#execute", function() {
 		it("calls the definition's block", function() {
-			let result: any;
+			let result = 0;
 			const fixtureRiveter = new FixtureRiveter();
 			const fixture = new Fixture(fixtureRiveter, "dummy", DummyModel, function() {
 				result = 1;
@@ -46,7 +46,7 @@ describe("DefinitionProxy", function() {
 		});
 
 		it("doesn't call the definition's block when no block is given", function() {
-			let result: any;
+			const result = undefined;
 			const fixtureRiveter = new FixtureRiveter();
 			const fixture = new Fixture(fixtureRiveter, "dummy", DummyModel);
 			const proxy = new DefinitionProxy(fixture);

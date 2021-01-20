@@ -1,7 +1,7 @@
 import {Attribute} from "./attribute";
 import {Evaluator} from "../evaluator";
 
-export type AttributeBlock = (evaluator?: Evaluator) => any;
+export type AttributeBlock = (evaluator: Evaluator) => any;
 
 export class DynamicAttribute extends Attribute {
 	block: AttributeBlock;

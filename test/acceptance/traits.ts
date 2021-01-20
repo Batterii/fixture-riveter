@@ -1,14 +1,22 @@
+import {Model as ObjectionModel} from "objection";
 import {FixtureRiveter} from "../../lib/fixture-riveter";
 import {ObjectionAdapter} from "../../lib/adapters/objection-adapter";
-import {defineModel} from "../test-fixtures/define-helpers";
+import {createTable} from "../test-fixtures/define-helpers";
 import {expect} from "chai";
 
 describe("Traits", function() {
 	let fr: FixtureRiveter;
-	let User: any;
+
+	class User extends ObjectionModel {
+		static tableName = "user";
+		name: string;
+		age: number;
+		admin: boolean;
+		email: string;
+	}
 
 	before(async function() {
-		User = await defineModel("User", {
+		await createTable(User, {
 			name: "string",
 			age: "integer",
 			admin: "boolean",
@@ -18,18 +26,18 @@ describe("Traits", function() {
 		fr = new FixtureRiveter();
 		fr.setAdapter(new ObjectionAdapter());
 
-		fr.fixture("user", User, (f: any) => {
-			f.attr("name", () => "Noah");
-			f.attr("age", () => 32);
-			f.attr("admin", () => false);
-			f.sequence("email", (n: number) => `test${n}@foo.bar`);
+		fr.fixture("user", User, (f) => {
+			f.name(() => "Noah");
+			f.age(() => 32);
+			f.admin(() => false);
+			f.sequence("email", (n) => `test${n}@foo.bar`);
 
-			f.trait("old", (t: any) => {
-				t.attr("age", () => 100);
+			f.trait("old", (t) => {
+				t.age(() => 100);
 			});
 
-			f.trait("admin", (t: any) => {
-				t.attr("admin", () => true);
+			f.trait("admin", (t) => {
+				t.admin(() => true);
 			});
 		});
 	});
@@ -48,10 +56,20 @@ describe("Traits", function() {
 });
 
 describe("tests from fixture_bot", function() {
-	let User: any;
+	class User extends ObjectionModel {
+		static tableName = "users";
+		id: number;
+		name: string;
+		age: number;
+		admin: boolean;
+		gender: string;
+		email: string;
+		dateOfBirth: Date;
+		great: string;
+	}
 
 	before(async function() {
-		User = await defineModel("User", {
+		await createTable(User, {
 			name: "string",
 			age: "integer",
 			admin: "boolean",
@@ -68,68 +86,68 @@ describe("tests from fixture_bot", function() {
 		before(async function() {
 			fr = new FixtureRiveter();
 
-			fr.fixture("userWithoutAdminScoping", User, (f: any) => {
+			fr.fixture("userWithoutAdminScoping", User, (f) => {
 				f.attr("adminTrait");
 			});
 
-			fr.fixture("user", User, (f: any) => {
+			fr.fixture("user", User, (f) => {
 				f.attr("name", () => "John");
 
-				f.trait("great", (t: any) => {
+				f.trait("great", (t) => {
 					t.attr("great", () => "GREAT!!!");
 				});
 
-				f.trait("great", (t: any) => {
+				f.trait("great", (t) => {
 					t.attr("great", () => "EVEN GREATER!!!");
 				});
 
-				f.trait("admin", (t: any) => {
+				f.trait("admin", (t) => {
 					t.attr("admin", () => true);
 				});
 
-				f.trait("adminTrait", (t: any) => {
+				f.trait("adminTrait", (t) => {
 					t.attr("admin", () => true);
 				});
 
-				f.trait("male", (t: any) => {
+				f.trait("male", (t) => {
 					t.attr("name", () => "Joe");
 					t.attr("gender", () => "Male");
 				});
 
-				f.trait("female", (t: any) => {
+				f.trait("female", (t) => {
 					t.attr("name", () => "Jane");
 					t.attr("gender", () => "Female");
 				});
 
-				f.fixture("greatUser", User, (ff: any) => {
+				f.fixture("greatUser", User, (ff) => {
 					ff.attr("great");
 				});
 
-				f.fixture("evenGreaterUser", User, (ff: any) => {
+				f.fixture("evenGreaterUser", User, (ff) => {
 					ff.attr("great");
 
-					ff.trait("great", (t: any) => {
+					ff.trait("great", (t) => {
 						t.attr("great", () => "EVEN GREATER!!!");
 					});
 				});
 
 				f.fixture("admin", User, {traits: ["admin"]});
 
-				f.fixture("maleUser", User, (ff: any) => {
+				f.fixture("maleUser", User, (ff) => {
 					ff.attr("male");
 
-					ff.fixture("childMaleUser", User, (fff: any) => {
+					ff.fixture("childMaleUser", User, (fff) => {
 						fff.attr("dateOfBirth", () => new Date("1/1/2020"));
 					});
 				});
 
-				f.fixture("female", User, {traits: ["female"]}, (ff: any) => {
-					ff.trait("admin", (t: any) => {
+				f.fixture("female", User, {traits: ["female"]}, (ff) => {
+					ff.trait("admin", (t) => {
 						t.attr("admin", () => true);
 						t.attr("name", () => "Judy");
 					});
 
-					ff.fixture("femaleGreatUser", User, (fff: any) => {
+					ff.fixture("femaleGreatUser", User, (fff) => {
 						fff.attr("great");
 					});
 
@@ -141,11 +159,11 @@ describe("tests from fixture_bot", function() {
 				f.fixture("maleAfterFemaleAdmin", User, {traits: ["female", "male", "admin"]});
 			});
 
-			fr.trait("email", (t: any) => {
-				t.attr("email", async(e: any) => `${await e.attr("name")}@example.com`);
+			fr.trait("email", (t) => {
+				t.attr("email", async(e) => `${await e.attr("name")}@example.com`);
 			});
 
-			fr.fixture("userWithEmail", User, {traits: ["email"]}, (f: any) => {
+			fr.fixture("userWithEmail", User, {traits: ["email"]}, (f) => {
 				f.attr("name", () => "Bill");
 			});
 		});
@@ -278,11 +296,11 @@ describe("tests from fixture_bot", function() {
 	specify("traits and dynamic attributes that are applied simultaneously", async function() {
 		const fr = new FixtureRiveter();
 
-		fr.trait("email", (f: any) => {
+		fr.trait("email", (f) => {
 			f.attr("email", async(e) => `${await e.attr("name")}@example.com`);
 		});
 
-		fr.fixture("user", User, (f: any) => {
+		fr.fixture("user", User, (f) => {
 			f.attr("name", () => "John");
 			f.attr("email");
 			f.attr("combined", async(e) => {
@@ -297,11 +315,15 @@ describe("tests from fixture_bot", function() {
 	});
 
 	describe("inline traits overriding existing attributes", function() {
-		let Action: any;
 		let fr: FixtureRiveter;
+		class Action extends ObjectionModel {
+			static tableName = "users";
+			id: number;
+			status: string;
+		}
 
 		before(async function() {
-			Action = await defineModel("Action", {
+			await createTable(Action, {
 				status: "string",
 			});
 
@@ -374,9 +396,16 @@ describe("tests from fixture_bot", function() {
 
 	describe("making sure the fixture is compiled the first time we instantiate it", function() {
 		let fr: FixtureRiveter;
+		class User extends ObjectionModel {
+			static tableName = "users";
+			id: number;
+			role: string;
+			gender: string;
+			age: number;
+		}
 
 		before(async function() {
-			User = await defineModel("User", {
+			await createTable(User, {
 				role: "string",
 				gender: "string",
 				age: "integer",
@@ -384,7 +413,7 @@ describe("tests from fixture_bot", function() {
 
 			fr = new FixtureRiveter();
 
-			fr.fixture("user", User, (f: any) => {
+			fr.fixture("user", User, (f) => {
 				f.trait("female", (t) => t.attr("gender", () => "female"));
 				f.trait("admin", (t) => t.attr("role", () => "admin"));
 
@@ -415,24 +444,28 @@ describe("tests from fixture_bot", function() {
 
 describe("#968", function() {
 	let fr: FixtureRiveter;
-	let Demo: any;
+	class Demo extends ObjectionModel {
+		static tableName = "users";
+		id: number;
+		value: string;
+	}
 
 	beforeEach(async function() {
-		Demo = await defineModel("Demo", {value: "string"});
+		await createTable(Demo, {value: "string"});
 		fr = new FixtureRiveter();
 
-		fr.fixture("parent", Demo, (f: any) => {
-			f.trait("y", (t: any) => {
-				t.value(() => "parent value");
+		fr.fixture("parent", Demo, (f) => {
+			f.trait("y", (t) => {
+				t.attr("value", () => "parent value");
 			});
 
-			f.trait("z", (t: any) => {
-				t.y();
+			f.trait("z", (t) => {
+				t.attr("y");
 			});
 
-			f.fixture("child", Demo, (ff: any) => {
-				ff.trait("y", (t: any) => {
-					t.value(() => "child value");
+			f.fixture("child", Demo, (ff) => {
+				ff.trait("y", (t) => {
+					t.attr("value", () => "child value");
 				});
 			});
 		});

@@ -24,7 +24,7 @@ describe("Trait", function() {
 
 	it("executes the given block immediately", function() {
 		let result = false;
-		const trait = new Trait("trait", fixtureRiveter, (t: any) => {
+		const trait = new Trait("trait", fixtureRiveter, (t) => {
 			result = true;
 			t.definition.name = "traitor";
 		});

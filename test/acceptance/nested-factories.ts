@@ -1,21 +1,22 @@
+import {Model as ObjectionModel} from "objection";
 import {FixtureRiveter} from "../../lib/fixture-riveter";
 
 import {expect} from "chai";
-import {defineModel} from "../test-fixtures/define-helpers";
 
 describe("Nested factories", function() {
 	let fr: FixtureRiveter;
-	let User: any;
+
+	class User extends ObjectionModel {
+		static tableName = "users";
+		execute1: number;
+		execute2: number;
+		execute3: number;
+		execute4: number;
+		execute5: number;
+	}
 
 	beforeEach(async function() {
 		fr = new FixtureRiveter();
-		User = await defineModel("User", {
-			execute1: "integer",
-			execute2: "integer",
-			execute3: "integer",
-			execute4: "integer",
-			execute5: "integer",
-		});
 	});
 
 	it("applies attributes from parent attribute", async function() {
@@ -23,29 +24,29 @@ describe("Nested factories", function() {
 			"great-grand-parent",
 			User,
 			(f1) => {
-				f1.attr("execute1", () => 1);
-				f1.attr("execute2", () => 2);
+				f1.execute1(() => 1);
+				f1.execute2(() => 2);
 
 				f1.fixture(
 					"grand-parent",
 					User,
 					(f2) => {
-						f2.attr("execute2", () => 20);
-						f2.attr("execute3", () => 3);
+						f2.execute2(() => 20);
+						f2.execute3(() => 3);
 
 						f2.fixture(
 							"parent",
 							User,
 							(f3) => {
-								f3.attr("execute3", () => 30);
-								f3.attr("execute4", () => 4);
+								f3.execute3(() => 30);
+								f3.execute4(() => 4);
 
 								f3.fixture(
 									"child",
 									User,
 									(f4) => {
-										f4.attr("execute4", () => 40);
-										f4.attr("execute5", () => 5);
+										f4.execute4(() => 40);
+										f4.execute5(() => 5);
 									},
 								);
 							},

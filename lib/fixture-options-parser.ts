@@ -12,7 +12,7 @@ export interface FixtureOptions {
 
 type ConvertToFn<T, FN = () => any> = {
 	[P in keyof T]-?: <Q = undefined>(
-		fn: FN,
+		fn?: FN,
 		overrides?: Partial<Q extends undefined ? T extends Instance ? T : Instance : Q>,
 	) => Promise<T[P]>;
 };
@@ -22,9 +22,11 @@ type EvaluatorFn<T> =
 	string[] |
 	Partial<T extends Instance ? T : Instance>;
 
-export type AttrFunction<T> = (f: ConvertToFn<T, EvaluatorFn<T>> & Evaluator) => Promise<any> | any;
+export type AttrFunction<T> =
+	(f: ConvertToFn<T, EvaluatorFn<T>> & Evaluator) => Promise<any> | any;
 
-export type BlockFunction<T> = (f: ConvertToFn<T, EvaluatorFn<T>> & DefinitionProxy<T>) => void;
+export type BlockFunction<T> =
+	(f: ConvertToFn<T, EvaluatorFn<T>> & DefinitionProxy<T>) => Promise<any> | any;
 
 export type FixtureArgs<T> = FixtureOptions | BlockFunction<T>;
 

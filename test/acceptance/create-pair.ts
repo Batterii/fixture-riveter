@@ -1,5 +1,5 @@
-import {defineModel} from "../test-fixtures/define-helpers";
-
+import {Model as ObjectionModel} from "objection";
+import {createTable} from "../test-fixtures/define-helpers";
 import {ObjectionAdapter} from "../../lib/adapters/objection-adapter";
 import {FixtureRiveter} from "../../lib/fixture-riveter";
 
@@ -7,10 +7,15 @@ import {expect} from "chai";
 
 describe("createPair", function() {
 	let fr: FixtureRiveter;
-	let Post: any;
+
+	class Post extends ObjectionModel {
+		static tableName = "posts";
+		title: string;
+		author: string;
+	}
 
 	before(async function() {
-		Post = await defineModel("Post", {title: "string", author: "string"});
+		await createTable(Post, {title: "string", author: "string"});
 
 		fr = new FixtureRiveter();
 		fr.setAdapter(new ObjectionAdapter());

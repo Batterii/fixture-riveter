@@ -188,7 +188,7 @@ describe("Complex associations", function() {
 						});
 					});
 				});
-				fr.fixture("post", Post, (f: any) => {
+				fr.fixture("post", Post, (f) => {
 					f.attr("title", () => "The City & The City");
 					f.attr("user");
 				});

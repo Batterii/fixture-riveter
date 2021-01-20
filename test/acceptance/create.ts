@@ -1,5 +1,5 @@
 import {Model as ObjectionModel} from "objection";
-import {createTable, defineModel} from "../test-fixtures/define-helpers";
+import {createTable} from "../test-fixtures/define-helpers";
 import {ObjectionAdapter} from "../../lib/adapters/objection-adapter";
 import {FixtureRiveter} from "../../lib/fixture-riveter";
 
@@ -7,10 +7,17 @@ import {expect} from "chai";
 
 describe("#create", function() {
 	let fr: FixtureRiveter;
-	let User: any;
+
+	class User extends ObjectionModel {
+		static tableName = "users";
+		id: number;
+		name: string;
+		age: number;
+		email: string;
+	}
 
 	before(async function() {
-		User = await defineModel("User", {
+		await createTable(User, {
 			name: "string",
 			age: "integer",
 			email: "string",
