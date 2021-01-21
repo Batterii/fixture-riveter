@@ -3,9 +3,6 @@ import {AdapterHandler, FixtureNames} from "./adapter-handler";
 import {DefinitionProxy} from "./definition-proxy";
 import {Fixture} from "./fixture";
 import {
-	BlockFunction,
-	FixtureArgs,
-	FixtureOptions,
 	fixtureOptionsParser,
 } from "./fixture-options-parser";
 import {
@@ -15,11 +12,20 @@ import {
 import {SequenceHandler} from "./sequence-handler";
 import {Trait} from "./trait";
 import {
-	callbackFunction,
+	CallbackFunction,
 	Callback,
 } from "./callback";
 import {CallbackHandler} from "./callback-handler";
 import {StrategyHandler} from "./strategy-handler";
+
+import {
+	Pojo,
+	ModelConstructor,
+	BlockFunction,
+	FixtureRestArgs,
+	FixtureOptions,
+	Overrides,
+} from "./types";
 
 import {
 	isPlainObject,
@@ -28,7 +34,7 @@ import {
 	cloneDeep,
 } from "lodash";
 
-export function extractAttributes(traitsAndOptions: any[]): Record<string, any> {
+export function extractOverrides(traitsAndOptions: any[]): Record<string, any> {
 	const options = last(traitsAndOptions);
 	if (isPlainObject(options)) {
 		return traitsAndOptions.pop();
@@ -78,7 +84,7 @@ export class FixtureRiveter {
 		return this.adapterHandler.setAdapter(adapter, fixtureNames);
 	}
 
-	getFixture(name: string, throws = true): Fixture<any> {
+	getFixture<T = any>(name: string, throws = true): Fixture<T> {
 		const fixture = this.fixtures[name];
 		if (throws && !fixture) {
 			throw new Error(`${name} hasn't been defined yet`);
@@ -102,7 +108,7 @@ export class FixtureRiveter {
 	fixture<T>(
 		name: FixtureName,
 		model: ModelConstructor<T>,
-		rest?: FixtureArgs<T>,
+		rest?: FixtureRestArgs<T>,
 	): Fixture<T>;
 
 	fixture<T>(fixtureName: FixtureName, model: ModelConstructor<T>, ...rest: any[]): Fixture<T> {
@@ -174,13 +180,13 @@ export class FixtureRiveter {
 		}
 	}
 
-	async run<T = Instance>(
+	async run<T = Pojo>(
 		fixtureName: FixtureName,
 		strategy: string,
 		traits: any[],
 	): Promise<T> {
 		const name = nameGuard(fixtureName);
-		const overrides = extractAttributes(traits);
+		const overrides = extractOverrides(traits);
 		let fixture = this.getFixture(name);
 
 		fixture.compile();
@@ -198,12 +204,12 @@ export class FixtureRiveter {
 		return instance;
 	}
 
-	async runList<T = Instance>(
+	async runList<T = Pojo>(
 		name: FixtureName,
 		strategy: string,
 		count: number,
 		traits: any[],
-	): Promise<List<T>> {
+	): Promise<T[]> {
 		const instances: T[] = [];
 		for (let idx = 0; idx < count; idx += 1) {
 			// eslint-disable-next-line no-await-in-loop
@@ -217,21 +223,21 @@ export class FixtureRiveter {
 		this.strategyHandler.registerStrategy(strategyName, strategyClass);
 	}
 
-	before<T>(name: string, block?: callbackFunction<T>): void;
-	before<T>(name: string, name2: string, block: callbackFunction<T>): void;
-	before<T>(name: string, name2: string, name3: string, block: callbackFunction<T>): void;
+	before<T>(name: string, block?: CallbackFunction<T>): void;
+	before<T>(name: string, name2: string, block?: CallbackFunction<T>): void;
+	before<T>(name: string, name2: string, name3: string, block?: CallbackFunction<T>): void;
 	before(...rest: any[]): void {
 		this.callbackHandler.before(...rest);
 	}
 
-	after<T>(name: string, block?: callbackFunction<T>): void;
-	after<T>(name: string, name2: string, block: callbackFunction<T>): void;
-	after<T>(name: string, name2: string, name3: string, block: callbackFunction<T>): void;
+	after<T>(name: string, block?: CallbackFunction<T>): void;
+	after<T>(name: string, name2: string, block?: CallbackFunction<T>): void;
+	after<T>(name: string, name2: string, name3: string, block?: CallbackFunction<T>): void;
 	after(...rest: any[]): void {
 		this.callbackHandler.after(...rest);
 	}
 
-	addCallback<T>(names: string[], block: callbackFunction<T>): void {
+	addCallback<T>(names: string[], block: CallbackFunction<T>): void {
 		this.callbackHandler.addCallback(names, block);
 	}
 
@@ -240,12 +246,11 @@ export class FixtureRiveter {
 	}
 
 	async cleanUp(): Promise<void> {
-		for (const [name, instance] of this.instances) {
+		await Promise.all(this.instances.map(([name, instance]) => {
 			const fixture = this.getFixture(name);
 			const adapter = this.getAdapter(name);
-			// eslint-disable-next-line no-await-in-loop
-			await adapter.destroy(instance, fixture.model);
-		}
+			return adapter.destroy(instance, fixture.model);
+		}));
 		this.instances = [];
 	}
 
@@ -253,156 +258,128 @@ export class FixtureRiveter {
 
 	// Typescript sucks for dynamically defined methods lol
 	// All of these will be overwritten on instantiation
-	async attributesFor<T = Instance>(
+	async attributesFor<T = Pojo>(
 		name: FixtureName,
 		traits?: string[],
-		overrides?: Override<T>,
+		overrides?: Overrides<T>,
 	): Promise<T>;
 
-	async attributesFor<T = Instance>(
+	async attributesFor<T = Pojo>(
 		name: FixtureName,
-		traits?: string[]|Override<T>,
+		traitOrOverrides?: string[]|Overrides<T>,
 	): Promise<T>;
 
-	async attributesFor<T>(..._args: any[]): Promise<T> {
-		return undefined as any;
-	}
+	async attributesFor<T>(..._args: any[]): Promise<T> { return undefined as any; }
 
-	async attributesForList<T = Instance>(
+	async attributesForList<T = Pojo>(
 		name: FixtureName,
 		count: number,
 		traits?: string[],
-		overrides?: Override<T>,
-	): Promise<List<T>>;
+		overrides?: Overrides<T>,
+	): Promise<T[]>;
 
-	async attributesForList<T = Instance>(
+	async attributesForList<T = Pojo>(
 		name: FixtureName,
 		count: number,
-		traits?: string[]|Override<T>,
-	): Promise<List<T>>;
+		traitOrOverrides?: string[]|Overrides<T>,
+	): Promise<T[]>;
 
-	async attributesForList<T>(..._args: any[]): Promise<List<T>> {
-		return undefined as any;
-	}
+	async attributesForList<T>(..._args: any[]): Promise<T[]> { return undefined as any; }
 
-	async attributesForPair<T = Instance>(
+	async attributesForPair<T = Pojo>(
 		name: FixtureName,
 		traits?: string[],
-		overrides?: Override<T>,
-	): Promise<Pair<T>>;
+		overrides?: Overrides<T>,
+	): Promise<[T, T]>;
 
-	async attributesForPair<T = Instance>(
+	async attributesForPair<T = Pojo>(
 		name: FixtureName,
-		traits?: string[]|Override<T>,
-	): Promise<Pair<T>>;
+		traitOrOverrides?: string[]|Overrides<T>,
+	): Promise<[T, T]>;
 
-	async attributesForPair<T>(..._args: any[]): Promise<Pair<T>> {
-		return undefined as any;
-	}
+	async attributesForPair<T>(..._args: any[]): Promise<[T, T]> { return undefined as any; }
 
-	async build<T = Instance>(
+	async build<T = Pojo>(
 		name: FixtureName,
-		traits?: string[]|Override<T>,
+		traitOrOverrides?: string[]|Overrides<T>,
 	): Promise<T>;
 
-	async build<T = Instance>(
+	async build<T = Pojo>(
 		name: FixtureName,
 		traits?: string[],
-		overrides?: Override<T>,
+		overrides?: Overrides<T>,
 	): Promise<T>;
 
-	async build<T = Instance>(..._args: any[]): Promise<T> {
-		return undefined as any;
-	}
+	async build<T = Pojo>(..._args: any[]): Promise<T> { return undefined as any; }
 
-	async buildList<T = Instance>(
+	async buildList<T = Pojo>(
 		name: FixtureName,
 		count: number,
 		traits?: string[],
-		overrides?: Override<T>,
-	): Promise<List<T>>;
+		overrides?: Overrides<T>,
+	): Promise<T[]>;
 
-	async buildList<T = Instance>(
+	async buildList<T = Pojo>(
 		name: FixtureName,
 		count: number,
-		traits?: string[]|Override<T>,
-	): Promise<List<T>>;
+		traitOrOverrides?: string[]|Overrides<T>,
+	): Promise<T[]>;
 
-	async buildList<T = Instance>(..._args: any[]): Promise<List<T>> {
-		return undefined as any;
-	}
+	async buildList<T = Pojo>(..._args: any[]): Promise<T[]> { return undefined as any; }
 
-	async buildPair<T = Instance>(
+	async buildPair<T = Pojo>(
 		name: FixtureName,
 		traits?: string[],
-		overrides?: Override<T>,
-	): Promise<Pair<T>>;
+		overrides?: Overrides<T>,
+	): Promise<[T, T]>;
 
-	async buildPair<T = Instance>(
+	async buildPair<T = Pojo>(
 		name: FixtureName,
-		traits?: string[]|Override<T>,
-	): Promise<Pair<T>>;
+		traitOrOverrides?: string[]|Overrides<T>,
+	): Promise<[T, T]>;
 
-	async buildPair<T = Instance>(..._args: any[]): Promise<Pair<T>> {
-		return undefined as any;
-	}
+	async buildPair<T = Pojo>(..._args: any[]): Promise<[T, T]> { return undefined as any; }
 
-	async create<T = Instance>(
+	async create<T = Pojo>(
 		name: FixtureName,
 		traits?: string[],
-		overrides?: Override<T>,
+		overrides?: Overrides<T>,
 	): Promise<T>;
 
-	async create<T = Instance>(
+	async create<T = Pojo>(
 		name: FixtureName,
-		traits?: string[]|Override<T>,
+		traitOrOverrides?: string[]|Overrides<T>,
 	): Promise<T>;
 
-	async create<T = Instance>(..._args: any[]): Promise<T> {
-		return undefined as any;
-	}
+	async create<T = Pojo>(..._args: any[]): Promise<T> { return undefined as any; }
 
-	async createList<T = Instance>(
+	async createList<T = Pojo>(
 		name: FixtureName,
 		count: number,
 		traits?: string[],
-		overrides?: Override<T>,
-	): Promise<List<T>>;
+		overrides?: Overrides<T>,
+	): Promise<T[]>;
 
-	async createList<T = Instance>(
+	async createList<T = Pojo>(
 		name: FixtureName,
 		count: number,
-		traits?: string[]|Override<T>,
-	): Promise<List<T>>;
+		traitOrOverrides?: string[]|Overrides<T>,
+	): Promise<T[]>;
 
-	async createList<T = Instance>(..._args: any[]): Promise<List<T>> {
-		return undefined as any;
-	}
+	async createList<T = Pojo>(..._args: any[]): Promise<T[]> { return undefined as any; }
 
-	async createPair<T = Instance>(
+	async createPair<T = Pojo>(
 		name: FixtureName,
 		traits?: string[],
-		overrides?: Override<T>,
-	): Promise<Pair<T>>;
+		overrides?: Overrides<T>,
+	): Promise<[T, T]>;
 
-	async createPair<T = Instance>(
+	async createPair<T = Pojo>(
 		name: FixtureName,
-		traits?: string[]|Override<T>,
-	): Promise<Pair<T>>;
+		traitOrOverrides?: string[]|Overrides<T>,
+	): Promise<[T, T]>;
 
-	async createPair<T = Instance>(..._args: any[]): Promise<Pair<T>> {
-		return undefined as any;
-	}
+	async createPair<T = Pojo>(..._args: any[]): Promise<[T, T]> { return undefined as any; }
 	/* eslint-enable */
 }
 
-export type Instance = Record<string, any>;
-
-type Pair<T> = [T, T];
-type List<T> = T[];
-
-type Override<T> = Partial<T extends Instance ? T : Instance>;
-
-export interface ModelConstructor<T> {
-	new(): T;
-}

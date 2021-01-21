@@ -1,5 +1,5 @@
 import {
-	callbackFunction,
+	CallbackFunction,
 	Callback,
 } from "./callback";
 import {FixtureRiveter} from "./fixture-riveter";
@@ -15,7 +15,7 @@ export class CallbackHandler {
 		this.fixtureRiveter = fixtureRiveter;
 	}
 
-	addCallback<T>(names: string[], block: callbackFunction<T>): void {
+	addCallback<T>(names: string[], block: CallbackFunction<T>): void {
 		for (const name of names) {
 			this.callbacks.push(new Callback(this.fixtureRiveter, name, block));
 		}

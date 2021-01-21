@@ -159,6 +159,14 @@ describe("All of the code from the guide", function() {
 					t.attr("cool", () => false);
 				});
 
+				// f.name(async(user) => {
+				// 	let cool = "";
+				// 	if (await user.attr("cool")) cool = '"The Coolest Dude"';
+				// 	return `Noah ${cool} Bogart`;
+				// });
+
+				// f.attr("survey", ["fuck"], {name: "Hello"});
+
 				f.attr("name", async(user) => {
 					let cool = "";
 					if (await user.attr("cool")) cool = '"The Coolest Dude"';

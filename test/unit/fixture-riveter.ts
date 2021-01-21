@@ -2,7 +2,7 @@ import {DummyModel} from "../test-fixtures/dummy-model";
 
 import {DefaultAdapter} from "../../lib/adapters/default-adapter";
 import {Fixture} from "../../lib/fixture";
-import {extractAttributes, FixtureRiveter} from "../../lib/fixture-riveter";
+import {extractOverrides, FixtureRiveter} from "../../lib/fixture-riveter";
 import {Sequence} from "../../lib/sequences/sequence";
 import {IntegerSequence} from "../../lib/sequences/integer-sequence";
 
@@ -13,14 +13,14 @@ import sinon from "sinon";
 describe("extractAttributes", function() {
 	it("returns an empty object", function() {
 		const array = [1, 2, 3];
-		const result = extractAttributes(array);
+		const result = extractOverrides(array);
 		expect(array).to.deep.equal([1, 2, 3]);
 		expect(result).to.deep.equal({});
 	});
 
 	it("returns the array at the end", function() {
 		const array = [1, 2, 3, {parent: "parent"}];
-		const result = extractAttributes(array);
+		const result = extractOverrides(array);
 		expect(array).to.deep.equal([1, 2, 3]);
 		expect(result).to.deep.equal({parent: "parent"});
 	});

@@ -1,7 +1,8 @@
 import {Attribute} from "./attributes/attribute";
 import {Callback} from "./callback";
 import {Definition} from "./definition";
-import {FixtureRiveter, ModelConstructor} from "./fixture-riveter";
+import {FixtureRiveter} from "./fixture-riveter";
+import {ModelConstructor} from "./types";
 
 /* eslint-disable class-methods-use-this */
 /* eslint-disable @typescript-eslint/no-empty-function */

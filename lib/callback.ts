@@ -1,14 +1,14 @@
 import {Evaluator} from "./evaluator";
 import {FixtureRiveter} from "./fixture-riveter";
 
-export type callbackFunction<T> = (instance: T, evaluator: T & Evaluator) => any;
+export type CallbackFunction<T> = (instance: T, evaluator: T & Evaluator) => any;
 
 export class Callback<T> {
 	fixtureRiveter: FixtureRiveter;
 	name: string;
-	block: callbackFunction<T>;
+	block: CallbackFunction<T>;
 
-	constructor(fixtureRiveter: FixtureRiveter, name: string, block: callbackFunction<T>) {
+	constructor(fixtureRiveter: FixtureRiveter, name: string, block: CallbackFunction<T>) {
 		this.fixtureRiveter = fixtureRiveter;
 		this.name = name;
 		this.block = block;

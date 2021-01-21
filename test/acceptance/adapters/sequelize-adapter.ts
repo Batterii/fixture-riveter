@@ -82,14 +82,14 @@ describe("Sequelize functionality", function() {
 				fr = new FixtureRiveter();
 				fr.setAdapter(new SequelizeAdapter());
 
-				fr.fixture("user", User, (f: any) => {
+				fr.fixture("user", User, (f) => {
 					f.attr("name", () => "Noah");
-					f.fixture("userWithPosts", User, (ff: any) => {
+					f.fixture("userWithPosts", User, (ff) => {
 						ff.transient((t) => {
 							t.attr("postCount", () => 5);
 						});
 
-						ff.after("create", async(user, evaluator) => {
+						ff.after("create", async(user: any, evaluator) => {
 							const posts = await fr.createList(
 								"post",
 								await evaluator.attr("postCount"),

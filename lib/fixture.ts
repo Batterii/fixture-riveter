@@ -4,19 +4,21 @@ import {Attribute} from "./attributes/attribute";
 import {AttributeAssigner} from "./attribute-assigner";
 import {Definition} from "./definition";
 import {Evaluator} from "./evaluator";
-import {FixtureRiveter, ModelConstructor} from "./fixture-riveter";
+import {FixtureRiveter} from "./fixture-riveter";
 import {NullFixture} from "./null-fixture";
-import {
-	BlockFunction,
-	FixtureArgs,
-	FixtureOptions,
-	fixtureOptionsParser,
-} from "./fixture-options-parser";
+import {fixtureOptionsParser} from "./fixture-options-parser";
 import {Strategy} from "./strategies/strategy";
 import {Trait} from "./trait";
 
 import {isFunction} from "lodash";
 import {Callback} from "./callback";
+
+import {
+	BlockFunction,
+	FixtureRestArgs,
+	FixtureOptions,
+	ModelConstructor,
+} from "./types";
 
 export interface ExtraAttributes {
 	traits?: string[];
@@ -40,7 +42,7 @@ export class Fixture<T> extends Definition<T> {
 		fixtureRiveter: FixtureRiveter,
 		name: string,
 		model: ModelConstructor<T>,
-		rest?: FixtureArgs<T>,
+		rest?: FixtureRestArgs<T>,
 	);
 
 	constructor(

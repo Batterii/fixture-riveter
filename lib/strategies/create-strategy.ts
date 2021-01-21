@@ -1,6 +1,6 @@
 import {Assembler} from "../assembler";
-import {ModelConstructor} from "../fixture-riveter";
 import {Strategy} from "./strategy";
+import {ModelConstructor} from "../types";
 
 /* eslint-disable class-methods-use-this */
 export class CreateStrategy extends Strategy {

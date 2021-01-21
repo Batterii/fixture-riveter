@@ -1,4 +1,5 @@
-import {fixtureOptionsParser, FixtureOptions} from "../../lib/fixture-options-parser";
+import {fixtureOptionsParser} from "../../lib/fixture-options-parser";
+import {FixtureOptions} from "../../lib/types";
 
 import {expect} from "chai";
 

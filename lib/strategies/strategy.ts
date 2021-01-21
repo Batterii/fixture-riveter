@@ -1,6 +1,7 @@
 import {Adapter} from "../adapters/adapter";
 import {Assembler} from "../assembler";
-import {FixtureRiveter, ModelConstructor} from "../fixture-riveter";
+import {FixtureRiveter} from "../fixture-riveter";
+import {ModelConstructor} from "../types";
 
 export abstract class Strategy {
 	adapter: Adapter;

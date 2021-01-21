@@ -1,10 +1,11 @@
 import {Attribute} from "./attributes/attribute";
 import {
-	extractAttributes,
+	extractOverrides,
 	FixtureRiveter,
 } from "./fixture-riveter";
 import {Strategy} from "./strategies/strategy";
 import {omit} from "lodash";
+import {Pojo} from "./types";
 
 export class Evaluator {
 	attributeFns: Record<string, (e: Evaluator) => any>;
@@ -51,19 +52,31 @@ export class Evaluator {
 		return this.cachedValues[name];
 	}
 
-	async association(
-		fixtureName: string,
-		...traitsAndOverrides: any[]
-	): Promise<Record<string, any>> {
-		const overrides = extractAttributes(traitsAndOverrides);
+	association<R = any>(
+		name: string,
+		traits: string[],
+		overrides?: Partial<R extends any ? Pojo : R & {strategy: string}>,
+	): Promise<R extends any ? Pojo : R>;
 
-		let strategyName: string;
+	association<R = any>(
+		name: string,
+		traitOrOverrides?: (
+			| string[]
+			| Partial<R extends any ? Pojo : R & {strategy: string}>
+		),
+	): Promise<R extends any ? Pojo : R>;
+
+	async association<R = any>(
+		fixtureName: string,
+		...traitOrOverrides: any[]
+	): Promise<R extends any ? Pojo : R> {
+		const overrides = extractOverrides(traitOrOverrides);
+
+		let strategyName = "create";
 		if (overrides.strategy) {
 			strategyName = overrides.strategy;
 		} else if (this.fixtureRiveter.useParentStrategy) {
 			strategyName = this.buildStrategy.name;
-		} else {
-			strategyName = "create";
 		}
 
 		const StrategyRiveter = this.fixtureRiveter.strategyHandler.getStrategy(strategyName);
@@ -73,8 +86,8 @@ export class Evaluator {
 			this.buildStrategy.adapter,
 		);
 
-		traitsAndOverrides.push(omit(overrides, "strategy"));
+		traitOrOverrides.push(omit(overrides, "strategy"));
 
-		return strategyOverride.association(fixtureName, traitsAndOverrides);
+		return strategyOverride.association(fixtureName, traitOrOverrides);
 	}
 }

@@ -7,12 +7,14 @@ import {Trait} from "./trait";
 import {Definition} from "./definition";
 import {Fixture} from "./fixture";
 import {
-	AttrFunction,
+	EvaluatorFunction,
 	BlockFunction,
-	FixtureArgs,
+	FixtureRestArgs,
 	FixtureOptions,
-} from "./fixture-options-parser";
-import {callbackFunction} from "./callback";
+	ModelConstructor,
+	OverrideForRelation,
+} from "./types";
+import {CallbackFunction} from "./callback";
 import {FixtureRiveter, FixtureName, nameGuard} from "./fixture-riveter";
 import {
 	Sequence,
@@ -52,7 +54,18 @@ export class DefinitionProxy<T> {
 		this.attr(name, ...rest);
 	}
 
-	attr(name: string, rest?: FixtureOptions | AttrFunction<T>): void;
+	attr(name: string, fn: EvaluatorFunction<T>): void;
+
+	attr<R = undefined>(
+		name: string,
+		traits: string[],
+		overrides?: OverrideForRelation<T, R>,
+	): void;
+
+	attr<R = undefined>(
+		name: string,
+		traitOrOverrides?: string[] | OverrideForRelation<T, R>,
+	): void;
 
 	attr(name: string, ...rest: any[]): void {
 		let declaration: Declaration;
@@ -85,13 +98,24 @@ export class DefinitionProxy<T> {
 	fixture(
 		name: FixtureName,
 		model: ModelConstructor<T>,
-		rest?: FixtureArgs<T>,
+		rest?: FixtureRestArgs<T>,
 	): void;
 
 	fixture(fixtureName: FixtureName, model: ModelConstructor<T>, ...rest: any[]): void {
 		const name = nameGuard(fixtureName);
 		this.childFixtures.push([name, model, ...rest]);
 	}
+
+	association<R = undefined>(
+		name: string,
+		traits: string[],
+		overrides?: OverrideForRelation<T, R> & {strategy?: string},
+	): void;
+
+	association<R = undefined>(
+		name: string,
+		traitOrOverrides?: string[] | (OverrideForRelation<T, R> & {strategy?: string}),
+	): void;
 
 	association(name: string, ...rest: any[]): void {
 		const association = new AssociationDeclaration(name, rest);
@@ -119,21 +143,17 @@ export class DefinitionProxy<T> {
 		block(addMethodMissing(proxy));
 	}
 
-	before(name: string, block: callbackFunction<T>): void;
-	before(name: string, name2: string, block: callbackFunction<T>): void;
-	before(name: string, name2: string, name3: string, block: callbackFunction<T>): void;
+	before(name: string, block: CallbackFunction<T>): void;
+	before(name: string, name2: string, block: CallbackFunction<T>): void;
+	before(name: string, name2: string, name3: string, block: CallbackFunction<T>): void;
 	before(...rest: any[]): void {
 		this.definition.before(...rest);
 	}
 
-	after(name: string, block: callbackFunction<T>): void;
-	after(name: string, name2: string, block: callbackFunction<T>): void;
-	after(name: string, name2: string, name3: string, block: callbackFunction<T>): void;
+	after(name: string, block: CallbackFunction<T>): void;
+	after(name: string, name2: string, block: CallbackFunction<T>): void;
+	after(name: string, name2: string, name3: string, block: CallbackFunction<T>): void;
 	after(...rest: any[]): void {
 		this.definition.after(...rest);
 	}
-}
-
-interface ModelConstructor<T> {
-	new(): T
 }

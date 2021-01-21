@@ -1,6 +1,7 @@
 import {Attribute} from "./attributes/attribute";
 import {Evaluator} from "./evaluator";
-import {FixtureRiveter, ModelConstructor} from "./fixture-riveter";
+import {FixtureRiveter} from "./fixture-riveter";
+import {ModelConstructor} from "./types";
 
 export class AttributeAssigner<T> {
 	fixtureRiveter: FixtureRiveter;

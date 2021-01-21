@@ -1,15 +1,15 @@
 import {Attribute} from "./attributes/attribute";
 import {
 	Callback,
-	callbackFunction,
+	CallbackFunction,
 } from "./callback";
 import {CallbackHandler} from "./callback-handler";
 import {Declaration} from "./declarations/declaration";
 import {DeclarationHandler} from "./declaration-handler";
-import {BlockFunction} from "./fixture-options-parser";
 import {Trait} from "./trait";
 import {FixtureRiveter} from "./fixture-riveter";
 import {SequenceHandler} from "./sequence-handler";
+import {BlockFunction} from "./types";
 
 export class Definition<T> {
 	fixtureRiveter: FixtureRiveter;
@@ -118,7 +118,7 @@ export class Definition<T> {
 		this.callbackHandler.after(...rest);
 	}
 
-	addCallback(names: string[], block: callbackFunction<T>): void {
+	addCallback(names: string[], block: CallbackFunction<T>): void {
 		this.callbackHandler.addCallback(names, block);
 	}
 

@@ -3,7 +3,7 @@ import {Definition} from "./definition";
 import {DefinitionProxy} from "./definition-proxy";
 import {Fixture} from "./fixture";
 import {FixtureRiveter} from "./fixture-riveter";
-import {BlockFunction} from "./fixture-options-parser";
+import {BlockFunction} from "./types";
 
 /* eslint-disable class-methods-use-this */
 export class Trait<T> extends Definition<T> {

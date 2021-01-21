@@ -1,6 +1,6 @@
 import {Declaration} from "./declaration";
 import {AssociationAttribute} from "../attributes/association-attribute";
-import {extractAttributes} from "../fixture-riveter";
+import {extractOverrides} from "../fixture-riveter";
 
 import {omit} from "lodash";
 
@@ -10,7 +10,7 @@ export class AssociationDeclaration extends Declaration {
 
 	constructor(name: string, traitsAndOptions: any[]) {
 		super(name);
-		this.overrides = extractAttributes(traitsAndOptions);
+		this.overrides = extractOverrides(traitsAndOptions);
 		this.traits = traitsAndOptions;
 	}
 
