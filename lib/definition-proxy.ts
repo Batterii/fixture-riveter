@@ -13,7 +13,7 @@ import {
 	FixtureOptions,
 } from "./fixture-options-parser";
 import {callbackFunction} from "./callback";
-import {FixtureRiveter} from "./fixture-riveter";
+import {FixtureRiveter, FixtureName, nameGuard} from "./fixture-riveter";
 import {
 	Sequence,
 	SequenceCallback,
@@ -76,19 +76,20 @@ export class DefinitionProxy<T> {
 	}
 
 	fixture(
-		name: string,
+		name: FixtureName,
 		model: ModelConstructor<T>,
 		options: FixtureOptions,
 		block?: BlockFunction<T>,
 	): void;
 
 	fixture(
-		name: string,
+		name: FixtureName,
 		model: ModelConstructor<T>,
 		rest?: FixtureArgs<T>,
 	): void;
 
-	fixture(name: string, model: ModelConstructor<T>, ...rest: any[]): void {
+	fixture(fixtureName: FixtureName, model: ModelConstructor<T>, ...rest: any[]): void {
+		const name = nameGuard(fixtureName);
 		this.childFixtures.push([name, model, ...rest]);
 	}
 

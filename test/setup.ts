@@ -1,5 +1,5 @@
 import Knex from "knex";
-import {CleanOptions, clean} from "knex-cleaner";
+import {KnexCleanerOptions, clean} from "knex-cleaner";
 import {Model} from "objection";
 import chai from "chai";
 import sinon from "sinon";
@@ -14,7 +14,7 @@ chai.use(sinonChai);
 const knex = Knex(config); // eslint-disable-line new-cap
 Model.knex(knex);
 
-const options: CleanOptions = {
+const options: KnexCleanerOptions = {
 	mode: "truncate",
 	ignoreTables: ["knex_migrations", "knex_migrations_lock"],
 };
@@ -26,6 +26,6 @@ afterEach(function() {
 
 
 after(async function() {
-	await clean(knex, options);
+	await clean(knex as any, options);
 	await knex.destroy();
 });

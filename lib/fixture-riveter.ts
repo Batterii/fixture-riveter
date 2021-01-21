@@ -23,6 +23,7 @@ import {StrategyHandler} from "./strategy-handler";
 
 import {
 	isPlainObject,
+	isString,
 	last,
 	cloneDeep,
 } from "lodash";
@@ -33,6 +34,17 @@ export function extractAttributes(traitsAndOptions: any[]): Record<string, any> 
 		return traitsAndOptions.pop();
 	}
 	return {};
+}
+
+export type FixtureName = string | {tableName: string};
+export function nameGuard(fixtureName: FixtureName): string {
+	if (isString(fixtureName)) {
+		return fixtureName;
+	}
+	if (fixtureName.tableName) {
+		return fixtureName.tableName;
+	}
+	throw new Error(`${fixtureName} isn't the right shape`);
 }
 
 export class FixtureRiveter {
@@ -81,22 +93,24 @@ export class FixtureRiveter {
 	}
 
 	fixture<T>(
-		name: string,
+		name: FixtureName,
 		model: ModelConstructor<T>,
 		options: FixtureOptions,
 		block?: BlockFunction<T>,
 	): Fixture<T>;
 
 	fixture<T>(
-		name: string,
+		name: FixtureName,
 		model: ModelConstructor<T>,
 		rest?: FixtureArgs<T>,
 	): Fixture<T>;
 
-	fixture<T>(name: string, model: ModelConstructor<T>, ...rest: any[]): Fixture<T> {
+	fixture<T>(fixtureName: FixtureName, model: ModelConstructor<T>, ...rest: any[]): Fixture<T> {
+		const name = nameGuard(fixtureName);
 		if (this.getFixture(name, false)) {
 			throw new Error(`${name} is already defined`);
 		}
+
 		const fixture = new Fixture(this, name, model, ...rest);
 		const proxy = new DefinitionProxy<T>(fixture);
 
@@ -127,12 +141,12 @@ export class FixtureRiveter {
 	}
 
 	sequence(
-		name: string,
+		name: FixtureName,
 		initial?: string | number | {aliases: string[]} | SequenceCallback,
 	): Sequence;
 
 	sequence(
-		name: string,
+		name: FixtureName,
 		initial?: string | number,
 		options?: {aliases: string[]},
 		callback?: SequenceCallback,
@@ -161,10 +175,11 @@ export class FixtureRiveter {
 	}
 
 	async run<T = Instance>(
-		name: string,
+		fixtureName: FixtureName,
 		strategy: string,
 		traits: any[],
 	): Promise<T> {
+		const name = nameGuard(fixtureName);
 		const overrides = extractAttributes(traits);
 		let fixture = this.getFixture(name);
 
@@ -184,7 +199,7 @@ export class FixtureRiveter {
 	}
 
 	async runList<T = Instance>(
-		name: string,
+		name: FixtureName,
 		strategy: string,
 		count: number,
 		traits: any[],
@@ -239,14 +254,14 @@ export class FixtureRiveter {
 	// Typescript sucks for dynamically defined methods lol
 	// All of these will be overwritten on instantiation
 	async attributesFor<T = Instance>(
-		name: string,
+		name: FixtureName,
 		traits?: string[],
-		overrides?: Partial<T extends Instance ? T : Instance>,
+		overrides?: Override<T>,
 	): Promise<T>;
 
 	async attributesFor<T = Instance>(
-		name: string,
-		traits?: string[]|Partial<T extends Instance ? T : Instance>,
+		name: FixtureName,
+		traits?: string[]|Override<T>,
 	): Promise<T>;
 
 	async attributesFor<T>(..._args: any[]): Promise<T> {
@@ -254,16 +269,16 @@ export class FixtureRiveter {
 	}
 
 	async attributesForList<T = Instance>(
-		name: string,
+		name: FixtureName,
 		count: number,
 		traits?: string[],
-		overrides?: Partial<T extends Instance ? T : Instance>,
+		overrides?: Override<T>,
 	): Promise<List<T>>;
 
 	async attributesForList<T = Instance>(
-		name: string,
+		name: FixtureName,
 		count: number,
-		traits?: string[]|Partial<T extends Instance ? T : Instance>,
+		traits?: string[]|Override<T>,
 	): Promise<List<T>>;
 
 	async attributesForList<T>(..._args: any[]): Promise<List<T>> {
@@ -271,14 +286,14 @@ export class FixtureRiveter {
 	}
 
 	async attributesForPair<T = Instance>(
-		name: string,
+		name: FixtureName,
 		traits?: string[],
-		overrides?: Partial<T extends Instance ? T : Instance>,
+		overrides?: Override<T>,
 	): Promise<Pair<T>>;
 
 	async attributesForPair<T = Instance>(
-		name: string,
-		traits?: string[]|Partial<T extends Instance ? T : Instance>,
+		name: FixtureName,
+		traits?: string[]|Override<T>,
 	): Promise<Pair<T>>;
 
 	async attributesForPair<T>(..._args: any[]): Promise<Pair<T>> {
@@ -286,14 +301,14 @@ export class FixtureRiveter {
 	}
 
 	async build<T = Instance>(
-		name: string,
-		traits?: string[]|Partial<T extends Instance ? T : Instance>,
+		name: FixtureName,
+		traits?: string[]|Override<T>,
 	): Promise<T>;
 
 	async build<T = Instance>(
-		name: string,
+		name: FixtureName,
 		traits?: string[],
-		overrides?: Partial<T extends Instance ? T : Instance>,
+		overrides?: Override<T>,
 	): Promise<T>;
 
 	async build<T = Instance>(..._args: any[]): Promise<T> {
@@ -301,16 +316,16 @@ export class FixtureRiveter {
 	}
 
 	async buildList<T = Instance>(
-		name: string,
+		name: FixtureName,
 		count: number,
 		traits?: string[],
-		overrides?: Partial<T extends Instance ? T : Instance>,
+		overrides?: Override<T>,
 	): Promise<List<T>>;
 
 	async buildList<T = Instance>(
-		name: string,
+		name: FixtureName,
 		count: number,
-		traits?: string[]|Partial<T extends Instance ? T : Instance>,
+		traits?: string[]|Override<T>,
 	): Promise<List<T>>;
 
 	async buildList<T = Instance>(..._args: any[]): Promise<List<T>> {
@@ -318,14 +333,14 @@ export class FixtureRiveter {
 	}
 
 	async buildPair<T = Instance>(
-		name: string,
+		name: FixtureName,
 		traits?: string[],
-		overrides?: Partial<T extends Instance ? T : Instance>,
+		overrides?: Override<T>,
 	): Promise<Pair<T>>;
 
 	async buildPair<T = Instance>(
-		name: string,
-		traits?: string[]|Partial<T extends Instance ? T : Instance>,
+		name: FixtureName,
+		traits?: string[]|Override<T>,
 	): Promise<Pair<T>>;
 
 	async buildPair<T = Instance>(..._args: any[]): Promise<Pair<T>> {
@@ -333,14 +348,14 @@ export class FixtureRiveter {
 	}
 
 	async create<T = Instance>(
-		name: string,
+		name: FixtureName,
 		traits?: string[],
-		overrides?: Partial<T extends Instance ? T : Instance>,
+		overrides?: Override<T>,
 	): Promise<T>;
 
 	async create<T = Instance>(
-		name: string,
-		traits?: string[]|Partial<T extends Instance ? T : Instance>,
+		name: FixtureName,
+		traits?: string[]|Override<T>,
 	): Promise<T>;
 
 	async create<T = Instance>(..._args: any[]): Promise<T> {
@@ -348,16 +363,16 @@ export class FixtureRiveter {
 	}
 
 	async createList<T = Instance>(
-		name: string,
+		name: FixtureName,
 		count: number,
 		traits?: string[],
-		overrides?: Partial<T extends Instance ? T : Instance>,
+		overrides?: Override<T>,
 	): Promise<List<T>>;
 
 	async createList<T = Instance>(
-		name: string,
+		name: FixtureName,
 		count: number,
-		traits?: string[]|Partial<T extends Instance ? T : Instance>,
+		traits?: string[]|Override<T>,
 	): Promise<List<T>>;
 
 	async createList<T = Instance>(..._args: any[]): Promise<List<T>> {
@@ -365,14 +380,14 @@ export class FixtureRiveter {
 	}
 
 	async createPair<T = Instance>(
-		name: string,
+		name: FixtureName,
 		traits?: string[],
-		overrides?: Partial<T extends Instance ? T : Instance>,
+		overrides?: Override<T>,
 	): Promise<Pair<T>>;
 
 	async createPair<T = Instance>(
-		name: string,
-		traits?: string[]|Partial<T extends Instance ? T : Instance>,
+		name: FixtureName,
+		traits?: string[]|Override<T>,
 	): Promise<Pair<T>>;
 
 	async createPair<T = Instance>(..._args: any[]): Promise<Pair<T>> {
@@ -386,6 +401,8 @@ export type Instance = Record<string, any>;
 type Pair<T> = [T, T];
 type List<T> = T[];
 
+type Override<T> = Partial<T extends Instance ? T : Instance>;
+
 export interface ModelConstructor<T> {
-	new(): T
+	new(): T;
 }
