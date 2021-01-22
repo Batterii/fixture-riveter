@@ -61,7 +61,6 @@ export class AttributeAssigner<T> {
 	async toObject(): Promise<Record<string, any>> {
 		const instance = {};
 		for (const name of this.attributesForObject()) {
-			// eslint-disable-next-line no-await-in-loop
 			const attribute = await this._get(name);
 			instance[name] = attribute;
 		}
@@ -76,11 +75,9 @@ export class AttributeAssigner<T> {
 		const attributeNames = this.attributesForInstance();
 
 		for (const name of attributeNames) {
-			// eslint-disable-next-line no-await-in-loop
 			const attribute = await this._get(name);
 			if (associationNames.includes(name)) {
-				// eslint-disable-next-line no-await-in-loop
-				await adapter.associate(instance, name, attribute);
+				await adapter.associate(instance, name, attribute, this.model);
 			} else {
 				adapter.set(instance, name, attribute);
 			}

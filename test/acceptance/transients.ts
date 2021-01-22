@@ -1,4 +1,4 @@
-import {Model as ObjectionModel} from "objection";
+import {Model} from "../test-fixtures/model";
 import {createTable} from "../test-fixtures/define-helpers";
 import {FixtureRiveter} from "../../lib/fixture-riveter";
 import {ObjectionAdapter} from "../../lib/adapters/objection-adapter";
@@ -8,17 +8,21 @@ import {expect} from "chai";
 describe("transient attributes", function() {
 	let fr: FixtureRiveter;
 
-	class User extends ObjectionModel {
+	class User extends Model {
 		static tableName = "user";
 		name: string;
 		email: string;
+
+		get props() {
+			return {
+				name: "string",
+				email: "string",
+			};
+		}
 	}
 
 	before(async function() {
-		await createTable(User, {
-			name: "string",
-			email: "string",
-		});
+		await createTable(User);
 
 		fr = new FixtureRiveter();
 		fr.setAdapter(new ObjectionAdapter());
@@ -106,13 +110,17 @@ describe("transient attributes", function() {
 
 describe("transient sequences", function() {
 	let fr: FixtureRiveter;
-	class User extends ObjectionModel {
+	class User extends Model {
 		static tableName = "user";
 		name: string;
+
+		get props() {
+			return {name: "string"};
+		}
 	}
 
 	before(async function() {
-		await createTable(User, {name: "string"});
+		await createTable(User);
 
 		fr = new FixtureRiveter();
 		fr.setAdapter(new ObjectionAdapter());

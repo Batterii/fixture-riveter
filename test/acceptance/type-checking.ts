@@ -1,4 +1,4 @@
-import {Model as ObjectionModel} from "objection";
+import {Model} from "../test-fixtures/model";
 
 import {createTable} from "../test-fixtures/define-helpers";
 import {ObjectionAdapter} from "../../lib/adapters/objection-adapter";
@@ -7,18 +7,25 @@ import {FixtureRiveter} from "../../lib/fixture-riveter";
 describe("checking various call", function() {
 	let fr: FixtureRiveter;
 
-	class User extends ObjectionModel {
+	class User extends Model {
 		static tableName = "users";
 		id: number;
 		name: string;
 		age: number;
+
+		get props() {
+			return {
+				name: "string",
+				age: "integer",
+			};
+		}
 	}
 
-	class Post extends ObjectionModel {
+	class Post extends Model {
 		static tableName = "posts";
 		static relationMappings = {
 			user: {
-				relation: ObjectionModel.BelongsToOneRelation,
+				relation: Model.BelongsToOneRelation,
 				modelClass: User,
 				join: {
 					from: "posts.userId",
@@ -29,18 +36,20 @@ describe("checking various call", function() {
 
 		id: number;
 		body: string;
+		userId: number;
 		user?: User;
+
+		get props() {
+			return {
+				body: "string",
+				age: "integer",
+			};
+		}
 	}
 
 	beforeEach(async function() {
-		await createTable(User, {
-			name: "string",
-			age: "integer",
-		});
-
-		await createTable(Post, {
-			body: "string",
-		});
+		await createTable(User);
+		await createTable(Post);
 
 		fr = new FixtureRiveter();
 		fr.setAdapter(new ObjectionAdapter());

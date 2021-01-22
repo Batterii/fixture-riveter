@@ -1,3 +1,4 @@
+import {Model} from "./model";
 import {Model as ObjectionModel} from "objection";
 
 const knex = ObjectionModel.knex();
@@ -8,31 +9,24 @@ type ColumnType = (
 	"json" | "jsonb" | "uuid"
 );
 
-const classes = {};
-
-function defineClass(name: string) {
-	classes[name] = class extends ObjectionModel {
-		static tableName = name.toLowerCase();
-	};
-	return classes[name];
-}
-
 export async function createTable(
-	Model: {tableName: string},
-	props: Record<string, ColumnType>,
+	M: typeof Model,
+	propsArg?: Record<string, ColumnType>,
 ): Promise<any> {
-	await knex.schema.dropTableIfExists(Model.tableName);
+	let props: Record<string, string>;
+	if (propsArg) {
+		props = propsArg;
+	} else {
+		const instance = new M();
+		({props} = instance);
+	}
 
-	await knex.schema.createTable(Model.tableName, (table) => {
+	await knex.schema.dropTableIfExists(M.tableName);
+
+	await knex.schema.createTable(M.tableName, (table) => {
 		table.increments("id");
 		for (const [columnName, type] of Object.entries(props)) {
 			table[type](columnName);
 		}
 	});
-}
-
-export async function defineModel(name: string, props: Record<string, ColumnType>): Promise<any> {
-	const Model = defineClass(name);
-	await createTable(Model, props);
-	return Model;
 }

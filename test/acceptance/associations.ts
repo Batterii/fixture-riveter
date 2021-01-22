@@ -1,4 +1,4 @@
-import {Model as ObjectionModel} from "objection";
+import {Model} from "../test-fixtures/model";
 
 import {createTable} from "../test-fixtures/define-helpers";
 import {ObjectionAdapter} from "../../lib/adapters/objection-adapter";
@@ -9,19 +9,27 @@ import {expect} from "chai";
 describe("simple associations", function() {
 	let fr: FixtureRiveter;
 
-	class User extends ObjectionModel {
+	class User extends Model {
 		static tableName = "users";
 		id: number;
 		name: string;
 		age: number;
 		admin: boolean;
+
+		get props() {
+			return {
+				name: "string",
+				age: "integer",
+				admin: "boolean",
+			};
+		}
 	}
 
-	class Post extends ObjectionModel {
+	class Post extends Model {
 		static tableName = "posts";
 		static relationMappings = {
 			user: {
-				relation: ObjectionModel.BelongsToOneRelation,
+				relation: Model.BelongsToOneRelation,
 				modelClass: User,
 				join: {
 					from: "posts.userId",
@@ -33,19 +41,19 @@ describe("simple associations", function() {
 		id: number;
 		userId: number;
 		user?: User;
+
+		get props() {
+			return {
+				userId: "integer",
+				body: "string",
+			};
+		}
 	}
 
 	before(async function() {
-		await createTable(User, {
-			name: "string",
-			age: "integer",
-			admin: "boolean",
-		});
+		await createTable(User);
 
-		await createTable(Post, {
-			userId: "integer",
-			body: "string",
-		});
+		await createTable(Post);
 
 		fr = new FixtureRiveter();
 		fr.setAdapter(new ObjectionAdapter());
@@ -53,6 +61,7 @@ describe("simple associations", function() {
 		fr.fixture("user", User, (f) => {
 			f.attr("name", () => "Noah");
 			f.attr("age", () => 32);
+			f.attr("admin", () => false);
 
 			f.trait("admin", (t) => {
 				t.admin(() => true);
@@ -111,16 +120,23 @@ describe("simple associations", function() {
 });
 
 describe("Complex associations", function() {
-	class User extends ObjectionModel {
+	class User extends Model {
 		static tableName = "users";
 		static relationMappings = {};
 
 		id: number;
 		name: string;
 		age: number;
+
+		get props() {
+			return {
+				name: "string",
+				age: "integer",
+			};
+		}
 	}
 
-	class Post extends ObjectionModel {
+	class Post extends Model {
 		static tableName = "posts";
 		static relationMappings = {};
 
@@ -128,11 +144,18 @@ describe("Complex associations", function() {
 		title: string;
 		userId: number;
 		user?: User;
+
+		get props() {
+			return {
+				userId: "integer",
+				title: "string",
+			};
+		}
 	}
 
 	User.relationMappings = {
 		posts: {
-			relation: ObjectionModel.HasManyRelation,
+			relation: Model.HasManyRelation,
 			modelClass: Post,
 			join: {
 				from: "users.id",
@@ -143,7 +166,7 @@ describe("Complex associations", function() {
 
 	Post.relationMappings = {
 		user: {
-			relation: ObjectionModel.BelongsToOneRelation,
+			relation: Model.BelongsToOneRelation,
 			modelClass: User,
 			join: {
 				from: "posts.userId",
@@ -158,15 +181,9 @@ describe("Complex associations", function() {
 			let fr: FixtureRiveter;
 
 			before(async function() {
-				await createTable(User, {
-					name: "string",
-					age: "integer",
-				});
+				await createTable(User);
 
-				await createTable(Post, {
-					userId: "integer",
-					title: "string",
-				});
+				await createTable(Post);
 
 				fr = new FixtureRiveter();
 				fr.setAdapter(new ObjectionAdapter());
@@ -206,19 +223,12 @@ describe("Complex associations", function() {
 		},
 	);
 
-	describe("a created instance, with strategy build", function() {
+	describe("association strategy stuff", function() {
 		let fr: FixtureRiveter;
 
-		before(async function() {
-			await createTable(User, {
-				name: "string",
-				age: "integer",
-			});
-
-			await createTable(Post, {
-				userId: "integer",
-				title: "string",
-			});
+		beforeEach(async function() {
+			await createTable(User);
+			await createTable(Post);
 
 			fr = new FixtureRiveter();
 			fr.setAdapter(new ObjectionAdapter());
@@ -227,18 +237,61 @@ describe("Complex associations", function() {
 				f.attr("name", () => "Noah");
 				f.attr("age", () => 32);
 			});
+		});
 
+		it("default is the same build strategy as parent", async function() {
+			fr.fixture("post", Post, (f) => {
+				f.attr("title", () => "The City & The City");
+				f.association("user");
+			});
+
+			const post1 = await fr.build("post");
+			expect(post1.id).to.be.undefined;
+			expect(post1.user).to.be.an.instanceof(User);
+			expect(post1.user.id).to.be.undefined;
+
+			const post2 = await fr.create("post");
+			expect(post2.id).to.exist;
+			expect(post2.user).to.be.an.instanceof(User);
+			expect(post2.user.id).to.exist;
+		});
+
+		it("useParentStragety defaults to create", async function() {
+			fr.fixture("post", Post, (f) => {
+				f.attr("title", () => "The City & The City");
+				f.association("user");
+			});
+
+			fr.useParentStrategy = false;
+
+			const post1 = await fr.build("post");
+			expect(post1.id).to.be.undefined;
+			expect(post1.user).to.be.an.instanceof(User);
+			expect(post1.user.id).to.exist;
+
+			const post2 = await fr.create("post");
+			expect(post2.id).to.exist;
+			expect(post2.user).to.be.an.instanceof(User);
+			expect(post2.user.id).to.exist;
+		});
+
+		it("association strategy overrides useParentStrategy", async function() {
 			fr.fixture("post", Post, (f) => {
 				f.attr("title", () => "The City & The City");
 				f.association("user", {strategy: "build"});
 			});
-		});
 
-		it("saves associations (strategy: build only affects build, not create)", async function() {
-			const post = await fr.create("post");
+			fr.useParentStrategy = false;
 
-			expect(post.user).to.be.an.instanceof(User);
-			expect(post.user.id).to.exist;
+			const post1 = await fr.build("post");
+			expect(post1.id).to.be.undefined;
+			expect(post1.user).to.be.an.instanceof(User);
+			expect(post1.user.id).to.be.undefined;
+
+			const post2 = await fr.create("post");
+			expect(post2.id).to.exist;
+			expect(post2.user).to.be.an.instanceof(User);
+			expect(post2.user.id).to.be.undefined;
 		});
 	});
 });

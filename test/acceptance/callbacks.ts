@@ -1,4 +1,4 @@
-import {Model as ObjectionModel} from "objection";
+import {Model} from "../test-fixtures/model";
 import {createTable} from "../test-fixtures/define-helpers";
 
 import {ObjectionAdapter} from "../../lib/adapters/objection-adapter";
@@ -9,18 +9,22 @@ import {expect} from "chai";
 describe("Callbacks", function() {
 	let fr: FixtureRiveter;
 
-	class User extends ObjectionModel {
+	class User extends Model {
 		static tableName = "users";
 		id: number;
 		name: string;
 		age: number;
+
+		get props() {
+			return {
+				name: "string",
+				age: "integer",
+			};
+		}
 	}
 
 	before(async function() {
-		await createTable(User, {
-			name: "string",
-			age: "integer",
-		});
+		await createTable(User);
 
 		fr = new FixtureRiveter();
 		fr.setAdapter(new ObjectionAdapter());
@@ -65,18 +69,22 @@ describe("binding a callback to multiple callbacks", function() {
 	let fr: FixtureRiveter;
 	let counter: number;
 
-	class User extends ObjectionModel {
+	class User extends Model {
 		static tableName = "users";
 		id: number;
 		name: string;
 		age: number;
+
+		get props() {
+			return {
+				name: "string",
+				age: "integer",
+			};
+		}
 	}
 
 	beforeEach(async function() {
-		await createTable(User, {
-			name: "string",
-			age: "integer",
-		});
+		await createTable(User);
 
 		counter = 0;
 
@@ -110,30 +118,37 @@ describe("binding a callback to multiple callbacks", function() {
 describe("global callbacks", function() {
 	let fr: FixtureRiveter;
 
-	class User extends ObjectionModel {
+	class User extends Model {
 		static tableName = "user";
 		id: number;
 		name: string;
 		age: number;
+
+		get props() {
+			return {
+				name: "string",
+				age: "integer",
+			};
+		}
 	}
 
-	class Company extends ObjectionModel {
+	class Company extends Model {
 		static tableName = "company";
 		id: number;
 		name: string;
 		type: string;
+
+		get props() {
+			return {
+				name: "string",
+				type: "string",
+			};
+		}
 	}
 
 	before(async function() {
-		await createTable(User, {
-			name: "string",
-			age: "integer",
-		});
-
-		await createTable(Company, {
-			name: "string",
-			type: "string",
-		});
+		await createTable(User);
+		await createTable(Company);
 
 		fr = new FixtureRiveter();
 		fr.setAdapter(new ObjectionAdapter());

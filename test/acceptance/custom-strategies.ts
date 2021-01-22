@@ -1,4 +1,4 @@
-import {Model as ObjectionModel} from "objection";
+import {Model} from "../test-fixtures/model";
 import {createTable} from "../test-fixtures/define-helpers";
 
 import {Assembler} from "../../lib/assembler";
@@ -24,14 +24,18 @@ export class JsonStrategy extends Strategy {
 describe("Custom strategies", function() {
 	let fr: FixtureRiveter;
 
-	class Post extends ObjectionModel {
+	class Post extends Model {
 		static tableName = "posts";
 		id: number;
 		title: string;
+
+		get props() {
+			return {title: "string"};
+		}
 	}
 
 	before(async function() {
-		await createTable(Post, {title: "string"});
+		await createTable(Post);
 
 		fr = new FixtureRiveter();
 		fr.setAdapter(new ObjectionAdapter());

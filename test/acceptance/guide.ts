@@ -1,4 +1,4 @@
-import {Model as ObjectionModel} from "objection";
+import {Model} from "../test-fixtures/model";
 import {createTable} from "../test-fixtures/define-helpers";
 import {ObjectionAdapter} from "../../lib/adapters/objection-adapter";
 import {FixtureRiveter} from "../../lib/fixture-riveter";
@@ -8,36 +8,58 @@ import {expect} from "chai";
 describe("All of the code from the guide", function() {
 	let fr: FixtureRiveter;
 
-	class User extends ObjectionModel {
+	class User extends Model {
 		static tableName = "users";
 		name: string;
 		age: number;
 		email: string;
 		firstName: string;
 		lastName: string;
+
+		get props() {
+			return {
+				name: "string",
+				age: "integer",
+				email: "string",
+				firstName: "string",
+				lastName: "string",
+			};
+		}
 	}
 
-	class Post extends ObjectionModel {
+	class Post extends Model {
 		static tableName = "posts";
 		title: string;
 		body: string;
 		sequence: string;
+
+		get props() {
+			return {
+				title: "string",
+				body: "string",
+				sequence: "string",
+			};
+		}
 	}
 
-	class List extends ObjectionModel {
+	class List extends Model {
 		static tableName = "lists";
 		entry1: string;
 		entry2: string;
 		entry3: string;
+
+		get props() {
+			return {
+				entry1: "string",
+				entry2: "string",
+				entry3: "string",
+			};
+		}
 	}
 
 	describe("Overview", function() {
 		specify("example", async function() {
-			await createTable(User, {
-				name: "string",
-				age: "integer",
-				email: "string",
-			});
+			await createTable(User);
 
 			fr = new FixtureRiveter();
 			fr.setAdapter(new ObjectionAdapter());
@@ -65,11 +87,7 @@ describe("All of the code from the guide", function() {
 		});
 
 		specify("Explicit vs Implicit", async function() {
-			await createTable(Post, {
-				title: "string",
-				body: "string",
-				sequence: "string",
-			});
+			await createTable(Post);
 
 			fr.fixture("post", Post, (f) => {
 				f.attr("title", () => "First post!");
@@ -85,11 +103,7 @@ describe("All of the code from the guide", function() {
 		});
 
 		specify("Dependent attributes", async function() {
-			await createTable(User, {
-				firstName: "string",
-				lastName: "string",
-				email: "string",
-			});
+			await createTable(User);
 
 			fr.fixture("user", User, (f) => {
 				f.firstName(() => "Noah");
@@ -108,11 +122,7 @@ describe("All of the code from the guide", function() {
 		});
 
 		specify("Argument passing vs Context", async function() {
-			await createTable(User, {
-				firstName: "string",
-				lastName: "string",
-				email: "string",
-			});
+			await createTable(User);
 
 			fr.fixture("contextUser", User, function() {
 				// eslint-disable-next-line no-invalid-this
@@ -134,10 +144,7 @@ describe("All of the code from the guide", function() {
 		});
 
 		specify("aliases", async function() {
-			await createTable(Post, {
-				title: "string",
-				body: "string",
-			});
+			await createTable(Post);
 
 			fr.fixture("post", Post, {aliases: ["twit", "comment"]}, (f) => {
 				f.attr("title", () => "First post!");
@@ -152,7 +159,7 @@ describe("All of the code from the guide", function() {
 		});
 
 		specify("transient attributes", async function() {
-			await createTable(User, {name: "string"});
+			await createTable(User);
 
 			fr.fixture("user", User, (f) => {
 				f.transient((t) => {
@@ -180,7 +187,7 @@ describe("All of the code from the guide", function() {
 		});
 
 		specify("transient attribute with callbacks", async function() {
-			await createTable(User, {name: "string"});
+			await createTable(User);
 
 			fr.fixture("user", User, (f) => {
 				f.transient((t) => {
@@ -203,11 +210,7 @@ describe("All of the code from the guide", function() {
 		});
 
 		specify("nested fixtures", async function() {
-			await createTable(List, {
-				entry1: "string",
-				entry2: "string",
-				entry3: "string",
-			});
+			await createTable(List);
 
 			fr.fixture("grandparentList", List, (f) => {
 				f.attr("entry1", () => "100");
@@ -230,11 +233,7 @@ describe("All of the code from the guide", function() {
 		});
 
 		specify("nested fixtures with explicit parent", async function() {
-			await createTable(List, {
-				entry1: "string",
-				entry2: "string",
-				entry3: "string",
-			});
+			await createTable(List);
 
 			fr.fixture("parentList", List, (f) => {
 				f.attr("entry1", () => "10");
@@ -257,7 +256,7 @@ describe("All of the code from the guide", function() {
 		beforeEach(async function() {
 			fr = new FixtureRiveter();
 			fr.setAdapter(new ObjectionAdapter());
-			await createTable(Post, {title: "string"});
+			await createTable(Post);
 			fr.fixture("post", Post, (f) => f.title(() => "First post!"));
 		});
 

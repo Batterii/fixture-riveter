@@ -2,6 +2,8 @@
 	"extends": "@batterii/eslint-config-ts",
 	"rules": {
 		"sort-imports": "off",
+		"no-await-in-loop": "off",
+		"class-methods-use-this": "off",
 		"@typescript-eslint/generic-type-naming": "off",
 		"@typescript-eslint/ban-ts-ignore": "off",
 		"@typescript-eslint/camelcase": "off",

@@ -3,15 +3,25 @@ import {DefaultAdapter} from "./default-adapter";
 /* eslint-disable class-methods-use-this */
 export class ObjectionAdapter extends DefaultAdapter {
 	async save<T>(instance: T, Model: any): Promise<T> {
-		return Model.query().upsertGraph(instance, {relate: true, insertMissing: true});
+		return Model.query().insertAndFetch(instance);
 	}
 
 	async destroy(instance: any): Promise<void> {
 		await instance.$query().delete();
 	}
 
-	async associate(instance: any, name: string, other: any): Promise<any> {
+	async associate(instance: any, name: string, other: any, Model?: any): Promise<any> {
 		instance.$setRelated(name, other);
+
+		const relations = Model.getRelations();
+		const selfIdCols = relations[name].ownerProp.cols;
+		const relationIdCols = relations[name].relatedProp.cols;
+		if (selfIdCols.length === 1 && relationIdCols.length === 1) {
+			const [selfIdCol] = selfIdCols;
+			const [relationIdCol] = relationIdCols;
+			instance = this.set(instance, selfIdCol, other[relationIdCol]);
+		}
+		return instance;
 	}
 
 	set(instance: any, key: string, value: any): any {

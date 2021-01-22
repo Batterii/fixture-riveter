@@ -1,4 +1,4 @@
-import {Model as ObjectionModel} from "objection";
+import {Model} from "../test-fixtures/model";
 import {FixtureRiveter} from "../../lib/fixture-riveter";
 
 import {expect} from "chai";
@@ -6,7 +6,7 @@ import {expect} from "chai";
 describe("Nested factories", function() {
 	let fr: FixtureRiveter;
 
-	class User extends ObjectionModel {
+	class User extends Model {
 		static tableName = "users";
 		execute1: number;
 		execute2: number;

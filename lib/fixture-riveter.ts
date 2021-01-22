@@ -212,7 +212,6 @@ export class FixtureRiveter {
 	): Promise<T[]> {
 		const instances: T[] = [];
 		for (let idx = 0; idx < count; idx += 1) {
-			// eslint-disable-next-line no-await-in-loop
 			const instance = await this.run<T>(name, strategy, cloneDeep(traits));
 			instances.push(instance);
 		}
@@ -382,4 +381,3 @@ export class FixtureRiveter {
 	async createPair<T = Pojo>(..._args: any[]): Promise<[T, T]> { return undefined as any; }
 	/* eslint-enable */
 }
-

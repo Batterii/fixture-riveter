@@ -1,4 +1,4 @@
-import {Model as ObjectionModel} from "objection";
+import {Model} from "../test-fixtures/model";
 import {createTable} from "../test-fixtures/define-helpers";
 import {ObjectionAdapter} from "../../lib/adapters/objection-adapter";
 import {FixtureRiveter} from "../../lib/fixture-riveter";
@@ -8,15 +8,23 @@ import {expect} from "chai";
 describe("createList", function() {
 	let fr: FixtureRiveter;
 
-	class Post extends ObjectionModel {
+	class Post extends Model {
 		static tableName = "posts";
 		title: string;
 		author: string;
 		position: number;
+
+		get props() {
+			return {
+				title: "string",
+				author: "string",
+				position: "integer",
+			};
+		}
 	}
 
 	before(async function() {
-		await createTable(Post, {title: "string", author: "string", position: "integer"});
+		await createTable(Post);
 
 		fr = new FixtureRiveter();
 		fr.setAdapter(new ObjectionAdapter());
