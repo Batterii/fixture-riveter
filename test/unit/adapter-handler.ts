@@ -1,4 +1,4 @@
-import {AdapterHandler} from "../../lib/adapter-handler";
+import {AdapterHandler, coerceNames} from "../../lib/adapter-handler";
 import {DefaultAdapter} from "../../lib/adapters/default-adapter";
 import {expect} from "chai";
 import sinon from "sinon";
@@ -77,8 +77,7 @@ describe("Adapters", function() {
 	describe("#coerceNames", function() {
 		it("returns an array if given an array", function() {
 			const array = ["key"];
-			const handler = new AdapterHandler();
-			const result = handler.coerceNames(array);
+			const result = coerceNames(array);
 
 			expect(result).to.equal(array);
 			expect(result).to.deep.equal(array);
@@ -86,32 +85,19 @@ describe("Adapters", function() {
 
 		it("returns an array if not given an array", function() {
 			const key = "key";
-			const handler = new AdapterHandler();
-			const result = handler.coerceNames(key);
+			const result = coerceNames(key);
 
 			expect(result).to.deep.equal([key]);
 		});
 
 		it("returns an empty array if not given anything", function() {
-			const handler = new AdapterHandler();
-			const result = handler.coerceNames();
+			const result = coerceNames();
 
 			expect(result).to.deep.equal([]);
 		});
 	});
 
 	describe("#setAdapters", function() {
-		it("coerces the name properly", function() {
-			const key = "key";
-			const adapter = new DefaultAdapter();
-			const handler = new AdapterHandler();
-			sinon.stub(handler, "coerceNames").returns([key]);
-			handler.setAdapters(adapter, key);
-
-			expect(handler.coerceNames).to.be.calledOnce;
-			expect(handler.coerceNames).to.be.calledOnceWithExactly(key);
-		});
-
 		it("assigns to all given names", function() {
 			const key = "key";
 			const adapter = new DefaultAdapter();

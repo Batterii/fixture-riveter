@@ -7,7 +7,6 @@ describe("Nested factories", function() {
 	let fr: FixtureRiveter;
 
 	class User extends Model {
-		static tableName = "users";
 		execute1: number;
 		execute2: number;
 		execute3: number;

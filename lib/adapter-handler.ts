@@ -27,16 +27,8 @@ export class AdapterHandler {
 		});
 	}
 
-	// eslint-disable-next-line class-methods-use-this
-	coerceNames(fixtureNames?: FixtureNames): string[] {
-		if (fixtureNames) {
-			return Array.isArray(fixtureNames) ? fixtureNames : [fixtureNames];
-		}
-		return [];
-	}
-
-	setAdapters(adapter: Adapter, fixtureNames: FixtureNames): void {
-		const names = this.coerceNames(fixtureNames);
+	setAdapters(adapter: Adapter, fixtureNames?: FixtureNames): void {
+		const names = coerceNames(fixtureNames);
 		this.assignMultiple(adapter, names);
 	}
 
@@ -48,4 +40,11 @@ export class AdapterHandler {
 		}
 		return adapter;
 	}
+}
+
+export function coerceNames(fixtureNames?: FixtureNames): string[] {
+	if (fixtureNames) {
+		return Array.isArray(fixtureNames) ? fixtureNames : [fixtureNames];
+	}
+	return [];
 }

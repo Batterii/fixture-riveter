@@ -10,7 +10,6 @@ describe("Callbacks", function() {
 	let fr: FixtureRiveter;
 
 	class User extends Model {
-		static tableName = "users";
 		id: number;
 		name: string;
 		age: number;
@@ -70,7 +69,6 @@ describe("binding a callback to multiple callbacks", function() {
 	let counter: number;
 
 	class User extends Model {
-		static tableName = "users";
 		id: number;
 		name: string;
 		age: number;
@@ -119,7 +117,6 @@ describe("global callbacks", function() {
 	let fr: FixtureRiveter;
 
 	class User extends Model {
-		static tableName = "user";
 		id: number;
 		name: string;
 		age: number;
@@ -133,7 +130,6 @@ describe("global callbacks", function() {
 	}
 
 	class Company extends Model {
-		static tableName = "company";
 		id: number;
 		name: string;
 		type: string;
@@ -154,7 +150,7 @@ describe("global callbacks", function() {
 		fr.setAdapter(new ObjectionAdapter());
 
 		fr.after("build", (object: any) => {
-			if (object.constructor.tableName === "company") {
+			if (object.constructor.tableName === Company.tableName) {
 				object.name = "Acme Suppliers";
 			} else {
 				object.name = "John Doe";

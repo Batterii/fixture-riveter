@@ -9,7 +9,6 @@ describe("method missing functionality", function() {
 	let fr: FixtureRiveter;
 
 	class User extends Model {
-		static tableName = "users";
 		id: number;
 		name: string;
 		age: number;

@@ -8,7 +8,6 @@ describe("Traits", function() {
 	let fr: FixtureRiveter;
 
 	class User extends Model {
-		static tableName = "user";
 		name: string;
 		age: number;
 		admin: boolean;
@@ -61,7 +60,6 @@ describe("Traits", function() {
 
 describe("tests from fixture_bot", function() {
 	class User extends Model {
-		static tableName = "users";
 		id: number;
 		name: string;
 		age: number;
@@ -325,7 +323,6 @@ describe("tests from fixture_bot", function() {
 	describe("inline traits overriding existing attributes", function() {
 		let fr: FixtureRiveter;
 		class Action extends Model {
-			static tableName = "users";
 			id: number;
 			status: string;
 
@@ -444,7 +441,6 @@ describe("tests from fixture_bot", function() {
 describe("#968", function() {
 	let fr: FixtureRiveter;
 	class Demo extends Model {
-		static tableName = "users";
 		id: number;
 		value: string;
 

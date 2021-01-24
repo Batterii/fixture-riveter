@@ -9,7 +9,6 @@ describe("transient attributes", function() {
 	let fr: FixtureRiveter;
 
 	class User extends Model {
-		static tableName = "user";
 		name: string;
 		email: string;
 
@@ -111,7 +110,6 @@ describe("transient attributes", function() {
 describe("transient sequences", function() {
 	let fr: FixtureRiveter;
 	class User extends Model {
-		static tableName = "user";
 		name: string;
 
 		get props() {

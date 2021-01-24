@@ -8,7 +8,6 @@ describe("checking various call", function() {
 	let fr: FixtureRiveter;
 
 	class User extends Model {
-		static tableName = "users";
 		id: number;
 		name: string;
 		age: number;
@@ -22,7 +21,6 @@ describe("checking various call", function() {
 	}
 
 	class Post extends Model {
-		static tableName = "posts";
 		static relationMappings = {
 			user: {
 				relation: Model.BelongsToOneRelation,

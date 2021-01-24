@@ -3,18 +3,18 @@ import {Evaluator} from "./evaluator";
 
 export type Pojo = Record<string, any>;
 
-export interface ModelConstructor<T> {
-	new(): T;
-}
+export interface ModelConstructor<T> {name?: string; new(): T}
 
-export type ClassOrRecord<T> =
-	T extends Pojo ? T : Pojo;
+export type ObjectionModelConstructor<T> = {tableName?: string} & ModelConstructor<T>;
+export type FixtureName<T> = string | ObjectionModelConstructor<T>;
+
+export type ClassOrRecord<T> = T extends Pojo ? T : Pojo;
 
 export type Overrides<T> = Partial<ClassOrRecord<T>>;
 
 export type OverrideForRelation<T, R = undefined> = Overrides<R extends undefined ? T : R>;
 
-export interface TraitsFn<T, KeyType, ArgFN, Relation = undefined> {
+interface TraitsFn<T, KeyType, ArgFN, Relation = undefined> {
 	(fn: ArgFN): Promise<KeyType>;
 	<R = Relation>(
 		traitsOrOverrides?:
@@ -27,7 +27,7 @@ export interface TraitsFn<T, KeyType, ArgFN, Relation = undefined> {
 	): Promise<KeyType>;
 }
 
-export type ConvertToFn<T, ArgFN = () => any> = {
+type ConvertToFn<T, ArgFN = () => any> = {
 	[Key in keyof T]-?: TraitsFn<T, T[Key], ArgFN>;
 };
 
@@ -40,13 +40,12 @@ export type EvaluatorFunction<T> =
 	| string[]
 	| Overrides<T>;
 
-export type BlockFunction<T> =
-	(
-		fixture: (
-			& ConvertToFn<T, EvaluatorFunction<T>>
-			& Exclude<DefinitionProxy<T>, "methodMissing">
-		)
-	) => any;
+type FixtureBuilder<T> = (
+	& ConvertToFn<T, EvaluatorFunction<T>>
+	& Exclude<DefinitionProxy<T>, "methodMissing">
+);
+
+export type BlockFunction<T> = (fixture: FixtureBuilder<T>) => any;
 
 export interface FixtureOptions {
 	aliases?: string[];

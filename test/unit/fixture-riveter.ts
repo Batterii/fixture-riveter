@@ -1,8 +1,9 @@
 import {DummyModel} from "../test-fixtures/dummy-model";
+import {Model} from "../test-fixtures/model";
 
 import {DefaultAdapter} from "../../lib/adapters/default-adapter";
 import {Fixture} from "../../lib/fixture";
-import {extractOverrides, FixtureRiveter} from "../../lib/fixture-riveter";
+import {extractOverrides, nameGuard, FixtureRiveter} from "../../lib/fixture-riveter";
 import {Sequence} from "../../lib/sequences/sequence";
 import {IntegerSequence} from "../../lib/sequences/integer-sequence";
 
@@ -26,6 +27,22 @@ describe("extractAttributes", function() {
 	});
 });
 
+describe("nameGuard", function() {
+	it("accepts strings", function() {
+		expect(nameGuard("name")).to.equal("name");
+	});
+
+	it("accepts ObjectionModels", function() {
+		// eslint-disable-next-line @typescript-eslint/no-extraneous-class
+		class User extends Model {}
+		expect(nameGuard(User)).to.equal(User.tableName);
+	});
+
+	it("accepts classes", function() {
+		expect(nameGuard(DummyModel)).to.equal(DummyModel.name);
+	});
+});
+
 describe("FixtureRiveter", function() {
 	it("can be built", function() {
 		const fixtureRiveter = new FixtureRiveter();
@@ -36,7 +53,7 @@ describe("FixtureRiveter", function() {
 	describe("#getAdapter", function() {
 		it("passes the call down", function() {
 			const fixtureRiveter = new FixtureRiveter();
-			sinon.stub(fixtureRiveter.adapterHandler, "getAdapter").returns("test");
+			sinon.stub(fixtureRiveter.adapterHandler, "getAdapter").returns("test" as any);
 			const result = fixtureRiveter.getAdapter("value");
 			const {getAdapter} = fixtureRiveter.adapterHandler;
 
@@ -49,7 +66,7 @@ describe("FixtureRiveter", function() {
 	describe("#setAdapter", function() {
 		it("passes the call down", function() {
 			const fixtureRiveter = new FixtureRiveter();
-			sinon.stub(fixtureRiveter.adapterHandler, "setAdapter").returns("test");
+			sinon.stub(fixtureRiveter.adapterHandler, "setAdapter").returns("test" as any);
 			const defaultAdapter = new DefaultAdapter();
 			const result = fixtureRiveter.setAdapter(defaultAdapter, "value");
 			const {setAdapter} = fixtureRiveter.adapterHandler;

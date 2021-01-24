@@ -1,8 +1,14 @@
 {
 	"lib/*.ts": {
-		"alternate": "test/unit/{}.ts"
+		"alternate": ["test/acceptance/{}.ts","test/unit/{}.ts"],
+		"type": "source"
+	},
+	"test/acceptance/*.ts": {
+		"alternate": "lib/{}.ts",
+		"type": "test"
 	},
 	"test/unit/*.ts": {
-		"alternate": "lib/{}.ts"
+		"alternate": "lib/{}.ts",
+		"type": "unit"
 	}
 }

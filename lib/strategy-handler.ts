@@ -1,9 +1,10 @@
-import {FixtureRiveter, FixtureName} from "./fixture-riveter";
+import {FixtureRiveter} from "./fixture-riveter";
 import {Strategy} from "./strategies/strategy";
 import {AttributesForStrategy} from "./strategies/attributes-for-strategy";
 import {BuildStrategy} from "./strategies/build-strategy";
 import {CreateStrategy} from "./strategies/create-strategy";
 import {NullStrategy} from "./strategies/null-strategy";
+import {FixtureName} from "./types";
 
 export class StrategyHandler {
 	fixtureRiveter: FixtureRiveter;
@@ -37,14 +38,14 @@ export class StrategyHandler {
 	}
 
 	defineSingularStrategyMethod(strategyName: string): void {
-		this.fixtureRiveter[strategyName] = async(name: FixtureName, ...traits: any[]) => {
+		this.fixtureRiveter[strategyName] = async(name: FixtureName<any>, ...traits: any[]) => {
 			return this.fixtureRiveter.run(name, strategyName, traits);
 		};
 	}
 
 	defineListStrategyMethod(strategyName: string): void {
 		this.fixtureRiveter[`${strategyName}List`] = async(
-			name: FixtureName,
+			name: FixtureName<any>,
 			count: number,
 			...traits: any[]
 		) => {
@@ -54,7 +55,7 @@ export class StrategyHandler {
 
 	definePairStrategyMethod(strategyName: string): void {
 		this.fixtureRiveter[`${strategyName}Pair`] = async(
-			name: FixtureName,
+			name: FixtureName<any>,
 			...traits: any[]
 		) => {
 			return this.fixtureRiveter.runList(name, strategyName, 2, traits);

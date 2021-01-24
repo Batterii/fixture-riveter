@@ -10,7 +10,6 @@ describe("simple associations", function() {
 	let fr: FixtureRiveter;
 
 	class User extends Model {
-		static tableName = "users";
 		id: number;
 		name: string;
 		age: number;
@@ -26,7 +25,6 @@ describe("simple associations", function() {
 	}
 
 	class Post extends Model {
-		static tableName = "posts";
 		static relationMappings = {
 			user: {
 				relation: Model.BelongsToOneRelation,
@@ -121,7 +119,6 @@ describe("simple associations", function() {
 
 describe("Complex associations", function() {
 	class User extends Model {
-		static tableName = "users";
 		static relationMappings = {};
 
 		id: number;
@@ -137,7 +134,6 @@ describe("Complex associations", function() {
 	}
 
 	class Post extends Model {
-		static tableName = "posts";
 		static relationMappings = {};
 
 		id: number;

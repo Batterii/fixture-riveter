@@ -9,7 +9,6 @@ describe("All of the code from the guide", function() {
 	let fr: FixtureRiveter;
 
 	class User extends Model {
-		static tableName = "users";
 		name: string;
 		age: number;
 		email: string;
@@ -28,7 +27,6 @@ describe("All of the code from the guide", function() {
 	}
 
 	class Post extends Model {
-		static tableName = "posts";
 		title: string;
 		body: string;
 		sequence: string;
@@ -43,7 +41,6 @@ describe("All of the code from the guide", function() {
 	}
 
 	class List extends Model {
-		static tableName = "lists";
 		entry1: string;
 		entry2: string;
 		entry3: string;

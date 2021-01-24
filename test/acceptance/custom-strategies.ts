@@ -25,7 +25,6 @@ describe("Custom strategies", function() {
 	let fr: FixtureRiveter;
 
 	class Post extends Model {
-		static tableName = "posts";
 		id: number;
 		title: string;
 

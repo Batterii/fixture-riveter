@@ -10,12 +10,13 @@ import {
 	EvaluatorFunction,
 	BlockFunction,
 	FixtureRestArgs,
+	FixtureName,
 	FixtureOptions,
 	ModelConstructor,
 	OverrideForRelation,
 } from "./types";
 import {CallbackFunction} from "./callback";
-import {FixtureRiveter, FixtureName, nameGuard} from "./fixture-riveter";
+import {FixtureRiveter, nameGuard} from "./fixture-riveter";
 import {
 	Sequence,
 	SequenceCallback,
@@ -89,19 +90,19 @@ export class DefinitionProxy<T> {
 	}
 
 	fixture(
-		name: FixtureName,
+		name: FixtureName<T>,
 		model: ModelConstructor<T>,
 		options: FixtureOptions,
 		block?: BlockFunction<T>,
 	): void;
 
 	fixture(
-		name: FixtureName,
+		name: FixtureName<T>,
 		model: ModelConstructor<T>,
 		rest?: FixtureRestArgs<T>,
 	): void;
 
-	fixture(fixtureName: FixtureName, model: ModelConstructor<T>, ...rest: any[]): void {
+	fixture(fixtureName: FixtureName<T>, model: ModelConstructor<T>, ...rest: any[]): void {
 		const name = nameGuard(fixtureName);
 		this.childFixtures.push([name, model, ...rest]);
 	}

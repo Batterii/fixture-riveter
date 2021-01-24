@@ -1,6 +1,7 @@
-import {Model as ObjectionModel} from "objection";
+import {mixin, Model as ObjectionModel} from "objection";
+import tableNamer from "objection-table-name";
 
-export class Model extends ObjectionModel {
+export class Model extends mixin(ObjectionModel, [tableNamer()]) {
 	get props() {
 		return {};
 	}

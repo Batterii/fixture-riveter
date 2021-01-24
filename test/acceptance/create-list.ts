@@ -9,7 +9,6 @@ describe("createList", function() {
 	let fr: FixtureRiveter;
 
 	class Post extends Model {
-		static tableName = "posts";
 		title: string;
 		author: string;
 		position: number;

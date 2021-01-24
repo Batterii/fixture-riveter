@@ -23,6 +23,7 @@ import {
 	ModelConstructor,
 	BlockFunction,
 	FixtureRestArgs,
+	FixtureName,
 	FixtureOptions,
 	Overrides,
 } from "./types";
@@ -42,13 +43,15 @@ export function extractOverrides(traitsAndOptions: any[]): Record<string, any> {
 	return {};
 }
 
-export type FixtureName = string | {tableName: string};
-export function nameGuard(fixtureName: FixtureName): string {
+export function nameGuard<T>(fixtureName: FixtureName<T>): string {
 	if (isString(fixtureName)) {
 		return fixtureName;
 	}
 	if (fixtureName.tableName) {
 		return fixtureName.tableName;
+	}
+	if (fixtureName.name) {
+		return fixtureName.name;
 	}
 	throw new Error(`${fixtureName} isn't the right shape`);
 }
@@ -57,7 +60,7 @@ export class FixtureRiveter {
 	fixtures: Record<string, Fixture<any>>;
 	traits: Record<string, Trait<any>>;
 	instances: [string, any][];
-	adapterHandler: any;
+	adapterHandler: AdapterHandler;
 	sequenceHandler: SequenceHandler;
 	useParentStrategy: boolean;
 	callbackHandler: CallbackHandler;
@@ -99,20 +102,41 @@ export class FixtureRiveter {
 	}
 
 	fixture<T>(
-		name: FixtureName,
+		fixtureClass: FixtureName<T>,
+		options: FixtureOptions,
+		block?: BlockFunction<T>,
+	): Fixture<T>;
+
+	fixture<T>(
+		fixtureClass: FixtureName<T>,
+		rest?: FixtureRestArgs<T>,
+	): Fixture<T>;
+
+	fixture<T>(
+		name: string,
 		model: ModelConstructor<T>,
 		options: FixtureOptions,
 		block?: BlockFunction<T>,
 	): Fixture<T>;
 
 	fixture<T>(
-		name: FixtureName,
+		name: string,
 		model: ModelConstructor<T>,
 		rest?: FixtureRestArgs<T>,
 	): Fixture<T>;
 
-	fixture<T>(fixtureName: FixtureName, model: ModelConstructor<T>, ...rest: any[]): Fixture<T> {
-		const name = nameGuard(fixtureName);
+	fixture<T>(...rest: any[]): Fixture<T> {
+		let fixtureName: FixtureName<T>;
+		let model: ModelConstructor<T> & {tableName?: string};
+
+		if (isString(rest[0])) {
+			fixtureName = rest.shift();
+			model = rest.shift();
+		} else {
+			fixtureName = model = rest.shift();
+		}
+
+		const name = nameGuard<T>(fixtureName);
 		if (this.getFixture(name, false)) {
 			throw new Error(`${name} is already defined`);
 		}
@@ -146,13 +170,13 @@ export class FixtureRiveter {
 		this.traits[trait.name] = trait;
 	}
 
-	sequence(
-		name: FixtureName,
+	sequence<T>(
+		name: FixtureName<T>,
 		initial?: string | number | {aliases: string[]} | SequenceCallback,
 	): Sequence;
 
-	sequence(
-		name: FixtureName,
+	sequence<T>(
+		name: FixtureName<T>,
 		initial?: string | number,
 		options?: {aliases: string[]},
 		callback?: SequenceCallback,
@@ -181,7 +205,7 @@ export class FixtureRiveter {
 	}
 
 	async run<T = Pojo>(
-		fixtureName: FixtureName,
+		fixtureName: FixtureName<T>,
 		strategy: string,
 		traits: any[],
 	): Promise<T> {
@@ -205,7 +229,7 @@ export class FixtureRiveter {
 	}
 
 	async runList<T = Pojo>(
-		name: FixtureName,
+		name: FixtureName<T>,
 		strategy: string,
 		count: number,
 		traits: any[],
@@ -258,27 +282,27 @@ export class FixtureRiveter {
 	// Typescript sucks for dynamically defined methods lol
 	// All of these will be overwritten on instantiation
 	async attributesFor<T = Pojo>(
-		name: FixtureName,
+		name: FixtureName<T>,
 		traits?: string[],
 		overrides?: Overrides<T>,
 	): Promise<T>;
 
 	async attributesFor<T = Pojo>(
-		name: FixtureName,
+		name: FixtureName<T>,
 		traitOrOverrides?: string[]|Overrides<T>,
 	): Promise<T>;
 
 	async attributesFor<T>(..._args: any[]): Promise<T> { return undefined as any; }
 
 	async attributesForList<T = Pojo>(
-		name: FixtureName,
+		name: FixtureName<T>,
 		count: number,
 		traits?: string[],
 		overrides?: Overrides<T>,
 	): Promise<T[]>;
 
 	async attributesForList<T = Pojo>(
-		name: FixtureName,
+		name: FixtureName<T>,
 		count: number,
 		traitOrOverrides?: string[]|Overrides<T>,
 	): Promise<T[]>;
@@ -286,25 +310,25 @@ export class FixtureRiveter {
 	async attributesForList<T>(..._args: any[]): Promise<T[]> { return undefined as any; }
 
 	async attributesForPair<T = Pojo>(
-		name: FixtureName,
+		name: FixtureName<T>,
 		traits?: string[],
 		overrides?: Overrides<T>,
 	): Promise<[T, T]>;
 
 	async attributesForPair<T = Pojo>(
-		name: FixtureName,
+		name: FixtureName<T>,
 		traitOrOverrides?: string[]|Overrides<T>,
 	): Promise<[T, T]>;
 
 	async attributesForPair<T>(..._args: any[]): Promise<[T, T]> { return undefined as any; }
 
 	async build<T = Pojo>(
-		name: FixtureName,
+		name: FixtureName<T>,
 		traitOrOverrides?: string[]|Overrides<T>,
 	): Promise<T>;
 
 	async build<T = Pojo>(
-		name: FixtureName,
+		name: FixtureName<T>,
 		traits?: string[],
 		overrides?: Overrides<T>,
 	): Promise<T>;
@@ -312,14 +336,14 @@ export class FixtureRiveter {
 	async build<T = Pojo>(..._args: any[]): Promise<T> { return undefined as any; }
 
 	async buildList<T = Pojo>(
-		name: FixtureName,
+		name: FixtureName<T>,
 		count: number,
 		traits?: string[],
 		overrides?: Overrides<T>,
 	): Promise<T[]>;
 
 	async buildList<T = Pojo>(
-		name: FixtureName,
+		name: FixtureName<T>,
 		count: number,
 		traitOrOverrides?: string[]|Overrides<T>,
 	): Promise<T[]>;
@@ -327,40 +351,40 @@ export class FixtureRiveter {
 	async buildList<T = Pojo>(..._args: any[]): Promise<T[]> { return undefined as any; }
 
 	async buildPair<T = Pojo>(
-		name: FixtureName,
+		name: FixtureName<T>,
 		traits?: string[],
 		overrides?: Overrides<T>,
 	): Promise<[T, T]>;
 
 	async buildPair<T = Pojo>(
-		name: FixtureName,
+		name: FixtureName<T>,
 		traitOrOverrides?: string[]|Overrides<T>,
 	): Promise<[T, T]>;
 
 	async buildPair<T = Pojo>(..._args: any[]): Promise<[T, T]> { return undefined as any; }
 
 	async create<T = Pojo>(
-		name: FixtureName,
+		name: FixtureName<T>,
 		traits?: string[],
 		overrides?: Overrides<T>,
 	): Promise<T>;
 
 	async create<T = Pojo>(
-		name: FixtureName,
+		name: FixtureName<T>,
 		traitOrOverrides?: string[]|Overrides<T>,
 	): Promise<T>;
 
 	async create<T = Pojo>(..._args: any[]): Promise<T> { return undefined as any; }
 
 	async createList<T = Pojo>(
-		name: FixtureName,
+		name: FixtureName<T>,
 		count: number,
 		traits?: string[],
 		overrides?: Overrides<T>,
 	): Promise<T[]>;
 
 	async createList<T = Pojo>(
-		name: FixtureName,
+		name: FixtureName<T>,
 		count: number,
 		traitOrOverrides?: string[]|Overrides<T>,
 	): Promise<T[]>;
@@ -368,13 +392,13 @@ export class FixtureRiveter {
 	async createList<T = Pojo>(..._args: any[]): Promise<T[]> { return undefined as any; }
 
 	async createPair<T = Pojo>(
-		name: FixtureName,
+		name: FixtureName<T>,
 		traits?: string[],
 		overrides?: Overrides<T>,
 	): Promise<[T, T]>;
 
 	async createPair<T = Pojo>(
-		name: FixtureName,
+		name: FixtureName<T>,
 		traitOrOverrides?: string[]|Overrides<T>,
 	): Promise<[T, T]>;
 
