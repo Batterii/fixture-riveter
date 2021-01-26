@@ -36,7 +36,7 @@ describe("FixtureRiveter", function() {
 				f.attr("age", () => 32);
 			});
 
-			const user = await fr.build("user", {name: "Bogart"});
+			const user = await fr.create<User>("user", {name: "Bogart"});
 
 			expect(user.name).to.equal("Bogart");
 			expect(user.age).to.equal(32);
@@ -54,7 +54,7 @@ describe("FixtureRiveter", function() {
 				f.attr("age", () => 32);
 			});
 
-			const user = await fr.build(User, {name: "Bogart"});
+			const user = await fr.create(User, {name: "Bogart"});
 
 			expect(user.name).to.equal("Bogart");
 			expect(user.age).to.equal(32);
@@ -69,7 +69,7 @@ describe("FixtureRiveter", function() {
 				f.attr("age", () => 32);
 			});
 
-			const user = await fr.build(DummyModel, {name: "Bogart"});
+			const user = await fr.create(DummyModel, {name: "Bogart"});
 
 			expect(user.name).to.equal("Bogart");
 			expect(user.age).to.equal(32);

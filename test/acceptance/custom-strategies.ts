@@ -9,8 +9,7 @@ import {FixtureRiveter} from "../../lib/fixture-riveter";
 
 import {expect} from "chai";
 
-/* eslint-disable class-methods-use-this */
-export class JsonStrategy extends Strategy {
+class JsonStrategy extends Strategy {
 	async association(fixtureName: string, traitsAndOverrides: any[]): Promise<any> {
 		return this.fixtureRiveter.run(fixtureName, "create", traitsAndOverrides);
 	}
@@ -33,33 +32,69 @@ describe("Custom strategies", function() {
 		}
 	}
 
-	before(async function() {
-		await createTable(Post);
+	describe("string name", function() {
+		beforeEach(async function() {
+			await createTable(Post);
 
-		fr = new FixtureRiveter();
-		fr.setAdapter(new ObjectionAdapter());
-		fr.registerStrategy("json", JsonStrategy);
+			fr = new FixtureRiveter();
+			fr.setAdapter(new ObjectionAdapter());
 
-		fr.fixture("post", Post, (f) => {
-			f.attr("title", () => "The City & The City");
+			fr.fixture("post", Post, (f) => {
+				f.attr("title", () => "The City & The City");
 
-			f.trait("modern", (t) => t.attr("title", () => "Kraken"));
+				f.trait("modern", (t) => t.attr("title", () => "Kraken"));
+			});
+
+			fr.registerStrategy("json", JsonStrategy);
+		});
+
+		it("works with property call", async function() {
+			const post = await (fr as any).json("post", ["modern"]);
+			const builtPost = await fr.build("post", ["modern"]);
+
+			expect(typeof post).to.equal("string");
+			expect(JSON.parse(post)).to.deep.equal(builtPost);
+		});
+
+		it("works with run", async function() {
+			const post = await fr.run<string>("post", "json", ["modern"]);
+			const builtPost = await fr.build("post", ["modern"]);
+
+			expect(typeof post).to.equal("string");
+			expect(JSON.parse(post)).to.deep.equal(builtPost);
 		});
 	});
 
-	it("works", async function() {
-		const post = await (fr as any).json("post", "modern");
-		const builtPost = await fr.build("post", ["modern"]);
+	describe("class name", function() {
+		beforeEach(async function() {
+			await createTable(Post);
 
-		expect(typeof post).to.equal("string");
-		expect(JSON.parse(post)).to.deep.equal(builtPost);
-	});
+			fr = new FixtureRiveter();
+			fr.setAdapter(new ObjectionAdapter());
 
-	it("works with run", async function() {
-		const post = await fr.run<string>("post", "json", ["modern"]);
-		const builtPost = await fr.build("post", ["modern"]);
+			fr.fixture("post", Post, (f) => {
+				f.attr("title", () => "The City & The City");
 
-		expect(typeof post).to.equal("string");
-		expect(JSON.parse(post)).to.deep.equal(builtPost);
+				f.trait("modern", (t) => t.attr("title", () => "Kraken"));
+			});
+
+			fr.registerStrategy(JsonStrategy);
+		});
+
+		it("works with property call", async function() {
+			const post = await (fr as any).JsonStrategy("post", ["modern"]);
+			const builtPost = await fr.build("post", ["modern"]);
+
+			expect(typeof post).to.equal("string");
+			expect(JSON.parse(post)).to.deep.equal(builtPost);
+		});
+
+		it("works with run", async function() {
+			const post = await fr.run<string>("post", JsonStrategy, ["modern"]);
+			const builtPost = await fr.build("post", ["modern"]);
+
+			expect(typeof post).to.equal("string");
+			expect(JSON.parse(post)).to.deep.equal(builtPost);
+		});
 	});
 });

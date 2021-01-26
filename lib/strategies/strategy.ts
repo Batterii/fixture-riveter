@@ -3,7 +3,7 @@ import {Assembler} from "../assembler";
 import {FixtureRiveter} from "../fixture-riveter";
 import {ModelConstructor} from "../types";
 
-export abstract class Strategy {
+export class Strategy {
 	adapter: Adapter;
 	fixtureRiveter: FixtureRiveter;
 	name: string;
@@ -14,6 +14,12 @@ export abstract class Strategy {
 		this.fixtureRiveter = fixtureRiveter;
 	}
 
-	abstract association(fixtureName: string, traitsAndOverrides: any[]): Promise<any>;
-	abstract result<T>(assembler: Assembler<T>, model?: ModelConstructor<T>): Promise<any>;
+	async association(fixtureName: string, traitsAndOverrides: any[]): Promise<any> {
+		return this.fixtureRiveter.run(fixtureName, "null", traitsAndOverrides);
+	}
+
+	async result<T>(assembler: Assembler<T>, model?: ModelConstructor<T>): Promise<any>;
+	async result<T>(assembler: Assembler<T>): Promise<any> {
+		return assembler.toObject();
+	}
 }

@@ -209,26 +209,4 @@ describe("Fixture", function() {
 			expect(result).to.deep.equal([parentAttr, childAttr]);
 		});
 	});
-
-	describe("#run", function() {
-		it("calls attributesFor", async function() {
-			const adapter = new DefaultAdapter();
-			const fixture = new Fixture(fixtureRiveter, "dummy", DummyModel);
-			const instance = [];
-
-			sinon.stub(fixture, "getAttributes").returns(instance);
-
-			const buildStrategy = new AttributesForStrategy(
-				"attributesFor",
-				fixtureRiveter,
-				adapter,
-			);
-			sinon.stub(buildStrategy, "result").resolves(instance);
-
-			const result = await fixture.run(buildStrategy);
-
-			expect(result).to.equal(instance);
-			expect(fixture.getAttributes).to.be.calledOnce;
-		});
-	});
 });

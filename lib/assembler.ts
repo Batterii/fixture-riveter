@@ -1,5 +1,6 @@
 import {AttributeAssigner} from "./attribute-assigner";
 import {Callback} from "./callback";
+import {Pojo} from "./types";
 
 export class Assembler<T> {
 	attributeAssigner: AttributeAssigner<T>;
@@ -10,7 +11,7 @@ export class Assembler<T> {
 		this.callbacks = callbacks;
 	}
 
-	async toObject(): Promise<Record<string, any>> {
+	async toObject(): Promise<Pojo> {
 		return this.attributeAssigner.toObject();
 	}
 

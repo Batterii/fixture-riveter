@@ -8,7 +8,7 @@ import {FixtureName} from "./types";
 
 export class StrategyHandler {
 	fixtureRiveter: FixtureRiveter;
-	strategies: Record<string, Strategy>;
+	strategies: Record<string, typeof Strategy>;
 
 	constructor(fixtureRiveter: FixtureRiveter) {
 		this.fixtureRiveter = fixtureRiveter;
@@ -20,7 +20,7 @@ export class StrategyHandler {
 		this.defineStrategyMethods(strategyName);
 	}
 
-	getStrategy(strategyName: string): any {
+	getStrategy(strategyName: string): typeof Strategy {
 		return this.strategies[strategyName];
 	}
 

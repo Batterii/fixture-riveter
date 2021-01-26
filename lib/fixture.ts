@@ -133,7 +133,7 @@ export class Fixture<T> extends Definition<T> {
 	async run(
 		buildStrategy: Strategy,
 		overrides: Record<string, any> = {},
-	): Promise<T | Record<string, any>> {
+	): Promise<Assembler<T>> {
 		const evaluator = addMethodMissing(
 			new Evaluator(
 				this.fixtureRiveter,
@@ -150,8 +150,6 @@ export class Fixture<T> extends Definition<T> {
 			evaluator,
 		);
 
-		const assembler = new Assembler<T>(attributeAssigner, this.getCallbacks());
-
-		return buildStrategy.result<T>(assembler, this.model);
+		return new Assembler<T>(attributeAssigner, this.getCallbacks());
 	}
 }

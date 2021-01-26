@@ -1,7 +1,6 @@
 import {DummyModel} from "../test-fixtures/dummy-model";
 import {Model} from "../test-fixtures/model";
 
-import {DefaultAdapter} from "../../lib/adapters/default-adapter";
 import {Fixture} from "../../lib/fixture";
 import {extractOverrides, nameGuard, FixtureRiveter} from "../../lib/fixture-riveter";
 import {Sequence} from "../../lib/sequences/sequence";
@@ -9,7 +8,6 @@ import {IntegerSequence} from "../../lib/sequences/integer-sequence";
 
 import {identity} from "lodash";
 import {expect} from "chai";
-import sinon from "sinon";
 
 describe("extractAttributes", function() {
 	it("returns an empty object", function() {
@@ -50,42 +48,9 @@ describe("FixtureRiveter", function() {
 		expect(fixtureRiveter.fixtures).to.exist.and.to.be.empty;
 	});
 
-	describe("#getAdapter", function() {
-		it("passes the call down", function() {
-			const fixtureRiveter = new FixtureRiveter();
-			sinon.stub(fixtureRiveter.adapterHandler, "getAdapter").returns("test" as any);
-			const result = fixtureRiveter.getAdapter("value");
-			const {getAdapter} = fixtureRiveter.adapterHandler;
-
-			expect(result).to.deep.equal("test");
-			expect(getAdapter).to.be.calledOnce;
-			expect(getAdapter).to.be.calledWithExactly("value");
-		});
-	});
-
-	describe("#setAdapter", function() {
-		it("passes the call down", function() {
-			const fixtureRiveter = new FixtureRiveter();
-			sinon.stub(fixtureRiveter.adapterHandler, "setAdapter").returns("test" as any);
-			const defaultAdapter = new DefaultAdapter();
-			const result = fixtureRiveter.setAdapter(defaultAdapter, "value");
-			const {setAdapter} = fixtureRiveter.adapterHandler;
-
-			expect(result).to.deep.equal("test");
-			expect(setAdapter).to.be.calledOnce;
-			expect(setAdapter).to.be.calledWithExactly(defaultAdapter, "value");
-		});
-	});
-
-	describe("#define", function() {
-		it("calls the block immediately", function() {
-			const fixtureRiveter = new FixtureRiveter();
-			const testArray = ["test"] as any;
-			fixtureRiveter.fixtures = testArray;
-
-			expect(fixtureRiveter.fixtures).to.deep.equal(testArray);
-		});
-	});
+	it("#getAdapter");
+	it("#setAdapter");
+	it("#define");
 
 	describe("#registerFixture", function() {
 		it("adds the fixture by name", function() {
@@ -156,11 +121,10 @@ describe("FixtureRiveter", function() {
 
 		it("registers the fixture", function() {
 			const fixtureRiveter = new FixtureRiveter();
-			const spy = sinon.spy(fixtureRiveter as any, "registerFixture");
-			sinon.stub(fixtureRiveter, "getFixture").returns(false as any);
+			const name = "testFixture";
+			expect(fixtureRiveter.fixtures[name]).to.not.exist;
 			fixtureRiveter.fixture("testFixture", DummyModel);
-
-			expect(spy.calledOnce).to.be.true;
+			expect(fixtureRiveter.fixtures[name]).to.exist;
 		});
 
 		it("doesn't register a fixture twice", function() {
@@ -168,9 +132,7 @@ describe("FixtureRiveter", function() {
 			const testFn = () => {
 				fixtureRiveter.fixture("testFixture", DummyModel);
 			};
-
 			testFn();
-
 			expect(testFn).to.throw();
 		});
 
@@ -204,37 +166,6 @@ describe("FixtureRiveter", function() {
 		});
 	});
 
-	describe("#attributesFor", function() {
-		it("calls run correctly", async function() {
-			const fr = new FixtureRiveter();
-			const name = "name";
-			sinon.stub(fr, "run").resolves({});
-			await fr.attributesFor(name);
-			expect(fr.run).to.be.calledOnceWith(name, "attributesFor", []);
-		});
-	});
-
-	describe("#build", function() {
-		it("calls run correctly", async function() {
-			const fr = new FixtureRiveter();
-			const name = "name";
-			sinon.stub(fr, "run").resolves({});
-			await fr.build(name);
-			expect(fr.run).to.be.calledOnceWith(name, "build", []);
-		});
-	});
-
-	describe("#create", function() {
-		it("calls run correctly", async function() {
-			const fr = new FixtureRiveter();
-			const name = "name";
-			sinon.stub(fr, "run").resolves({});
-			await fr.create(name);
-			expect(fr.run).to.be.calledOnceWith(name, "create", []);
-		});
-	});
-
-
 	describe("#sequence", function() {
 		it("returns the created sequence", function() {
 			const fr = new FixtureRiveter();
@@ -248,16 +179,6 @@ describe("FixtureRiveter", function() {
 			fr.sequence(name);
 			expect(fr.sequenceHandler.sequences).to.be.length(1);
 			expect(fr.sequenceHandler.sequences[0].name).to.equal(name);
-		});
-
-		it("delegates sequence creation to sequenceHandler", function() {
-			const fr = new FixtureRiveter();
-			sinon.spy(fr.sequenceHandler, "registerSequence");
-			const name = "email";
-			fr.sequence(name);
-
-			expect(fr.sequenceHandler.registerSequence).to.be.calledOnce;
-			expect(fr.sequenceHandler.registerSequence).to.be.calledOnceWithExactly(name);
 		});
 	});
 

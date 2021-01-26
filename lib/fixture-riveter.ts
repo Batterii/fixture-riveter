@@ -17,6 +17,7 @@ import {
 } from "./callback";
 import {CallbackHandler} from "./callback-handler";
 import {StrategyHandler} from "./strategy-handler";
+import {Strategy} from "./strategies/strategy";
 
 import {
 	Pojo,
@@ -205,44 +206,99 @@ export class FixtureRiveter {
 	}
 
 	async run<T = Pojo>(
-		fixtureName: FixtureName<T>,
-		strategy: string,
-		traits: any[],
+		fixtureName: FixtureName<T> | FixtureName<Pojo>,
+		strategyName: string | typeof Strategy,
+		traitsOrOverride?: string[]|Overrides<T>,
+	): Promise<T>;
+
+	async run<T = Pojo>(
+		fixtureName: FixtureName<T> | FixtureName<Pojo>,
+		strategyName: string | typeof Strategy,
+		traits: string[],
+		overrides?: Overrides<T>,
+	): Promise<T>;
+
+	async run<T>(
+		fixtureName: FixtureName<T> | FixtureName<Pojo>,
+		strategyName: string | typeof Strategy,
+		...traitsAndOverrides: any[]
 	): Promise<T> {
 		const name = nameGuard(fixtureName);
+		const traits = traitsAndOverrides.flat(2);
 		const overrides = extractOverrides(traits);
-		let fixture = this.getFixture(name);
+		let fixture = this.getFixture<T>(name);
 
 		fixture.compile();
 
-		traits = traits.flat(2);
 		if (traits.length > 0) {
 			fixture = fixture.copy();
 			fixture.appendTraits(traits);
 		}
+
 		const adapter = this.getAdapter(name);
-		const StrategyRiveter = this.strategyHandler.getStrategy(strategy);
-		const buildStrategy = new StrategyRiveter(strategy, this, adapter);
-		const instance = await fixture.run(buildStrategy, overrides);
+		const sName = nameGuard(strategyName as FixtureName<Strategy>);
+
+		let StrategyConstructor: typeof strategyName;
+		if (isString(strategyName)) {
+			StrategyConstructor = this.strategyHandler.getStrategy(sName);
+		} else {
+			StrategyConstructor = strategyName;
+		}
+		const strategy = new StrategyConstructor(sName, this, adapter);
+
+		const assembler = await fixture.run(strategy, overrides);
+		const instance = await strategy.result<T>(assembler, fixture.model);
 		this.instances.push([name, instance]);
 		return instance;
 	}
 
 	async runList<T = Pojo>(
-		name: FixtureName<T>,
-		strategy: string,
+		name: FixtureName<T> | FixtureName<Pojo>,
+		strategyName: string | typeof Strategy,
 		count: number,
-		traits: any[],
+		traitsOrOverride?: string[] | Overrides<T>,
+	): Promise<T[]>;
+
+	async runList<T = Pojo>(
+		name: FixtureName<T> | FixtureName<Pojo>,
+		strategyName: string | typeof Strategy,
+		count: number,
+		traits: string[],
+		overrides?: Overrides<T>,
+	): Promise<T[]>;
+
+	async runList<T = Pojo>(
+		name: FixtureName<T> | FixtureName<Pojo>,
+		strategyName: string | typeof Strategy,
+		count: number,
+		...traitsAndOverrides: any[]
 	): Promise<T[]> {
+		const strategy = nameGuard(strategyName as FixtureName<Strategy>);
+
 		const instances: T[] = [];
 		for (let idx = 0; idx < count; idx += 1) {
-			const instance = await this.run<T>(name, strategy, cloneDeep(traits));
+			const instance = await this.run<T>(name, strategy, cloneDeep(traitsAndOverrides));
 			instances.push(instance);
 		}
 		return instances;
 	}
 
-	registerStrategy(strategyName: string, strategyClass: any): void {
+	registerStrategy(strategyClass: typeof Strategy): void;
+	registerStrategy(strategyName: string, strategyClass: typeof Strategy): void;
+
+	registerStrategy(...rest: any[]): void {
+		let name: string | FixtureName<Strategy>;
+		let strategyClass: Strategy;
+
+		if (isString(rest[0])) {
+			name = rest.shift();
+			strategyClass = rest.shift();
+		} else {
+			name = strategyClass = rest.shift();
+		}
+
+		const strategyName = nameGuard(name);
+
 		this.strategyHandler.registerStrategy(strategyName, strategyClass);
 	}
 
