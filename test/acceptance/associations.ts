@@ -291,3 +291,169 @@ describe("Complex associations", function() {
 		});
 	});
 });
+
+describe("Associations with a join table", function() {
+	class User extends Model {
+		static relationMappings = {};
+
+		id: number;
+		name: string;
+		teams?: Team[];
+
+		get props() {
+			return {
+				name: "string",
+			};
+		}
+	}
+
+	class Team extends Model {
+		static relationMappings = {};
+
+		id: number;
+		title: string;
+		users?: User[];
+
+		get props() {
+			return {
+				title: "string",
+			};
+		}
+	}
+
+	class Membership extends Model {
+		static idColumn = ["teamId", "userId"];
+		static relationMappings = {};
+
+		teamId: number;
+		userId: number;
+
+		team?: Team;
+		user?: User;
+
+		get props() {
+			return {
+				teamId: "integer",
+				userId: "integer",
+			};
+		}
+	}
+
+	User.relationMappings = {
+		teams: {
+			relation: Model.ManyToManyRelation,
+			modelClass: Team,
+			join: {
+				from: "users.id",
+				through: {
+					from: "memberships.userId",
+					to: "memberships.teamId",
+				},
+				to: "teams.id",
+			},
+		},
+	};
+
+	Team.relationMappings = {
+		users: {
+			relation: Model.ManyToManyRelation,
+			modelClass: User,
+			join: {
+				from: "teams.id",
+				through: {
+					from: "memberships.teamId",
+					to: "memberships.userId",
+				},
+				to: "users.id",
+			},
+		},
+	};
+
+	Membership.relationMappings = {
+		team: {
+			relation: Model.BelongsToOneRelation,
+			modelClass: Team,
+			join: {
+				from: "memberships.teamId",
+				to: "teams.id",
+			},
+		},
+		user: {
+			relation: Model.BelongsToOneRelation,
+			modelClass: User,
+			join: {
+				from: "memberships.userId",
+				to: "users.id",
+			},
+		},
+	};
+
+	let fr: FixtureRiveter;
+
+	before(async function() {
+		await createTable(User);
+		await createTable(Team);
+		await createTable(Membership, false);
+
+		fr = new FixtureRiveter();
+		fr.setAdapter(new ObjectionAdapter());
+
+		fr.fixture("user", User, (f) => {
+			f.attr("name", () => "Noah");
+
+			f.transient((t) => {
+				t.attr("team", () => false);
+			});
+
+			f.trait("on a team", (t) => {
+				t.after("create", async(user, evaluator: any) => {
+					let team = await evaluator.team();
+					if (!team) {
+						team = await fr.create("team");
+					}
+
+					await fr.create("membership", {user, team});
+					user.$setRelated("teams", [team]);
+				});
+			});
+		});
+
+		fr.fixture("team", Team, (f) => {
+			f.attr("title", () => "The City & The City");
+
+			f.transient((t) => {
+				t.attr("users", () => []);
+				t.attr("userCount", () => 1);
+			});
+
+			f.trait("with memberships", (t) => {
+				t.after("create", async(team, evaluator) => {
+					let users: User[] = await evaluator.attr("users");
+					const userCount: number = await evaluator.attr("userCount");
+
+					if (users.length === 0) {
+						users = await fr.createList<User>("user", userCount);
+					}
+
+					await Promise.all(users.map(async(user) => {
+						return fr.create("membership", {team, user});
+					}));
+
+					team.$setRelated("users", users);
+				});
+			});
+		});
+
+		fr.fixture("membership", Membership, (f) => {
+			f.user();
+			f.team();
+		});
+	});
+
+	it("works", async function() {
+		const user = await fr.create<User>("user", ["on a team"]);
+		expect(user.teams).to.exist.and.to.have.length(1);
+		const team = await fr.create<Team>("team", ["with memberships"]);
+		expect(team.users).to.exist.and.to.have.length(1);
+	});
+});
