@@ -23,7 +23,6 @@ export class Definition<T> {
 	block?: BlockFunction<T>;
 	callbackHandler: CallbackHandler;
 
-	sequenceHandler: SequenceHandler;
 	declarationHandler: DeclarationHandler;
 
 	traits: Record<string, Trait<T>>;
@@ -38,11 +37,14 @@ export class Definition<T> {
 		this.additionalTraits = [];
 		this.compiled = false;
 
-		this.sequenceHandler = new SequenceHandler();
 		this.declarationHandler = new DeclarationHandler(name);
 		this.callbackHandler = new CallbackHandler(fixtureRiveter);
 
 		this.traits = {};
+	}
+
+	get sequenceHandler(): SequenceHandler {
+		return this.fixtureRiveter.sequenceHandler;
 	}
 
 	names(): string[] {

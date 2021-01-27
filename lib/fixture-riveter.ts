@@ -98,6 +98,9 @@ export class FixtureRiveter {
 
 	registerFixture<T>(fixture: Fixture<T>): void {
 		for (const name of fixture.names()) {
+			if (this.fixtures[name]) {
+				throw new Error(`Can't define ${name} fixture twice`);
+			}
 			this.fixtures[name] = fixture;
 		}
 	}
@@ -171,16 +174,28 @@ export class FixtureRiveter {
 		this.traits[trait.name] = trait;
 	}
 
-	sequence<T>(
-		name: FixtureName<T>,
-		initial?: string | number | {aliases: string[]} | SequenceCallback,
+	sequence<I extends number | string>(
+		name: string,
+		options?: I | {aliases: string[]} | SequenceCallback<I>,
 	): Sequence;
 
-	sequence<T>(
-		name: FixtureName<T>,
-		initial?: string | number,
-		options?: {aliases: string[]},
-		callback?: SequenceCallback,
+	sequence<I extends number | string>(
+		name: string,
+		initial: I,
+		aliasesOrCallback?: {aliases: string[]} | SequenceCallback<I>,
+	): Sequence;
+
+	sequence<I extends number | string>(
+		name: string,
+		aliases: {aliases: string[]},
+		callback?: SequenceCallback<I>,
+	): Sequence;
+
+	sequence<I extends number | string>(
+		name: string,
+		initial: I,
+		aliases: {aliases: string[]},
+		callback: SequenceCallback<I>,
 	): Sequence;
 
 	sequence(name: string, ...rest: any[]): Sequence {

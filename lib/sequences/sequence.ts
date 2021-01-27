@@ -1,9 +1,9 @@
-export type SequenceCallback = (result: string | number) => any;
+export type SequenceCallback<I extends number | string> = (result: I) => any;
 
 export abstract class Sequence {
 	name: string;
 	aliases: string[];
-	callback: SequenceCallback;
+	callback: SequenceCallback<any>;
 
 	constructor(name: string, options?: any) {
 		this.name = name;

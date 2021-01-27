@@ -123,9 +123,28 @@ export class DefinitionProxy<T> {
 		this.definition.declareAttribute(association);
 	}
 
-	sequence(
+	sequence<I extends number | string>(
 		name: string,
-		initial?: string | number | {aliases: string[]} | SequenceCallback,
+		options?: I | {aliases: string[]} | SequenceCallback<I>,
+	): Sequence;
+
+	sequence<I extends number | string>(
+		name: string,
+		initial: I,
+		aliasesOrCallback?: {aliases: string[]} | SequenceCallback<I>,
+	): Sequence;
+
+	sequence<I extends number | string>(
+		name: string,
+		aliases: {aliases: string[]},
+		callback?: SequenceCallback<I>,
+	): Sequence;
+
+	sequence<I extends number | string>(
+		name: string,
+		initial: I,
+		aliases: {aliases: string[]},
+		callback: SequenceCallback<I>,
 	): Sequence;
 
 	sequence(name: string, ...rest: any[]): Sequence {

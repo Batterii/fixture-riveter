@@ -10,7 +10,7 @@ explanatory comments.
 import {fr, ObjectionAdapter} from "fixture-riveter";
 import {User} from "./models/user";
 
-// Each adapter can specify ORM-specific build, save, associate, and set functions
+// Each adapter can specify ORM-specific build, save, associate, and set functions.
 // A given adapter can be set on a specific fixture as well, allowing for
 // fixture-specific build and save functionality.
 fr.setAdapter(new ObjectionAdapter());

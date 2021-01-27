@@ -1,4 +1,6 @@
 {
+	"docs/*.md": {"type": "doc"},
+	"README.md": {"type": "doc"},
 	"lib/*.ts": {
 		"alternate": ["test/acceptance/{}.ts","test/unit/{}.ts"],
 		"type": "source"

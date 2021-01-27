@@ -12,50 +12,49 @@ import {
 	isString,
 } from "lodash";
 
-export interface SequenceOptions {
-	initial?: string | number;
-	aliases?: string[];
-	callback?: SequenceCallback;
-}
-
 export class SequenceHandler {
-	sequences: Sequence[];
+	sequences: Record<string, Sequence>;
 
 	constructor() {
-		this.sequences = [];
+		this.sequences = {};
 	}
 
-	registerSequence(
-		name: string,
-		initial?: string | number,
-		options?: {aliases: string[]},
-		callback?: SequenceCallback,
-	): Sequence;
-
-	registerSequence(name: string, ...rest: any[]): Sequence {
+	registerSequence(sequenceName: string, ...rest: any[]): Sequence {
 		const options = optionsParser(...rest);
-		const newSequence = sequenceChooser(name, options);
+		const newSequence = sequenceChooser(sequenceName, options);
 
-		this.sequences.push(newSequence);
+		for (const name of newSequence.names()) {
+			if (this.sequences[name]) {
+				throw new Error(`Can't define ${name} sequence twice`);
+			}
+			this.sequences[name] = newSequence;
+		}
+
 		return newSequence;
 	}
 
 	resetSequences(): void {
-		this.sequences.forEach((seq) => seq.reset());
+		Object.values(this.sequences).forEach((seq) => seq.reset());
 	}
 
 	findSequence(name: string): Sequence | undefined {
-		return this.sequences.find((s: Sequence) => s.name === name);
+		return this.sequences[name];
 	}
+}
+
+interface SequenceOptions {
+	initial?: string | number;
+	aliases?: string[];
+	callback?: SequenceCallback<any>;
 }
 
 type Initial = string | number;
 type Options = {aliases: string[]};
 
 export function optionsParser(
-	initial?: Initial | Options | SequenceCallback,
-	options?: Initial | Options | SequenceCallback,
-	callback?: Initial | Options | SequenceCallback,
+	initial?: Initial | Options | SequenceCallback<any>,
+	options?: Initial | Options | SequenceCallback<any>,
+	callback?: Initial | Options | SequenceCallback<any>,
 ): SequenceOptions;
 
 export function optionsParser(...args: any[]): SequenceOptions {

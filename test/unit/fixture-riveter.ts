@@ -177,8 +177,8 @@ describe("FixtureRiveter", function() {
 			const fr = new FixtureRiveter();
 			const name = "email";
 			fr.sequence(name);
-			expect(fr.sequenceHandler.sequences).to.be.length(1);
-			expect(fr.sequenceHandler.sequences[0].name).to.equal(name);
+			expect(Object.keys(fr.sequenceHandler.sequences)).to.deep.equal([name]);
+			expect(fr.sequenceHandler.sequences[name]).to.be.an.instanceof(Sequence);
 		});
 	});
 
