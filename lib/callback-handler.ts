@@ -22,25 +22,25 @@ export class CallbackHandler {
 	}
 
 	before<T>(...rest: any[]): void {
-		const block = extractCallbackFunction(rest);
+		const block = extractCallbackFunction<T>(rest);
 		const names = rest.map((n: string) => {
 			const string = n.charAt(0).toUpperCase() + n.slice(1);
 			return `before${string}`;
 		});
-		this.addCallback<T>(names, block);
+		this.addCallback(names, block);
 	}
 
 	after<T>(...rest: any[]): void {
-		const block = extractCallbackFunction(rest);
+		const block = extractCallbackFunction<T>(rest);
 		const names = rest.map((n: string) => {
 			const string = n.charAt(0).toUpperCase() + n.slice(1);
 			return `after${string}`;
 		});
-		this.addCallback<T>(names, block);
+		this.addCallback(names, block);
 	}
 }
 
-export function extractCallbackFunction(rest: any[]): any {
+export function extractCallbackFunction<T>(rest: any[]): CallbackFunction<T> {
 	const block = rest.pop();
 	if (!isFunction(block)) {
 		throw new Error("Callback needs to be a function");

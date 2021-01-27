@@ -26,6 +26,7 @@ import {
 	FixtureRestArgs,
 	FixtureName,
 	FixtureOptions,
+	ObjectionModelConstructor,
 	Overrides,
 } from "./types";
 
@@ -106,13 +107,13 @@ export class FixtureRiveter {
 	}
 
 	fixture<T>(
-		fixtureClass: FixtureName<T>,
+		fixtureClass: ObjectionModelConstructor<T>,
 		options: FixtureOptions,
 		block?: BlockFunction<T>,
 	): Fixture<T>;
 
 	fixture<T>(
-		fixtureClass: FixtureName<T>,
+		fixtureClass: ObjectionModelConstructor<T>,
 		rest?: FixtureRestArgs<T>,
 	): Fixture<T>;
 
@@ -204,16 +205,13 @@ export class FixtureRiveter {
 
 	resetSequences(): void {
 		this.sequenceHandler.resetSequences();
-		for (const [, fixture] of Object.entries(this.fixtures)) {
-			fixture.sequenceHandler.resetSequences();
-		}
 	}
 
 	findSequence(name: string): Sequence | undefined {
 		return this.sequenceHandler.findSequence(name);
 	}
 
-	generate(name: string): any {
+	generate(name: string): any | undefined {
 		const sequence = this.findSequence(name);
 		if (sequence) {
 			return sequence.next();
@@ -317,16 +315,16 @@ export class FixtureRiveter {
 		this.strategyHandler.registerStrategy(strategyName, strategyClass);
 	}
 
-	before<T>(name: string, block?: CallbackFunction<T>): void;
-	before<T>(name: string, name2: string, block?: CallbackFunction<T>): void;
-	before<T>(name: string, name2: string, name3: string, block?: CallbackFunction<T>): void;
+	before<T>(name: string, block: CallbackFunction<T>): void;
+	before<T>(name: string, name2: string, block: CallbackFunction<T>): void;
+	before<T>(name: string, name2: string, name3: string, block: CallbackFunction<T>): void;
 	before(...rest: any[]): void {
 		this.callbackHandler.before(...rest);
 	}
 
-	after<T>(name: string, block?: CallbackFunction<T>): void;
-	after<T>(name: string, name2: string, block?: CallbackFunction<T>): void;
-	after<T>(name: string, name2: string, name3: string, block?: CallbackFunction<T>): void;
+	after<T>(name: string, block: CallbackFunction<T>): void;
+	after<T>(name: string, name2: string, block: CallbackFunction<T>): void;
+	after<T>(name: string, name2: string, name3: string, block: CallbackFunction<T>): void;
 	after(...rest: any[]): void {
 		this.callbackHandler.after(...rest);
 	}

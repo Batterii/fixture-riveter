@@ -6,11 +6,6 @@ import {expect} from "chai";
 describe("Sequences", function() {
 	let fr: FixtureRiveter;
 
-	class User extends Model {
-		id: number;
-		email: string;
-	}
-
 	beforeEach(async function() {
 		fr = new FixtureRiveter();
 	});
@@ -68,22 +63,34 @@ describe("Sequences", function() {
 		});
 
 		describe("inside a fixture", function() {
+			class User extends Model {
+				id: number;
+				email: string;
+				email1: string;
+				email2: string;
+				email3: string;
+				email4: string;
+				email5: string;
+			}
+
 			specify("1 arg", async function() {
-				fr.fixture("user", User, (f) => {
+				fr.fixture(User, (f) => {
 					f.sequence("email");
 				});
-				const user = await fr.build("user");
+
+				const user = await fr.build(User);
 				expect(user.email).to.equal(1);
 			});
 
 			specify("2 args", async function() {
-				fr.fixture("user", User, (f) => {
+				fr.fixture(User, (f) => {
 					f.sequence("email1", 1);
 					f.sequence("email2", "a");
 					f.sequence("email3", {aliases: ["alias3"]});
 					f.sequence("email4", (n) => `test${n}@gmail.com`);
 				});
-				const user = await fr.build("user");
+
+				const user = await fr.build(User);
 				expect(user.email1).to.equal(1);
 				expect(user.email2).to.equal("a");
 				expect(user.email3).to.equal(1);
@@ -92,14 +99,15 @@ describe("Sequences", function() {
 			});
 
 			specify("3 args", async function() {
-				fr.fixture("user", User, (f) => {
+				fr.fixture(User, (f) => {
 					f.sequence("email1", 1, {aliases: ["alias1"]});
 					f.sequence("email2", 1, (n) => `test${n}@gmail.com`);
 					f.sequence("email3", "a", {aliases: ["alias3"]});
 					f.sequence("email4", "a", (n) => `test${n}@gmail.com`);
 					f.sequence("email5", {aliases: ["alias5"]}, (n) => `test${n}@gmail.com`);
 				});
-				const user = await fr.build("user");
+
+				const user = await fr.build(User);
 				expect(user.email1).to.equal(1);
 				expect(fr.generate("alias1")).to.equal(2);
 				expect(user.email2).to.equal("test1@gmail.com");
@@ -111,11 +119,12 @@ describe("Sequences", function() {
 			});
 
 			specify("4 args", async function() {
-				fr.fixture("user", User, (f) => {
+				fr.fixture(User, (f) => {
 					f.sequence("email1", 1, {aliases: ["alias1"]}, (n) => `test${n}@gmail.com`);
 					f.sequence("email2", "a", {aliases: ["alias2"]}, (n) => `test${n}@gmail.com`);
 				});
-				const user = await fr.build("user");
+
+				const user = await fr.build(User);
 				expect(user.email1).to.equal("test1@gmail.com");
 				expect(fr.generate("alias1")).to.equal("test2@gmail.com");
 				expect(user.email2).to.equal("testa@gmail.com");

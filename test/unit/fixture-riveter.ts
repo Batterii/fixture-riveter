@@ -182,6 +182,34 @@ describe("FixtureRiveter", function() {
 		});
 	});
 
+	describe("#findSequence", function() {
+		it("returns the sequence for that name", function() {
+			const fr = new FixtureRiveter();
+			const name = "email";
+			const sequence = fr.sequence(name);
+			expect(fr.findSequence(name)).to.equal(sequence);
+		});
+
+		it("returns undefined when sequence doesn't exist", function() {
+			const fr = new FixtureRiveter();
+			expect(fr.findSequence("name")).to.be.undefined;
+		});
+	});
+
+	describe("#generate", function() {
+		it("returns the sequence for that name", function() {
+			const fr = new FixtureRiveter();
+			const name = "email";
+			fr.sequence(name);
+			expect(fr.generate(name)).to.equal(1);
+		});
+
+		it("returns undefined when sequence doesn't exist", function() {
+			const fr = new FixtureRiveter();
+			expect(fr.generate("name")).to.be.undefined;
+		});
+	});
+
 	describe("#resetSequences", function() {
 		it("resets all sequences", function() {
 			const name = "user";
