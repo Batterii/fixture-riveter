@@ -40,7 +40,7 @@ export class Evaluator {
 		}
 	}
 
-	async methodMissing(name: string): Promise<any> {
+	async _methodMissing(name: string): Promise<any> {
 		return this.attr(name);
 	}
 

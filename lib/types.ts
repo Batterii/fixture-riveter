@@ -33,7 +33,7 @@ type ConvertToFn<T, ArgFN = () => any> = {
 
 type CurrentEvaluator<T> = {
 	[Key in keyof T]-?: () => Promise<T[Key]>;
-} & Exclude<Evaluator, "methodMissing">;
+} & Exclude<Evaluator, "_methodMissing">;
 
 export type EvaluatorFunction<T> =
 	| ((evaluator: CurrentEvaluator<T>) => any)
@@ -42,7 +42,7 @@ export type EvaluatorFunction<T> =
 
 type FixtureBuilder<T> = (
 	& ConvertToFn<T, EvaluatorFunction<T>>
-	& Exclude<DefinitionProxy<T>, "methodMissing">
+	& Exclude<DefinitionProxy<T>, "_methodMissing">
 );
 
 export type BlockFunction<T> = (fixture: FixtureBuilder<T>) => any;
