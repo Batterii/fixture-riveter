@@ -38,7 +38,7 @@ describe("simple associations", function() {
 
 		id: number;
 		userId: number;
-		user?: User;
+		user: User;
 
 		get props() {
 			return {
@@ -50,9 +50,10 @@ describe("simple associations", function() {
 
 	before(async function() {
 		await createTable(User);
-
 		await createTable(Post);
+	});
 
+	beforeEach(function() {
 		fr = new FixtureRiveter();
 		fr.setAdapter(new ObjectionAdapter());
 
@@ -63,6 +64,10 @@ describe("simple associations", function() {
 
 			f.trait("admin", (t) => {
 				t.admin(() => true);
+			});
+
+			f.fixture("oldUser", User, (ff) => {
+				ff.attr("age", () => 100);
 			});
 		});
 
@@ -114,6 +119,26 @@ describe("simple associations", function() {
 
 		expect(post.user.age).to.equal(100);
 		expect(post.user.admin).to.be.true;
+	});
+
+	it("reads the fixture property", async function() {
+		fr.fixture("fixturePost", Post, (f) => {
+			f.association("user", {fixture: "oldUser"});
+			f.attr("body", () => "Post body");
+		});
+
+		const post = await fr.build("fixturePost");
+		expect(post.user.age).to.equal(100);
+	});
+
+	it("can use attributes from the current fixture", async function() {
+		fr.fixture("currentAttrPost", Post, (f) => {
+			f.attr("body", () => "Post body");
+			f.attr("user", async(e) => e.association("user", {name: await e.attr("body")}));
+		});
+
+		const post = await fr.build("currentAttrPost");
+		expect(post.user.name).to.equal("Post body");
 	});
 });
 

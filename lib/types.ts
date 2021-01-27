@@ -12,7 +12,7 @@ export type ClassOrRecord<T> = T extends Pojo ? T : Pojo;
 
 export type Overrides<T> = Partial<ClassOrRecord<T>>;
 
-export type OverrideForRelation<T, R = undefined> = Overrides<R extends undefined ? T : R>;
+export type OverrideForRelation<T, R> = Overrides<R extends undefined ? T : R>;
 
 interface TraitsFn<T, KeyType, ArgFN, Relation = undefined> {
 	(fn: ArgFN): Promise<KeyType>;

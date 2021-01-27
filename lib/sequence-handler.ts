@@ -48,15 +48,6 @@ interface SequenceOptions {
 	callback?: SequenceCallback<any>;
 }
 
-type Initial = string | number;
-type Options = {aliases: string[]};
-
-export function optionsParser(
-	initial?: Initial | Options | SequenceCallback<any>,
-	options?: Initial | Options | SequenceCallback<any>,
-	callback?: Initial | Options | SequenceCallback<any>,
-): SequenceOptions;
-
 export function optionsParser(...args: any[]): SequenceOptions {
 	const options = {} as SequenceOptions;
 	for (const arg of args) {

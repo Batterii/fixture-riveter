@@ -96,11 +96,7 @@ export class DefinitionProxy<T> {
 		block?: BlockFunction<T>,
 	): void;
 
-	fixture(
-		name: FixtureName<T>,
-		model: ModelConstructor<T>,
-		rest?: FixtureRestArgs<T>,
-	): void;
+	fixture(name: FixtureName<T>, model: ModelConstructor<T>, rest?: FixtureRestArgs<T>): void;
 
 	fixture(fixtureName: FixtureName<T>, model: ModelConstructor<T>, ...rest: any[]): void {
 		const name = nameGuard(fixtureName);
@@ -110,12 +106,14 @@ export class DefinitionProxy<T> {
 	association<R = undefined>(
 		name: string,
 		traits: string[],
-		overrides?: OverrideForRelation<T, R> & {strategy?: string},
+		overrides?: OverrideForRelation<T, R> & {strategy?: string, fixture?: string},
 	): void;
 
 	association<R = undefined>(
 		name: string,
-		traitOrOverrides?: string[] | (OverrideForRelation<T, R> & {strategy?: string}),
+		traitOrOverrides?: string[] | (
+			OverrideForRelation<T, R> & {strategy?: string, fixture?: string}
+		),
 	): void;
 
 	association(name: string, ...rest: any[]): void {
