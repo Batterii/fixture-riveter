@@ -3,7 +3,7 @@ import {ImplicitDeclaration} from "../../lib/declarations/implicit-declaration";
 import {DefinitionProxy} from "../../lib/definition-proxy";
 import {Fixture} from "../../lib/fixture";
 import {FixtureRiveter} from "../../lib/fixture-riveter";
-import {Sequence} from "../../lib/sequences/sequence";
+import {Sequence} from "../../lib/sequence";
 
 import {DummyModel} from "../test-fixtures/dummy-model";
 

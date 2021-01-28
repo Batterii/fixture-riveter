@@ -17,10 +17,7 @@ import {
 } from "./types";
 import {CallbackFunction} from "./callback";
 import {FixtureRiveter, nameGuard} from "./fixture-riveter";
-import {
-	Sequence,
-	SequenceCallback,
-} from "./sequences/sequence";
+import {Sequence, SequenceCallback} from "./sequence";
 import {SequenceHandler} from "./sequence-handler";
 
 import {isFunction, last} from "lodash";
@@ -121,28 +118,28 @@ export class DefinitionProxy<T> {
 		this.definition.declareAttribute(association);
 	}
 
-	sequence<I extends number | string>(
+	sequence(
 		name: string,
-		options?: I | {aliases: string[]} | SequenceCallback<I>,
+		options?: string | number | Generator<any, any, any> | string[] | SequenceCallback,
 	): Sequence;
 
-	sequence<I extends number | string>(
+	sequence(
 		name: string,
-		initial: I,
-		aliasesOrCallback?: {aliases: string[]} | SequenceCallback<I>,
+		initial: string | number | Generator<any, any, any>,
+		aliasesOrCallback?: string[] | SequenceCallback,
 	): Sequence;
 
-	sequence<I extends number | string>(
+	sequence(
 		name: string,
-		aliases: {aliases: string[]},
-		callback?: SequenceCallback<I>,
+		initialOrAliases: string | number | Generator<any, any, any> | string[],
+		callback?: SequenceCallback,
 	): Sequence;
 
-	sequence<I extends number | string>(
+	sequence(
 		name: string,
-		initial: I,
-		aliases: {aliases: string[]},
-		callback: SequenceCallback<I>,
+		initial: string | number | Generator<any, any, any>,
+		aliases: string[],
+		callback?: SequenceCallback,
 	): Sequence;
 
 	sequence(name: string, ...rest: any[]): Sequence {

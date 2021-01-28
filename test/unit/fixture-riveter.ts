@@ -3,8 +3,7 @@ import {Model} from "../test-fixtures/model";
 
 import {Fixture} from "../../lib/fixture";
 import {extractOverrides, nameGuard, FixtureRiveter} from "../../lib/fixture-riveter";
-import {Sequence} from "../../lib/sequences/sequence";
-import {IntegerSequence} from "../../lib/sequences/integer-sequence";
+import {Sequence} from "../../lib/sequence";
 
 import {identity} from "lodash";
 import {expect} from "chai";
@@ -214,18 +213,23 @@ describe("FixtureRiveter", function() {
 		it("resets all sequences", function() {
 			const name = "user";
 			const fr = new FixtureRiveter();
-			let sequenceInFixture = new IntegerSequence("temp");
+			function *g(): Generator<string, string, string> {
+				while (true) {
+					yield "a";
+				}
+			}
+			let sequenceInFixture = new Sequence("temp", g(), [], () => 1);
 			fr.fixture(name, DummyModel, (f) => {
-				sequenceInFixture = f.sequence("email") as IntegerSequence;
+				sequenceInFixture = f.sequence("email");
 			});
-			const globalSeq = fr.sequence("usernames") as IntegerSequence;
+			const globalSeq = fr.sequence("usernames");
 			globalSeq.next();
 			globalSeq.next();
 			sequenceInFixture.next();
 			sequenceInFixture.next();
 			fr.resetSequences();
-			expect(globalSeq.index).to.equal(1);
-			expect(sequenceInFixture.index).to.equal(1);
+			expect(globalSeq.value).to.equal(1);
+			expect(sequenceInFixture.value).to.equal(1);
 		});
 	});
 

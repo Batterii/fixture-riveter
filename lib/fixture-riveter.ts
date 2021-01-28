@@ -1,23 +1,15 @@
-import {Adapter} from "./adapters/adapter";
 import {AdapterHandler, FixtureNames} from "./adapter-handler";
+import {Adapter} from "./adapters/adapter";
+import {CallbackFunction, Callback} from "./callback";
+import {CallbackHandler} from "./callback-handler";
 import {DefinitionProxy} from "./definition-proxy";
 import {Fixture} from "./fixture";
-import {
-	fixtureOptionsParser,
-} from "./fixture-options-parser";
-import {
-	Sequence,
-	SequenceCallback,
-} from "./sequences/sequence";
+import {Sequence, SequenceCallback} from "./sequence";
 import {SequenceHandler} from "./sequence-handler";
-import {Trait} from "./trait";
-import {
-	CallbackFunction,
-	Callback,
-} from "./callback";
-import {CallbackHandler} from "./callback-handler";
 import {StrategyHandler} from "./strategy-handler";
 import {Strategy} from "./strategies/strategy";
+import {Trait} from "./trait";
+import {fixtureOptionsParser} from "./fixture-options-parser";
 
 import {
 	Pojo,
@@ -175,28 +167,28 @@ export class FixtureRiveter {
 		this.traits[trait.name] = trait;
 	}
 
-	sequence<I extends number | string>(
+	sequence(
 		name: string,
-		options?: I | {aliases: string[]} | SequenceCallback<I>,
+		options?: string | number | Generator<any, any, any> | string[] | SequenceCallback,
 	): Sequence;
 
-	sequence<I extends number | string>(
+	sequence(
 		name: string,
-		initial: I,
-		aliasesOrCallback?: {aliases: string[]} | SequenceCallback<I>,
+		initial: string | number | Generator<any, any, any>,
+		aliasesOrCallback?: string[] | SequenceCallback,
 	): Sequence;
 
-	sequence<I extends number | string>(
+	sequence(
 		name: string,
-		aliases: {aliases: string[]},
-		callback?: SequenceCallback<I>,
+		initialOrAliases: string | number | Generator<any, any, any> | string[],
+		callback?: SequenceCallback,
 	): Sequence;
 
-	sequence<I extends number | string>(
+	sequence(
 		name: string,
-		initial: I,
-		aliases: {aliases: string[]},
-		callback: SequenceCallback<I>,
+		initial: string | number | Generator<any, any, any>,
+		aliases: string[],
+		callback?: SequenceCallback,
 	): Sequence;
 
 	sequence(name: string, ...rest: any[]): Sequence {

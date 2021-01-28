@@ -1,6 +1,5 @@
 import {SequenceAttribute} from "../../../lib/attributes/sequence-attribute";
-import {Sequence} from "../../../lib/sequences/sequence";
-import {IntegerSequence} from "../../../lib/sequences/integer-sequence";
+import {Sequence} from "../../../lib/sequence";
 
 import {expect} from "chai";
 
@@ -17,8 +16,7 @@ describe("SequenceAttribute", function() {
 
 	describe("#evaluate", function() {
 		it("returns a function that calls #next()", function() {
-			const options = {callback: (n: number) => `Name ${n}`};
-			const sequence = new IntegerSequence("email", options);
+			const sequence = new Sequence("email", (n: number) => `Name ${n}`);
 			const attribute = new SequenceAttribute("email", false, sequence);
 			const result = attribute.evaluate();
 
