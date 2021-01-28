@@ -1,38 +1,41 @@
 import {isFunction, isNumber, isObject, isString} from "lodash";
 
-export type SequenceCallback = (result: any) => any;
+export type SequenceCallback<C> = (result: C) => any;
 
-export class Sequence {
+export class Sequence<C extends string | number | (() => Generator<any, any, any>)> {
 	name: string;
 	baseGenerator: () => Generator<any, any, any>;
 	initialValue: any;
 	generator: Generator<any, any, any>;
 	value: any;
 	aliases: string[];
-	callback: SequenceCallback;
+	callback: SequenceCallback<any>;
 
 	constructor(
 		sequenceName: string,
-		options?: string | number | Generator<any, any, any> | string[] | SequenceCallback,
+		options?: C | string[] | SequenceCallback<number>,
 	);
 
 	constructor(
 		sequenceName: string,
-		initial: string | number | Generator<any, any, any>,
-		aliasesOrCallback?: string[] | SequenceCallback,
+		initial: C,
+		aliasesOrCallback?: (
+			| string[]
+			| SequenceCallback<C extends (() => Generator<infer T, any, any>) ? T : C>
+		),
 	);
 
 	constructor(
 		sequenceName: string,
-		initialOrAliases: string | number | Generator<any, any, any> | string[],
-		callback?: SequenceCallback,
+		initialOrAliases: C | string[],
+		callback?: SequenceCallback<C extends (() => Generator<infer T, any, any>) ? T : C>
 	);
 
 	constructor(
 		sequenceName: string,
-		initial: string | number | Generator<any, any, any>,
+		initial: C,
 		aliases: string[],
-		callback?: SequenceCallback,
+		callback?: SequenceCallback<C extends (() => Generator<infer T, any, any>) ? T : C>
 	);
 
 	constructor(name: string, ...args: any[]) {
@@ -88,7 +91,7 @@ export class Sequence {
 export interface SequenceOptions {
 	gen?: string | number | (() => Generator<any, any, any>);
 	aliases?: string[];
-	callback?: SequenceCallback;
+	callback?: SequenceCallback<any>;
 }
 
 export function optionsParser(...args: any[]): SequenceOptions {

@@ -1,37 +1,40 @@
 import {Sequence, SequenceCallback} from "./sequence";
 
 export class SequenceHandler {
-	sequences: Record<string, Sequence>;
+	sequences: Record<string, Sequence<any>>;
 
 	constructor() {
 		this.sequences = {};
 	}
 
-	registerSequence(
+	registerSequence<C extends string | number | (() => Generator<any, any, any>)>(
 		sequenceName: string,
-		options?: string | number | Generator<any, any, any> | string[] | SequenceCallback,
-	): Sequence;
+		options?: C | string[] | SequenceCallback<number>,
+	): Sequence<C>;
 
-	registerSequence(
+	registerSequence<C extends string | number | (() => Generator<any, any, any>)>(
 		sequenceName: string,
-		initial: string | number | Generator<any, any, any>,
-		aliasesOrCallback?: string[] | SequenceCallback,
-	): Sequence;
+		initial: C,
+		aliasesOrCallback?: (
+			| string[]
+			| SequenceCallback<C extends (() => Generator<infer T, any, any>) ? T : C>
+		),
+	): Sequence<C>;
 
-	registerSequence(
+	registerSequence<C extends string | number | (() => Generator<any, any, any>)>(
 		sequenceName: string,
-		initialOrAliases: string | number | Generator<any, any, any> | string[],
-		callback?: SequenceCallback,
-	): Sequence;
+		initialOrAliases: C | string[],
+		callback?: SequenceCallback<C extends (() => Generator<infer T, any, any>) ? T : C>,
+	): Sequence<C>;
 
-	registerSequence(
+	registerSequence<C extends string | number | (() => Generator<any, any, any>)>(
 		sequenceName: string,
-		initial: string | number | Generator<any, any, any>,
+		initial: C,
 		aliases: string[],
-		callback?: SequenceCallback,
-	): Sequence;
+		callback?: SequenceCallback<C extends (() => Generator<infer T, any, any>) ? T : C>,
+	): Sequence<C>;
 
-	registerSequence(sequenceName: string, ...rest: any[]): Sequence {
+	registerSequence(sequenceName: string, ...rest: any[]): Sequence<any> {
 		const newSequence = new Sequence(sequenceName, ...rest);
 
 		for (const name of newSequence.names()) {
@@ -48,7 +51,7 @@ export class SequenceHandler {
 		Object.values(this.sequences).forEach((seq) => seq.reset());
 	}
 
-	findSequence(name: string): Sequence | undefined {
+	findSequence(name: string): Sequence<any> | undefined {
 		return this.sequences[name];
 	}
 }

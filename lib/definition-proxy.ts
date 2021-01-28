@@ -118,31 +118,21 @@ export class DefinitionProxy<T> {
 		this.definition.declareAttribute(association);
 	}
 
-	sequence(
+	sequence<C extends string | number | (() => Generator<any, any, any>)>(
 		name: string,
-		options?: string | number | Generator<any, any, any> | string[] | SequenceCallback,
-	): Sequence;
+		options?: C | SequenceCallback<number>,
+	): Sequence<C>;
 
-	sequence(
+	sequence<C extends string | number | (() => Generator<any, any, any>)>(
 		name: string,
-		initial: string | number | Generator<any, any, any>,
-		aliasesOrCallback?: string[] | SequenceCallback,
-	): Sequence;
+		initial: C,
+		callback?: SequenceCallback<C extends string ? string : C extends | number ? number : any>,
+	): Sequence<C>;
 
-	sequence(
-		name: string,
-		initialOrAliases: string | number | Generator<any, any, any> | string[],
-		callback?: SequenceCallback,
-	): Sequence;
-
-	sequence(
-		name: string,
-		initial: string | number | Generator<any, any, any>,
-		aliases: string[],
-		callback?: SequenceCallback,
-	): Sequence;
-
-	sequence(name: string, ...rest: any[]): Sequence {
+	sequence(name: string, ...rest: any[]): Sequence<any> {
+		if (rest.some((s) => Array.isArray(s))) {
+			throw new Error(`Can't define the inline sequence ${name} with aliases`);
+		}
 		const sequence = this.sequenceHandler.registerSequence(name, ...rest);
 		this.attr(name, () => sequence.next());
 		return sequence;

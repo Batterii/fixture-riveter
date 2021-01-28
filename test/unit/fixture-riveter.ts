@@ -213,12 +213,12 @@ describe("FixtureRiveter", function() {
 		it("resets all sequences", function() {
 			const name = "user";
 			const fr = new FixtureRiveter();
-			function *g(): Generator<string, string, string> {
+			function *g() {
 				while (true) {
 					yield "a";
 				}
 			}
-			let sequenceInFixture = new Sequence("temp", g(), [], () => 1);
+			let sequenceInFixture = new Sequence("temp", g, [], () => 1);
 			fr.fixture(name, DummyModel, (f) => {
 				sequenceInFixture = f.sequence("email");
 			});

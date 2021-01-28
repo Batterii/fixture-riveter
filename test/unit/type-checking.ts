@@ -245,52 +245,43 @@ describe("type checking", function() {
 			});
 
 			specify("2 args", async function() {
+				function *g() {
+					while (true) {
+						yield "X";
+					}
+				}
+
 				fr.fixture(User, (f) => {
 					f.sequence("email1", 1);
 					f.sequence("email2", "a");
-					f.sequence("email3", ["alias3"]);
-					f.sequence("email4", (n) => `test${n}@gmail.com`);
+					f.sequence("email3", (n) => `test${n}@gmail.com`);
+					f.sequence("email4", g);
 				});
 
 				const user = await fr.build(User);
 				expect(user.email1).to.equal(1);
 				expect(user.email2).to.equal("a");
-				expect(user.email3).to.equal(1);
-				expect(fr.generate("alias3")).to.equal(2);
-				expect(user.email4).to.equal("test1@gmail.com");
+				expect(user.email3).to.equal("test1@gmail.com");
+				expect(user.email4).to.equal("X");
 			});
 
 			specify("3 args", async function() {
-				fr.fixture(User, (f) => {
-					f.sequence("email1", 1, ["alias1"]);
-					f.sequence("email2", 1, (n) => `test${n}@gmail.com`);
-					f.sequence("email3", "a", ["alias3"]);
-					f.sequence("email4", "a", (n) => `test${n}@gmail.com`);
-					f.sequence("email5", ["alias5"], (n) => `test${n}@gmail.com`);
-				});
+				function *g() {
+					while (true) {
+						yield "X";
+					}
+				}
 
-				const user = await fr.build(User);
-				expect(user.email1).to.equal(1);
-				expect(fr.generate("alias1")).to.equal(2);
-				expect(user.email2).to.equal("test1@gmail.com");
-				expect(user.email3).to.equal("a");
-				expect(fr.generate("alias3")).to.equal("b");
-				expect(user.email4).to.equal("testa@gmail.com");
-				expect(user.email5).to.equal("test1@gmail.com");
-				expect(fr.generate("alias5")).to.equal("test2@gmail.com");
-			});
-
-			specify("4 args", async function() {
 				fr.fixture(User, (f) => {
-					f.sequence("email1", 1, ["alias1"], (n) => `test${n}@gmail.com`);
-					f.sequence("email2", "a", ["alias2"], (n) => `test${n}@gmail.com`);
+					f.sequence("email1", 1, (n) => `test${n}@gmail.com`);
+					f.sequence("email2", "a", (n) => `test${n}@gmail.com`);
+					f.sequence("email3", g, (n) => `test${n}@gmail.com`);
 				});
 
 				const user = await fr.build(User);
 				expect(user.email1).to.equal("test1@gmail.com");
-				expect(fr.generate("alias1")).to.equal("test2@gmail.com");
 				expect(user.email2).to.equal("testa@gmail.com");
-				expect(fr.generate("alias2")).to.equal("testb@gmail.com");
+				expect(user.email3).to.equal("testX@gmail.com");
 			});
 		});
 	});
@@ -302,33 +293,82 @@ describe("type checking", function() {
 		});
 
 		specify("2 args", function() {
-			const seq = new SequenceHandler();
-			seq.registerSequence("name1", "a");
-			seq.registerSequence("name2", 1);
-
 			function *g() {
 				while (true) {
-					yield "a";
+					yield "X";
 				}
 			}
-			seq.registerSequence("name3", g());
-			seq.registerSequence("name4", ["alias4"]);
-			seq.registerSequence("name5", (x) => `5result${x}`);
+
+			const seq = new SequenceHandler();
+			seq.registerSequence("name1", "a");
+			expect(seq.findSequence("name1")?.next()).to.equal("a");
+
+			seq.registerSequence("name2", 1);
+			expect(seq.findSequence("name2")?.next()).to.equal(1);
+
+			seq.registerSequence("name3", ["alias3"]);
+			expect(seq.findSequence("name3")?.next()).to.equal(1);
+			expect(seq.findSequence("alias3")?.next()).to.equal(2);
+
+			seq.registerSequence("name4", (x) => `4result${x}`);
+			expect(seq.findSequence("name4")?.next()).to.equal("4result1");
+
+			seq.registerSequence("name5", g);
+			expect(seq.findSequence("name5")?.next()).to.equal("X");
 		});
 
 		specify("3 args", function() {
+			function *g() {
+				while (true) {
+					yield "X";
+				}
+			}
+
 			const seq = new SequenceHandler();
 			seq.registerSequence("name1", "a", ["alias1"]);
+			expect(seq.findSequence("name1")?.next()).to.equal("a");
+			expect(seq.findSequence("alias1")?.next()).to.equal("b");
+
 			seq.registerSequence("name2", "a", (x) => `2result${x}`);
+			expect(seq.findSequence("name2")?.next()).to.equal("2resulta");
+
 			seq.registerSequence("name3", 1, ["alias3"]);
+			expect(seq.findSequence("name3")?.next()).to.equal(1);
+			expect(seq.findSequence("alias3")?.next()).to.equal(2);
+
 			seq.registerSequence("name4", 1, (x) => `4result${x}`);
-			seq.registerSequence("name5", ["alias5"], (x) => `5result${x}`);
+			expect(seq.findSequence("name4")?.next()).to.equal("4result1");
+
+			seq.registerSequence("name5", g, ["alias5"]);
+			expect(seq.findSequence("name5")?.next()).to.equal("X");
+			expect(seq.findSequence("alias5")?.next()).to.equal("X");
+
+			seq.registerSequence("name6", g, (x) => `6result${x}`);
+			expect(seq.findSequence("name6")?.next()).to.equal("6resultX");
+
+			seq.registerSequence("name7", ["alias7"], (x) => `7result${x}`);
+			expect(seq.findSequence("name7")?.next()).to.equal("7result1");
+			expect(seq.findSequence("alias7")?.next()).to.equal("7result2");
 		});
 
 		specify("4 args", function() {
+			function *g() {
+				while (true) {
+					yield "X";
+				}
+			}
 			const seq = new SequenceHandler();
 			seq.registerSequence("name1", "a", ["alias1"], (x) => `1result${x}`);
+			expect(seq.findSequence("name1")?.next()).to.equal("1resulta");
+			expect(seq.findSequence("alias1")?.next()).to.equal("1resultb");
+
 			seq.registerSequence("name2", 1, ["alias2"], (x) => `2result${x}`);
+			expect(seq.findSequence("name2")?.next()).to.equal("2result1");
+			expect(seq.findSequence("alias2")?.next()).to.equal("2result2");
+
+			seq.registerSequence("name3", g, ["alias3"], (x) => `3result${x}`);
+			expect(seq.findSequence("name3")?.next()).to.equal("3resultX");
+			expect(seq.findSequence("alias3")?.next()).to.equal("3resultX");
 		});
 	});
 });

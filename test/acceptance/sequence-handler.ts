@@ -13,7 +13,6 @@ describe("sequence stuff", function() {
 		const seq = SH.registerSequence("test");
 		expect(seq.next()).to.equal(1);
 		expect(seq.next()).to.equal(2);
-		console.log(seq);
 	});
 
 	it("works", function() {
@@ -26,6 +25,5 @@ describe("sequence stuff", function() {
 		const seq = SH.registerSequence("test", g);
 		expect(seq.next()).to.equal("a");
 		expect(seq.next()).to.equal("a");
-		console.log(seq);
 	});
 });

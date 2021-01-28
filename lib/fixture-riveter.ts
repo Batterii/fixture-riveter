@@ -167,39 +167,45 @@ export class FixtureRiveter {
 		this.traits[trait.name] = trait;
 	}
 
-	sequence(
+	sequence<C extends string | number | (() => Generator<any, any, any>)>(
 		name: string,
-		options?: string | number | Generator<any, any, any> | string[] | SequenceCallback,
-	): Sequence;
+		options?: C | string[] | SequenceCallback<number>,
+	): Sequence<C>;
 
-	sequence(
+	sequence<C extends string | number | (() => Generator<any, any, any>)>(
 		name: string,
-		initial: string | number | Generator<any, any, any>,
-		aliasesOrCallback?: string[] | SequenceCallback,
-	): Sequence;
+		initial: C,
+		aliasesOrCallback?: (
+			| string[]
+			| SequenceCallback<C extends (() => Generator<infer T, any, any>) ? T : C>
+		),
+	): Sequence<C>;
 
-	sequence(
+	sequence<C extends string | number | (() => Generator<any, any, any>)>(
 		name: string,
-		initialOrAliases: string | number | Generator<any, any, any> | string[],
-		callback?: SequenceCallback,
-	): Sequence;
+		initialOrAliases: C | string[],
+		callback?: SequenceCallback<C extends (() => Generator<infer T, any, any>) ? T : C>,
+	): Sequence<C>;
 
-	sequence(
+	sequence<C extends string | number | (() => Generator<any, any, any>)>(
 		name: string,
-		initial: string | number | Generator<any, any, any>,
+		initial: C,
 		aliases: string[],
-		callback?: SequenceCallback,
-	): Sequence;
+		callback?: SequenceCallback<C extends (() => Generator<infer T, any, any>) ? T : C>,
+	): Sequence<C>;
 
-	sequence(name: string, ...rest: any[]): Sequence {
+	sequence(name: string, ...rest: any[]): Sequence<any> {
 		return this.sequenceHandler.registerSequence(name, ...rest);
 	}
 
 	resetSequences(): void {
 		this.sequenceHandler.resetSequences();
+		for (const fixture of Object.values(this.fixtures)) {
+			fixture.sequenceHandler.resetSequences();
+		}
 	}
 
-	findSequence(name: string): Sequence | undefined {
+	findSequence(name: string): Sequence<any> | undefined {
 		return this.sequenceHandler.findSequence(name);
 	}
 
