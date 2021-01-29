@@ -41,7 +41,7 @@ export class Sequence<C extends string | number | (() => Generator<any, any, any
 	constructor(name: string, ...args: any[]) {
 		this.name = name;
 
-		const options = optionsParser(...args);
+		const options = optionsParser(name, ...args);
 		this.aliases = options.aliases || [];
 		this.callback = options.callback || ((x: any) => x);
 
@@ -52,7 +52,7 @@ export class Sequence<C extends string | number | (() => Generator<any, any, any
 		} else if (isNumber(gen)) {
 			this.baseGenerator = () => numberGen(gen);
 			this.value = gen;
-		} else if (gen) {
+		} else if (isFunction(gen)) {
 			this.baseGenerator = () => gen();
 		} else {
 			this.baseGenerator = () => numberGen(1);
@@ -94,7 +94,7 @@ export interface SequenceOptions {
 	callback?: SequenceCallback<any>;
 }
 
-export function optionsParser(...args: any[]): SequenceOptions {
+export function optionsParser(name: string, ...args: any[]): SequenceOptions {
 	const options: SequenceOptions = {};
 
 	const [gen] = args;
@@ -115,6 +115,10 @@ export function optionsParser(...args: any[]): SequenceOptions {
 	const [fn] = args;
 	if (isFunction(fn)) {
 		options.callback = args.shift();
+	}
+
+	if (args.length > 0) {
+		throw new Error(`Incorrect sequence options for "${name}"`);
 	}
 
 	return options;
