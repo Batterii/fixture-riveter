@@ -131,6 +131,17 @@ describe("simple associations", function() {
 		expect(post.user.age).to.equal(100);
 	});
 
+	it("the fixture property can be a list", async function() {
+		fr.fixture("fixturePost", Post, (f) => {
+			f.association("user", {fixture: ["oldUser", "admin"]});
+			f.attr("body", () => "Post body");
+		});
+
+		const post = await fr.build("fixturePost");
+		expect(post.user.age).to.equal(100);
+		expect(post.user.admin).to.be.true;
+	});
+
 	it("can use attributes from the current fixture", async function() {
 		fr.fixture("currentAttrPost", Post, (f) => {
 			f.attr("body", () => "Post body");

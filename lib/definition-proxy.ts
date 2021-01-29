@@ -103,13 +103,13 @@ export class DefinitionProxy<T> {
 	association<R = undefined>(
 		name: string,
 		traits: string[],
-		overrides?: OverrideForRelation<T, R> & {strategy?: string, fixture?: string},
+		overrides?: OverrideForRelation<T, R> & {strategy?: string, fixture?: string | string[]},
 	): void;
 
 	association<R = undefined>(
 		name: string,
 		traitOrOverrides?: string[] | (
-			OverrideForRelation<T, R> & {strategy?: string, fixture?: string}
+			OverrideForRelation<T, R> & {strategy?: string, fixture?: string | string[]}
 		),
 	): void;
 

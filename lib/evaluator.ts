@@ -55,14 +55,14 @@ export class Evaluator {
 	association<R = any>(
 		name: string,
 		traits: string[],
-		overrides?: Partial<R extends any ? Pojo : R & {strategy: string}>,
+		overrides?: Partial<(R extends any ? Pojo : R) & {strategy: string}>,
 	): Promise<R extends any ? Pojo : R>;
 
 	association<R = any>(
 		name: string,
 		traitOrOverrides?: (
 			| string[]
-			| Partial<R extends any ? Pojo : R & {strategy: string}>
+			| Partial<(R extends any ? Pojo : R) & {strategy: string}>
 		),
 	): Promise<R extends any ? Pojo : R>;
 

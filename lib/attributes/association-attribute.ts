@@ -2,10 +2,10 @@ import {Attribute} from "./attribute";
 import {Evaluator} from "../evaluator";
 
 export class AssociationAttribute extends Attribute {
-	fixture: string;
+	fixture: string | string[];
 	overrides: any[];
 
-	constructor(name: string, fixture: string, overrides: any[]) {
+	constructor(name: string, fixture: string | string[], overrides: any[]) {
 		super(name, false);
 		this.fixture = fixture;
 		this.overrides = overrides;
