@@ -6,7 +6,7 @@ export class SequelizeAdapter extends DefaultAdapter {
 		return Model.build();
 	}
 
-	async associate(instance: any, name: string, other: any): Promise<any> {
+	async relate(instance: any, name: string, other: any): Promise<any> {
 		// To do: figure out how to do this
 		instance = instance.set(`${name}Id`, other.get("id"));
 		return instance;

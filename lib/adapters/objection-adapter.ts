@@ -10,7 +10,7 @@ export class ObjectionAdapter extends DefaultAdapter {
 		await instance.$query().delete();
 	}
 
-	async associate(instance: any, name: string, other: any, Model?: any): Promise<any> {
+	async relate(instance: any, name: string, other: any, Model?: any): Promise<any> {
 		instance.$setRelated(name, other);
 
 		const relations = Model.getRelations();

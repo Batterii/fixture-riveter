@@ -1,6 +1,6 @@
 import {addMethodMissing} from "./method-missing";
 import {Declaration} from "./declarations/declaration";
-import {AssociationDeclaration} from "./declarations/association-declaration";
+import {RelationDeclaration} from "./declarations/relation-declaration";
 import {DynamicDeclaration} from "./declarations/dynamic-declaration";
 import {ImplicitDeclaration} from "./declarations/implicit-declaration";
 import {Trait} from "./trait";
@@ -73,7 +73,7 @@ export class DefinitionProxy<T> {
 			if (isFunction(block)) {
 				declaration = new DynamicDeclaration(name, this.ignore, block);
 			} else {
-				declaration = new AssociationDeclaration(name, rest);
+				declaration = new RelationDeclaration(name, rest);
 			}
 		} else {
 			declaration = new ImplicitDeclaration(
@@ -100,22 +100,22 @@ export class DefinitionProxy<T> {
 		this.childFixtures.push([name, model, ...rest]);
 	}
 
-	association<R = undefined>(
+	relation<R = undefined>(
 		name: string,
 		traits: string[],
 		overrides?: OverrideForRelation<T, R> & {strategy?: string, fixture?: string | string[]},
 	): void;
 
-	association<R = undefined>(
+	relation<R = undefined>(
 		name: string,
 		traitOrOverrides?: string[] | (
 			OverrideForRelation<T, R> & {strategy?: string, fixture?: string | string[]}
 		),
 	): void;
 
-	association(name: string, ...rest: any[]): void {
-		const association = new AssociationDeclaration(name, rest);
-		this.definition.declareAttribute(association);
+	relation(name: string, ...rest: any[]): void {
+		const relation = new RelationDeclaration(name, rest);
+		this.definition.declareAttribute(relation);
 	}
 
 	sequence<C extends string | number | (() => Generator<any, any, any>)>(

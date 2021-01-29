@@ -2,7 +2,7 @@ import {Attribute} from "../attributes/attribute";
 import {Declaration} from "../declarations/declaration";
 import {Fixture} from "../fixture";
 import {FixtureRiveter} from "../fixture-riveter";
-import {AssociationAttribute} from "../attributes/association-attribute";
+import {RelationAttribute} from "../attributes/relation-attribute";
 import {SequenceAttribute} from "../attributes/sequence-attribute";
 
 export class ImplicitDeclaration<T> extends Declaration {
@@ -26,7 +26,7 @@ export class ImplicitDeclaration<T> extends Declaration {
 
 	build(): Attribute[] {
 		if (this.fixtureRiveter.getFixture(this.name, false)) {
-			return [new AssociationAttribute(this.name, this.name, [])];
+			return [new RelationAttribute(this.name, this.name, [])];
 		}
 		const sequence = this.fixtureRiveter.findSequence(this.name);
 		if (sequence) {

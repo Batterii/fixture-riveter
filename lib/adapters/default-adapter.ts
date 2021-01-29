@@ -15,7 +15,7 @@ export class DefaultAdapter implements Adapter {
 		await instance.destroy();
 	}
 
-	async associate(instance: any, name: string, other: any, _Model?: any): Promise<any> {
+	async relate(instance: any, name: string, other: any, _Model?: any): Promise<any> {
 		return this.set(instance, name, other);
 	}
 

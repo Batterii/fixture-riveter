@@ -72,7 +72,7 @@ describe("simple associations", function() {
 		});
 
 		fr.fixture("post", Post, (f) => {
-			f.association("user");
+			f.relation("user");
 			f.attr("body", () => "Post body");
 
 			f.trait("admin", (t) => {
@@ -123,7 +123,7 @@ describe("simple associations", function() {
 
 	it("reads the fixture property", async function() {
 		fr.fixture("fixturePost", Post, (f) => {
-			f.association("user", {fixture: "oldUser"});
+			f.relation("user", {fixture: "oldUser"});
 			f.attr("body", () => "Post body");
 		});
 
@@ -133,7 +133,7 @@ describe("simple associations", function() {
 
 	it("the fixture property can be a list", async function() {
 		fr.fixture("fixturePost", Post, (f) => {
-			f.association("user", {fixture: ["oldUser", "admin"]});
+			f.relation("user", {fixture: ["oldUser", "admin"]});
 			f.attr("body", () => "Post body");
 		});
 
@@ -145,7 +145,7 @@ describe("simple associations", function() {
 	it("can use attributes from the current fixture", async function() {
 		fr.fixture("currentAttrPost", Post, (f) => {
 			f.attr("body", () => "Post body");
-			f.attr("user", async(e) => e.association("user", {name: await e.attr("body")}));
+			f.attr("user", async(e) => e.relation("user", {name: await e.attr("body")}));
 		});
 
 		const post = await fr.build("currentAttrPost");
@@ -274,7 +274,7 @@ describe("Complex associations", function() {
 		it("default is the same build strategy as parent", async function() {
 			fr.fixture("post", Post, (f) => {
 				f.attr("title", () => "The City & The City");
-				f.association("user");
+				f.relation("user");
 			});
 
 			const post1 = await fr.build("post");
@@ -291,7 +291,7 @@ describe("Complex associations", function() {
 		it("useParentStragety defaults to create", async function() {
 			fr.fixture("post", Post, (f) => {
 				f.attr("title", () => "The City & The City");
-				f.association("user");
+				f.relation("user");
 			});
 
 			fr.useParentStrategy = false;
@@ -310,7 +310,7 @@ describe("Complex associations", function() {
 		it("association strategy overrides useParentStrategy", async function() {
 			fr.fixture("post", Post, (f) => {
 				f.attr("title", () => "The City & The City");
-				f.association("user", {strategy: "build"});
+				f.relation("user", {strategy: "build"});
 			});
 
 			fr.useParentStrategy = false;

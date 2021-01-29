@@ -10,7 +10,7 @@ explanatory comments.
 import {fr, ObjectionAdapter} from "fixture-riveter";
 import {User} from "./models/user";
 
-// Each adapter can specify ORM-specific build, save, associate, and set functions.
+// Each adapter can specify ORM-specific build, save, relate, and set functions.
 // A given adapter can be set on a specific fixture as well, allowing for
 // fixture-specific build and save functionality.
 fr.setAdapter(new ObjectionAdapter());
@@ -353,14 +353,14 @@ strategy (by default, the same strategy as the initial instance), and then is se
 property.
 
 Then, relating the two instances beyond setting the property (for example, setting
-`postId`) will use the `associate` function in the chosen adapter, allowing for each ORM
+`postId`) will use the `relate` function in the chosen adapter, allowing for each ORM
 to bind the two instances as they need. This removes the need to define `postId` foreign
 key attributes in fixtures.
 
 
 ### Fixture name matches attribute
 When defining a relation, if the attribute's name is the same as the related fixture, it
-can be defined implicitly like a normal attribute or explicitly with the `associate`
+can be defined implicitly like a normal attribute or explicitly with the `relate`
 function:
 
 ```javascript
@@ -369,9 +369,9 @@ fr.fixture("user", User, (f) => {
     // or
     f.post();
     // or
-    f.association("post");
+    f.relation("post");
     // or
-    f.attr("post", async(e) => e.association("post"));
+    f.attr("post", async(e) => e.relation("post"));
 });
 ```
 
@@ -381,11 +381,11 @@ fixture explicitly:
 
 ```javascript
 fr.fixture("user", User, (f) => {
-    f.association("post", {fixture: "blog"});
-    // or same as above but changing the association name to match other fixture
-    f.attr("post", async(e) => e.association("blog"));
+    f.relation("post", {fixture: "blog"});
+    // or same as above but changing the relation name to match other fixture
+    f.attr("post", async(e) => e.relation("blog"));
     // or
-    f.post(async(e) => e.association("blog"));
+    f.post(async(e) => e.relation("blog"));
 });
 ```
 
@@ -399,10 +399,10 @@ fr.fixture("user", User, (f) => {
     // or
     f.post({title: "New post"});
     // or
-    f.association("post", {title: "New post"});
+    f.relation("post", {title: "New post"});
     // or
     f.attr("name", () => "Noah");
-    f.attr("post", async(e) => e.association("post", {title: await e.attr("name")}));
+    f.attr("post", async(e) => e.relation("post", {title: await e.attr("name")}));
 });
 ```
 
@@ -454,7 +454,7 @@ option in the attribute definition:
 fr.fixture("post", Post, ...);
 
 fr.fixture("user", User, (f) => {
-    f.association("post", {strategy: "build"});
+    f.relation("post", {strategy: "build"});
 });
 const user = await fr.create("user");
 user.id === undefined;
@@ -748,9 +748,9 @@ fr.fixture("user", User, (f) => {
 });
 
 fr.fixture("post", Post, (f) => {
-    f.association("user", ["clown"]);
+    f.relation("user", ["clown"]);
     // or
-    f.association("author", ["clown"], {fixture: "user"});
+    f.relation("author", ["clown"], {fixture: "user"});
 });
 
 const post = await fr.create("post");

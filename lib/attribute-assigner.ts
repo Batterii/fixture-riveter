@@ -39,18 +39,18 @@ export class AttributeAssigner<T> {
 		return this.attributeNamesToAssign;
 	}
 
-	associationNames(): string[] {
+	relationNames(): string[] {
 		return this.attributes
-			.filter((a) => a.isAssociation)
+			.filter((a) => a.isRelation)
 			.map((a) => a.name);
 	}
 
 	attributesForObject(): string[] {
-		const associationNames = this.associationNames();
+		const relationNames = this.relationNames();
 
-		// Remove all associations
+		// Remove all relations
 		return this.getAttributeNamesToAssign()
-			.filter((a) => !associationNames.includes(a));
+			.filter((a) => !relationNames.includes(a));
 	}
 
 	attributesForInstance(): string[] {
@@ -71,13 +71,13 @@ export class AttributeAssigner<T> {
 	async toInstance(): Promise<T> {
 		const adapter = this.fixtureRiveter.getAdapter(this.name);
 		const instance = adapter.build<T>(this.model);
-		const associationNames = this.associationNames();
+		const relationNames = this.relationNames();
 		const attributeNames = this.attributesForInstance();
 
 		for (const name of attributeNames) {
 			const attribute = await this._get(name);
-			if (associationNames.includes(name)) {
-				await adapter.associate(instance, name, attribute, this.model);
+			if (relationNames.includes(name)) {
+				await adapter.relate(instance, name, attribute, this.model);
 			} else {
 				adapter.set(instance, name, attribute);
 			}

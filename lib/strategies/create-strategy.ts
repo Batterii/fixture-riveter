@@ -4,7 +4,7 @@ import {ModelConstructor} from "../types";
 
 /* eslint-disable class-methods-use-this */
 export class CreateStrategy extends Strategy {
-	async association(fixtureName: string, traitsAndOverrides: any[]): Promise<any> {
+	async relation(fixtureName: string, traitsAndOverrides: any[]): Promise<any> {
 		return this.fixtureRiveter.run(fixtureName, "create", traitsAndOverrides);
 	}
 

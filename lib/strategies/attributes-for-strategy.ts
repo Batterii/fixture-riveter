@@ -3,7 +3,7 @@ import {Strategy} from "./strategy";
 import {Pojo} from "../types";
 
 export class AttributesForStrategy extends Strategy {
-	async association(fixtureName: string, traitsAndOverrides: any[]): Promise<any> {
+	async relation(fixtureName: string, traitsAndOverrides: any[]): Promise<any> {
 		return this.fixtureRiveter.run(fixtureName, "null", traitsAndOverrides);
 	}
 

@@ -52,13 +52,13 @@ export class Evaluator {
 		return this.cachedValues[name];
 	}
 
-	association<R = any>(
+	relation<R = any>(
 		name: string,
 		traits: string[],
 		overrides?: Partial<(R extends any ? Pojo : R) & {strategy: string}>,
 	): Promise<R extends any ? Pojo : R>;
 
-	association<R = any>(
+	relation<R = any>(
 		name: string,
 		traitOrOverrides?: (
 			| string[]
@@ -66,7 +66,7 @@ export class Evaluator {
 		),
 	): Promise<R extends any ? Pojo : R>;
 
-	async association<R = any>(
+	async relation<R = any>(
 		fixtureName: string,
 		...traitOrOverrides: any[]
 	): Promise<R extends any ? Pojo : R> {
@@ -88,6 +88,6 @@ export class Evaluator {
 
 		traitOrOverrides.push(omit(overrides, "strategy"));
 
-		return strategyOverride.association(fixtureName, traitOrOverrides);
+		return strategyOverride.relation(fixtureName, traitOrOverrides);
 	}
 }

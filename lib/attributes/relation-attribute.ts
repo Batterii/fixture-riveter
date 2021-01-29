@@ -1,7 +1,7 @@
 import {Attribute} from "./attribute";
 import {Evaluator} from "../evaluator";
 
-export class AssociationAttribute extends Attribute {
+export class RelationAttribute extends Attribute {
 	fixture: string | string[];
 	overrides: any[];
 
@@ -9,7 +9,7 @@ export class AssociationAttribute extends Attribute {
 		super(name, false);
 		this.fixture = fixture;
 		this.overrides = overrides;
-		this.isAssociation = true;
+		this.isRelation = true;
 	}
 
 	evaluate(evaluator: Evaluator): () => Promise<Record<string, any>> {
@@ -17,7 +17,7 @@ export class AssociationAttribute extends Attribute {
 		const fixtureName = traitsAndOverrides.shift();
 
 		return async() => {
-			return evaluator.association(fixtureName, ...traitsAndOverrides);
+			return evaluator.relation(fixtureName, ...traitsAndOverrides);
 		};
 	}
 }

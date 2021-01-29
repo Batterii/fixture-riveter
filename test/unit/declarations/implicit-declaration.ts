@@ -2,7 +2,7 @@ import {DummyModel} from "../../test-fixtures/dummy-model";
 import {FixtureRiveter} from "../../../lib/fixture-riveter";
 import {Fixture} from "../../../lib/fixture";
 import {ImplicitDeclaration} from "../../../lib/declarations/implicit-declaration";
-import {AssociationAttribute} from "../../../lib/attributes/association-attribute";
+import {RelationAttribute} from "../../../lib/attributes/relation-attribute";
 import {SequenceAttribute} from "../../../lib/attributes/sequence-attribute";
 
 import {expect} from "chai";
@@ -46,7 +46,7 @@ describe("ImplicitDeclaration", function() {
 
 				expect(array).to.be.an.instanceof(Array);
 				expect(array).to.have.length(1);
-				expect(result).to.be.an.instanceof(AssociationAttribute);
+				expect(result).to.be.an.instanceof(RelationAttribute);
 				expect(result.name).to.equal(name);
 			});
 

@@ -66,13 +66,13 @@ describe("type checking", function() {
 
 		specify("assocation signatures", function() {
 			fr.fixture("post", Post, (f) => {
-				f.association("user");
-				f.association("user", ["old"]);
-				f.association<User>("user", {name: "Bogart"});
-				f.association("user", {strategy: "create"});
-				f.association("user", ["old"], {strategy: "build"});
-				f.association<User>("user", ["old"], {name: "Bogart"});
-				f.association<User>("user", ["old"], {name: "Bogart", strategy: "build"});
+				f.relation("user");
+				f.relation("user", ["old"]);
+				f.relation<User>("user", {name: "Bogart"});
+				f.relation("user", {strategy: "create"});
+				f.relation("user", ["old"], {strategy: "build"});
+				f.relation<User>("user", ["old"], {name: "Bogart"});
+				f.relation<User>("user", ["old"], {name: "Bogart", strategy: "build"});
 			});
 		});
 	});
@@ -140,15 +140,15 @@ describe("type checking", function() {
 
 		specify("association signatures", function() {
 			fr.fixture("post", Post, (f) => {
-				f.body((e) => e.association("user"));
-				f.body((e) => e.association("user", ["old"]));
-				f.body((e) => e.association("user", {name: "Bogart"}));
-				f.body((e) => e.association("user", {strategy: "build"}));
-				f.body((e) => e.association("user", ["old"], {name: "Bogart"}));
-				f.body((e) => e.association("user", ["old"], {strategy: "build"}));
-				f.body((e) => e.association<User>("user", ["old"], {name: "Bogart"}));
+				f.body((e) => e.relation("user"));
+				f.body((e) => e.relation("user", ["old"]));
+				f.body((e) => e.relation("user", {name: "Bogart"}));
+				f.body((e) => e.relation("user", {strategy: "build"}));
+				f.body((e) => e.relation("user", ["old"], {name: "Bogart"}));
+				f.body((e) => e.relation("user", ["old"], {strategy: "build"}));
+				f.body((e) => e.relation<User>("user", ["old"], {name: "Bogart"}));
 				f.body((e) => {
-					return e.association<User>(
+					return e.relation<User>(
 						"user",
 						["old"],
 						{name: "Bogart", strategy: "build"},

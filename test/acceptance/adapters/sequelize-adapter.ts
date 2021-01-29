@@ -41,7 +41,7 @@ describe("Sequelize functionality", function() {
 	Post.belongsTo(User);
 	User.hasMany(Post);
 
-	describe("simple associations", function() {
+	describe("simple relations", function() {
 		let fr: FixtureRiveter;
 
 		before(async function() {
@@ -50,17 +50,17 @@ describe("Sequelize functionality", function() {
 			fr = new FixtureRiveter();
 			fr.setAdapter(new SequelizeAdapter());
 
-			fr.fixture("user", User, (f: any) => {
+			fr.fixture("user", User, (f) => {
 				f.attr("name", () => "Noah");
 				f.attr("age", () => 32);
 			});
-			fr.fixture("post", Post, (f: any) => {
-				f.association("user");
+			fr.fixture("post", Post, (f) => {
+				f.relation("user");
 				f.attr("title", () => "Post title");
 			});
 		});
 
-		specify("#create creates an association", async function() {
+		specify("#create creates an relation", async function() {
 			const post = await fr.create("post");
 			const user = await post.getUser();
 
@@ -99,7 +99,7 @@ describe("Sequelize functionality", function() {
 						});
 					});
 				});
-				fr.fixture("post", Post, (f: any) => {
+				fr.fixture("post", Post, (f) => {
 					f.attr("title", () => "The City & The City");
 					f.attr("user");
 				});
@@ -135,7 +135,7 @@ describe("Sequelize functionality", function() {
 
 			fr.fixture("post", Post, (f) => {
 				f.attr("title", () => "The City & The City");
-				f.association("user", {strategy: "build"});
+				f.relation("user", {strategy: "build"});
 			});
 		});
 

@@ -10,7 +10,7 @@ import {FixtureRiveter} from "../../lib/fixture-riveter";
 import {expect} from "chai";
 
 class JsonStrategy extends Strategy {
-	async association(fixtureName: string, traitsAndOverrides: any[]): Promise<any> {
+	async relation(fixtureName: string, traitsAndOverrides: any[]): Promise<any> {
 		return this.fixtureRiveter.run(fixtureName, "create", traitsAndOverrides);
 	}
 

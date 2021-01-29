@@ -4,12 +4,12 @@ import {Evaluator} from "../evaluator";
 /* eslint-disable @typescript-eslint/no-empty-function */
 export abstract class Attribute {
 	name: string;
-	isAssociation: boolean;
+	isRelation: boolean;
 	ignored: boolean;
 
 	constructor(name: string, ignored: boolean) {
 		this.name = name;
-		this.isAssociation = false;
+		this.isRelation = false;
 		this.ignored = ignored;
 	}
 

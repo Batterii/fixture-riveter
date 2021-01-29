@@ -14,7 +14,7 @@ export class Strategy {
 		this.fixtureRiveter = fixtureRiveter;
 	}
 
-	async association(fixtureName: string, traitsAndOverrides: any[]): Promise<any> {
+	async relation(fixtureName: string, traitsAndOverrides: any[]): Promise<any> {
 		return this.fixtureRiveter.run(fixtureName, "null", traitsAndOverrides);
 	}
 

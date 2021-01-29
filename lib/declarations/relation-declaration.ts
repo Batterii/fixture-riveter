@@ -1,10 +1,10 @@
 import {Declaration} from "./declaration";
-import {AssociationAttribute} from "../attributes/association-attribute";
+import {RelationAttribute} from "../attributes/relation-attribute";
 import {extractOverrides} from "../fixture-riveter";
 
 import {omit} from "lodash";
 
-export class AssociationDeclaration extends Declaration {
+export class RelationDeclaration extends Declaration {
 	overrides: Record<string, any>;
 	traits: string[];
 
@@ -14,11 +14,11 @@ export class AssociationDeclaration extends Declaration {
 		this.traits = traitsAndOptions;
 	}
 
-	build(): AssociationAttribute[] {
+	build(): RelationAttribute[] {
 		const fixtureName = this.overrides.fixture || this.name;
 		const overrides = omit(this.overrides, "fixture");
 		const options = [this.traits, overrides].flat(Infinity);
 
-		return [new AssociationAttribute(this.name, fixtureName, options)];
+		return [new RelationAttribute(this.name, fixtureName, options)];
 	}
 }
