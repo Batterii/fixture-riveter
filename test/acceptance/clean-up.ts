@@ -45,4 +45,16 @@ describe("#clean-up", function() {
 		expect(fr.instances).to.have.length(0);
 		expect(await User.query()).to.have.length(0);
 	});
+
+	it("only calls delete on saved fixtures", async function() {
+		await fr.attributesFor("user");
+		await fr.build("user");
+		await fr.create("user");
+
+		expect(fr.instances).to.have.length(3);
+
+		await fr.cleanUp();
+		expect(fr.instances).to.have.length(0);
+		expect(await User.query()).to.have.length(0);
+	});
 });

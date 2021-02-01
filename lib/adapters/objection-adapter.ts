@@ -7,7 +7,13 @@ export class ObjectionAdapter extends DefaultAdapter {
 	}
 
 	async destroy(instance: any): Promise<void> {
-		await instance.$query().delete();
+		if (instance.$query) {
+			try {
+				await instance.$query().delete();
+			} catch (e) {
+				// Do nothing
+			}
+		}
 	}
 
 	async relate(instance: any, name: string, other: any, Model?: any): Promise<any> {
