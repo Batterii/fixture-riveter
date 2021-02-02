@@ -6,7 +6,7 @@ import {FixtureRiveter} from "../../lib/fixture-riveter";
 
 import {expect} from "chai";
 
-describe("simple associations", function() {
+describe("simple relationships", function() {
 	let fr: FixtureRiveter;
 
 	class User extends Model {
@@ -153,7 +153,7 @@ describe("simple associations", function() {
 	});
 });
 
-describe("Complex associations", function() {
+describe("Complex relationships", function() {
 	class User extends Model {
 		static relationMappings = {};
 
@@ -328,7 +328,7 @@ describe("Complex associations", function() {
 	});
 });
 
-describe("Associations with a join table", function() {
+describe("Relations with a join table", function() {
 	class User extends Model {
 		static relationMappings = {};
 
@@ -491,5 +491,97 @@ describe("Associations with a join table", function() {
 		expect(user.teams).to.exist.and.to.have.length(1);
 		const team = await fr.create<Team>("team", ["with memberships"]);
 		expect(team.users).to.exist.and.to.have.length(1);
+	});
+});
+
+describe("not relying on built-in relation methods", function() {
+	let fr: FixtureRiveter;
+
+	class User extends Model {
+		id: number;
+		name: string;
+		age: number;
+		admin: boolean;
+
+		get props() {
+			return {
+				name: "string",
+				age: "integer",
+			};
+		}
+	}
+
+	class Post extends Model {
+		static relationMappings = {
+			user: {
+				relation: Model.BelongsToOneRelation,
+				modelClass: User,
+				join: {
+					from: "posts.userId",
+					to: "users.id",
+				},
+			},
+		};
+
+		id: number;
+		userId: number;
+		user: User;
+
+		get props() {
+			return {
+				userId: "integer",
+				body: "string",
+			};
+		}
+	}
+
+	before(async function() {
+		await createTable(User);
+		await createTable(Post);
+	});
+
+	beforeEach(function() {
+		fr = new FixtureRiveter();
+		fr.setAdapter(new ObjectionAdapter());
+
+		fr.fixture("user", User, (f) => {
+			f.attr("name", () => "Noah");
+			f.attr("age", () => 32);
+		});
+
+		fr.fixture("post", Post, (f) => {
+			f.attr("body", () => "Post body");
+			f.attr("user", async(e) => e.relation("user"));
+			f.attr("userId", async(e) => (await e.attr("user"))?.id);
+		});
+	});
+
+	specify("#attributesFor doesn't create an association", async function() {
+		const post = await fr.attributesFor("post");
+		expect(post).to.be.an.instanceof(Object);
+		expect(post.body).to.equal("Post body");
+		expect(post.user).to.be.undefined;
+	});
+
+	specify("#build creates an association", async function() {
+		const post = await fr.build("post");
+		expect(post).to.be.an.instanceof(Object);
+		expect(post.body).to.equal("Post body");
+		expect(post.user).to.be.an.instanceof(User);
+		expect(post.user.name).to.equal("Noah");
+		expect(post.user.id).to.be.undefined;
+	});
+
+	specify("#create creates an association", async function() {
+		const post = await fr.create("post");
+
+		expect(post).to.be.an.instanceof(Post);
+		expect(post.body).to.equal("Post body");
+		expect(post.user).to.be.an.instanceof(User);
+		expect(post.user.name).to.equal("Noah");
+
+		const model = await User.query().findById(post.userId);
+		expect(model.id).to.equal(post.userId);
+		expect(model.id).to.equal(post.user.id);
 	});
 });

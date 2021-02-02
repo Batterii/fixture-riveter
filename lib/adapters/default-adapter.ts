@@ -2,6 +2,7 @@ import {Adapter} from "./adapter";
 
 /* eslint-disable class-methods-use-this */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 export class DefaultAdapter implements Adapter {
 	build<T>(Model: any): T {
 		return new Model();

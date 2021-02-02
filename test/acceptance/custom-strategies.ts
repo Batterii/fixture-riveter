@@ -82,6 +82,7 @@ describe("Custom strategies", function() {
 		});
 
 		it("works with property call", async function() {
+			// eslint-disable-next-line new-cap
 			const post = await (fr as any).JsonStrategy("post", ["modern"]);
 			const builtPost = await fr.build("post", ["modern"]);
 

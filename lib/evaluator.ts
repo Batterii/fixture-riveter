@@ -40,7 +40,7 @@ export class Evaluator {
 		}
 	}
 
-	async _methodMissing(name: string): Promise<any> {
+	async methodMissing(name: string): Promise<any> {
 		return this.attr(name);
 	}
 
@@ -52,31 +52,31 @@ export class Evaluator {
 		return this.cachedValues[name];
 	}
 
-	relation<R = any>(
+	relation<R = Pojo>(
 		name: string,
 		traits: string[],
-		overrides?: Partial<(R extends any ? Pojo : R) & {strategy: string}>,
-	): Promise<R extends any ? Pojo : R>;
+		overrides?: Partial<R & {strategy: string}>,
+	): Promise<R>;
 
-	relation<R = any>(
+	relation<R = Pojo>(
 		name: string,
 		traitOrOverrides?: (
 			| string[]
-			| Partial<(R extends any ? Pojo : R) & {strategy: string}>
+			| Partial<R & {strategy: string}>
 		),
-	): Promise<R extends any ? Pojo : R>;
+	): Promise<R>;
 
-	async relation<R = any>(
+	async relation<R = Pojo>(
 		fixtureName: string,
 		...traitOrOverrides: any[]
-	): Promise<R extends any ? Pojo : R> {
+	): Promise<R> {
 		const overrides = extractOverrides(traitOrOverrides);
 
-		let strategyName = "create";
+		let strategyName = this.buildStrategy.name;
 		if (overrides.strategy) {
 			strategyName = overrides.strategy;
-		} else if (this.fixtureRiveter.useParentStrategy) {
-			strategyName = this.buildStrategy.name;
+		} else if (!this.fixtureRiveter.useParentStrategy) {
+			strategyName = "create";
 		}
 
 		const StrategyRiveter = this.fixtureRiveter.strategyHandler.getStrategy(strategyName);

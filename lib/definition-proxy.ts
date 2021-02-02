@@ -48,7 +48,7 @@ export class DefinitionProxy<T> {
 		return this.definition.sequenceHandler;
 	}
 
-	_methodMissing(name: string, ...rest: any[]): void {
+	methodMissing(name: string, ...rest: any[]): void {
 		this.attr(name, ...rest);
 	}
 

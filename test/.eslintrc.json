@@ -1,9 +1,12 @@
 {
 	"extends": "@batterii/eslint-config-ts/test",
 	"rules": {
-		"multiline-comment-style": "off",
-		"sort-imports": "off",
+		"@typescript-eslint/restrict-plus-operands": "error",
+		"@typescript-eslint/explicit-module-boundary-types": "off",
+		"class-methods-use-this": "off",
 		"max-len": ["error", {"code": 100}],
-		"quotes": ["error", "double", {"avoidEscape": true}]
+		"multiline-comment-style": "off",
+		"quotes": ["error", "double", {"avoidEscape": true}],
+		"sort-imports": "off"
 	}
 }

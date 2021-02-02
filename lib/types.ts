@@ -21,10 +21,7 @@ interface TraitsFn<T, KeyType, ArgFN, Relation = undefined> {
 		| string[]
 		| OverrideForRelation<T, R>,
 	): Promise<KeyType>;
-	<R = Relation>(
-		traits: string[],
-		overrides?: OverrideForRelation<T, R>,
-	): Promise<KeyType>;
+	<R = Relation>(traits?: string[], overrides?: OverrideForRelation<T, R>): Promise<KeyType>;
 }
 
 type ConvertToFn<T, ArgFN = () => any> = {
@@ -33,7 +30,7 @@ type ConvertToFn<T, ArgFN = () => any> = {
 
 type CurrentEvaluator<T> = {
 	[Key in keyof T]-?: () => Promise<T[Key]>;
-} & Exclude<Evaluator, "_methodMissing">;
+} & Exclude<Evaluator, "methodMissing">;
 
 export type EvaluatorFunction<T> =
 	| ((evaluator: CurrentEvaluator<T>) => any)
@@ -42,7 +39,7 @@ export type EvaluatorFunction<T> =
 
 type FixtureBuilder<T> = (
 	& ConvertToFn<T, EvaluatorFunction<T>>
-	& Exclude<DefinitionProxy<T>, "_methodMissing">
+	& Exclude<DefinitionProxy<T>, "methodMissing">
 );
 
 export type BlockFunction<T> = (fixture: FixtureBuilder<T>) => any;

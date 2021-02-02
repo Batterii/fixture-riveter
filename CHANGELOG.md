@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ObjectionAdapter: only call delete on instances that might be in the database,
     and wrap call in a try-catch for when we call it on instances that were
     constructed with `build`.
+- Move all default build method overloads to separate interfaces
+- Change `fixture#run` to `fixture#prepare`
+- Revert `_methodMissing` back to `methodMissing`
+- Enforce RelationAttribute fixture property being only an array
+- Clean up eslint rules, update @batterii/eslint-config-ts
 
 
 ## [v2.0.0] - 2021-01-29
@@ -19,8 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Convert `association` to `relation` to match Objection.js and TypeORM naming
 - Throw an error in `optionsParser` if given incorrect options
-- Change `fixture:` option in `relation` method to allow string array to match
-    [factory_bot] specification
+- Change `fixture:` option to allow string array to match [factory_bot] specification
 
 
 ## [v1.7.0] - 2021-01-28

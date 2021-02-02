@@ -130,7 +130,7 @@ export class Fixture<T> extends Definition<T> {
 			this.fixtureRiveter.getTrait(name);
 	}
 
-	async run(
+	async prepare(
 		buildStrategy: Strategy,
 		overrides: Record<string, any> = {},
 	): Promise<Assembler<T>> {

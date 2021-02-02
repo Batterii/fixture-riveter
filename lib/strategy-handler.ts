@@ -15,7 +15,7 @@ export class StrategyHandler {
 		this.strategies = {};
 	}
 
-	registerStrategy(strategyName: string, strategyClass: any): void {
+	registerStrategy(strategyName: string, strategyClass: typeof Strategy): void {
 		this.strategies[strategyName] = strategyClass;
 		this.defineStrategyMethods(strategyName);
 	}

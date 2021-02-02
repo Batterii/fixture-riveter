@@ -2,10 +2,7 @@ import {DynamicAttribute} from "../../lib/attributes/dynamic-attribute";
 import {DynamicDeclaration} from "../../lib/declarations/dynamic-declaration";
 import {Fixture} from "../../lib/fixture";
 import {FixtureRiveter} from "../../lib/fixture-riveter";
-import {DefaultAdapter} from "../../lib/adapters/default-adapter";
 import {NullFixture} from "../../lib/null-fixture";
-
-import {AttributesForStrategy} from "../../lib/strategies/attributes-for-strategy";
 
 import {DummyModel} from "../test-fixtures/dummy-model";
 
