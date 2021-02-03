@@ -4,26 +4,29 @@ import {DefaultAdapter} from "./adapters/default-adapter";
 export type FixtureNames = string | string[];
 
 export class AdapterHandler {
-	adapters: Record<string, Adapter>;
+	adapters: Map<string, Adapter>;
 	defaultAdapter: Adapter;
 	currentAdapter: Adapter;
 
 	constructor(adapter?: Adapter) {
-		this.adapters = {};
+		this.adapters = new Map();
 		this.defaultAdapter = new DefaultAdapter();
 		this.currentAdapter = adapter || this.defaultAdapter;
 	}
 
 	getAdapter(fixtureName?: string): Adapter {
-		if (fixtureName && fixtureName in this.adapters) {
-			return this.adapters[fixtureName];
+		if (fixtureName) {
+			const adapter = this.adapters.get(fixtureName);
+			if (adapter !== undefined) {
+				return adapter;
+			}
 		}
 		return this.currentAdapter;
 	}
 
 	assignMultiple(adapter: Adapter, names: string[]): void {
 		names.forEach((name) => {
-			this.adapters[name] = adapter;
+			this.adapters.set(name, adapter);
 		});
 	}
 

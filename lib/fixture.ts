@@ -20,11 +20,6 @@ import {
 	ModelConstructor,
 } from "./types";
 
-export interface ExtraAttributes {
-	traits?: string[];
-	attrs?: Record<string, any>;
-}
-
 export class Fixture<T> extends Definition<T> {
 	fixtureRiveter: FixtureRiveter;
 	model: ModelConstructor<T>;
@@ -74,7 +69,10 @@ export class Fixture<T> extends Definition<T> {
 
 	parentFixture(): Fixture<T> {
 		if (this.parent) {
-			return this.fixtureRiveter.getFixture(this.parent, false);
+			const fixture = this.fixtureRiveter.getFixture(this.parent, false);
+			if (fixture) {
+				return fixture;
+			}
 		}
 		return new NullFixture(this.fixtureRiveter) as Fixture<T>;
 	}
@@ -125,7 +123,7 @@ export class Fixture<T> extends Definition<T> {
 	}
 
 	traitByName(name: string): Trait<T> {
-		return this.traits[name] ||
+		return this.traitsCache.get(name) ||
 			this.parentFixture().traitByName(name) ||
 			this.fixtureRiveter.getTrait(name);
 	}

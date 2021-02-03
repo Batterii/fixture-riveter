@@ -8,20 +8,20 @@ import {FixtureName} from "./types";
 
 export class StrategyHandler {
 	fixtureRiveter: FixtureRiveter;
-	strategies: Record<string, typeof Strategy>;
+	strategies: Map<string, typeof Strategy>;
 
 	constructor(fixtureRiveter: FixtureRiveter) {
 		this.fixtureRiveter = fixtureRiveter;
-		this.strategies = {};
+		this.strategies = new Map();
 	}
 
 	registerStrategy(strategyName: string, strategyClass: typeof Strategy): void {
-		this.strategies[strategyName] = strategyClass;
+		this.strategies.set(strategyName, strategyClass);
 		this.defineStrategyMethods(strategyName);
 	}
 
-	getStrategy(strategyName: string): typeof Strategy {
-		return this.strategies[strategyName];
+	getStrategy(strategyName: string): typeof Strategy | undefined {
+		return this.strategies.get(strategyName);
 	}
 
 	registerDefaultStategies(): void {
@@ -39,7 +39,7 @@ export class StrategyHandler {
 
 	defineSingularStrategyMethod(strategyName: string): void {
 		this.fixtureRiveter[strategyName] = async(name: FixtureName<any>, ...traits: any[]) => {
-			return this.fixtureRiveter.run(name, strategyName, traits);
+			return this.fixtureRiveter.run(name, strategyName, ...traits);
 		};
 	}
 
@@ -49,7 +49,7 @@ export class StrategyHandler {
 			count: number,
 			...traits: any[]
 		) => {
-			return this.fixtureRiveter.runList(name, strategyName, count, traits);
+			return this.fixtureRiveter.runList(name, strategyName, count, ...traits);
 		};
 	}
 
@@ -58,7 +58,7 @@ export class StrategyHandler {
 			name: FixtureName<any>,
 			...traits: any[]
 		) => {
-			return this.fixtureRiveter.runList(name, strategyName, 2, traits);
+			return this.fixtureRiveter.runList(name, strategyName, 2, ...traits);
 		};
 	}
 }

@@ -15,7 +15,8 @@ describe("Adapters", function() {
 		it("sets the defaults correctly", function() {
 			const handler = new AdapterHandler();
 
-			expect(handler.adapters).to.deep.equal({});
+			expect(handler.adapters).to.be.an.instanceOf(Map);
+			expect(handler.adapters.size).to.equal(0);
 			expect(handler.defaultAdapter).to.be.an.instanceOf(DefaultAdapter);
 			expect(handler.currentAdapter).to.be.an.instanceOf(DefaultAdapter);
 		});
@@ -48,7 +49,7 @@ describe("Adapters", function() {
 			const key = "key";
 			const value = new DefaultAdapter();
 			const handler = new AdapterHandler();
-			handler.adapters[key] = value;
+			handler.adapters.set(key, value);
 
 			expect(handler.getAdapter(key)).to.equal(value);
 		});
@@ -117,9 +118,9 @@ describe("Adapters", function() {
 			handler.setAdapters(adapter, key);
 			handler.setAdapters(adapter, listOfKeys);
 
-			expect(handler.adapters[key]).to.equal(adapter);
-			expect(handler.adapters[listOfKeys[0]]).to.equal(adapter);
-			expect(handler.adapters[listOfKeys[1]]).to.equal(adapter);
+			expect(handler.adapters.get(key)).to.equal(adapter);
+			expect(handler.adapters.get("key1")).to.equal(adapter);
+			expect(handler.adapters.get("key2")).to.equal(adapter);
 		});
 	});
 });

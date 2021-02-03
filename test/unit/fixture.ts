@@ -30,7 +30,8 @@ describe("Fixture", function() {
 	it("defines default options", function() {
 		const noOptions = new Fixture(fixtureRiveter, "name", DummyModel);
 		expect(noOptions.aliases).to.deep.equal([]);
-		expect(noOptions.traits).to.deep.equal({});
+		expect(noOptions.traitsCache).to.be.an.instanceOf(Map);
+		expect(noOptions.traitsCache.size).to.equal(0);
 	});
 
 	it("accepts aliases", function() {

@@ -59,7 +59,7 @@ describe("FixtureRiveter", function() {
 
 			fixtureRiveter.registerFixture(fixture);
 
-			expect(fixtureRiveter.fixtures[name]).to.equal(fixture);
+			expect(fixtureRiveter.fixtures.get(name)).to.equal(fixture);
 		});
 
 		it("adds the fixture by alias", function() {
@@ -70,8 +70,8 @@ describe("FixtureRiveter", function() {
 
 			fixtureRiveter.registerFixture(fixture);
 
-			expect(fixtureRiveter.fixtures[aliases[0]]).to.equal(fixture);
-			expect(fixtureRiveter.fixtures[aliases[1]]).to.equal(fixture);
+			expect(fixtureRiveter.fixtures.get("fixture1")).to.equal(fixture);
+			expect(fixtureRiveter.fixtures.get("fixture2")).to.equal(fixture);
 		});
 
 		it("adds the same fixture multiples times", function() {
@@ -94,11 +94,11 @@ describe("FixtureRiveter", function() {
 			const name = "testFixture";
 			fixtureRiveter.fixture(name, DummyModel);
 
-			const fixture = fixtureRiveter.fixtures[name];
+			const fixture = fixtureRiveter.fixtures.get(name);
 
 			expect(fixtureRiveter.fixtures).to.not.be.empty;
 			expect(fixture).to.exist;
-			expect(fixture.name).to.equal(name);
+			expect(fixture!.name).to.equal(name);
 		});
 
 		it("returns the created fixture", function() {
@@ -121,9 +121,9 @@ describe("FixtureRiveter", function() {
 		it("registers the fixture", function() {
 			const fixtureRiveter = new FixtureRiveter();
 			const name = "testFixture";
-			expect(fixtureRiveter.fixtures[name]).to.not.exist;
+			expect(fixtureRiveter.fixtures.get(name)).to.not.exist;
 			fixtureRiveter.fixture("testFixture", DummyModel);
-			expect(fixtureRiveter.fixtures[name]).to.exist;
+			expect(fixtureRiveter.fixtures.get(name)).to.exist;
 		});
 
 		it("doesn't register a fixture twice", function() {
@@ -140,9 +140,8 @@ describe("FixtureRiveter", function() {
 			fixtureRiveter.fixture("user", DummyModel, (f) => {
 				f.fixture("oldUser", DummyModel);
 			});
-			const result = Object
-				.keys(fixtureRiveter.fixtures)
-				.map((name: string) => fixtureRiveter.fixtures[name])
+			const result = Array.from(fixtureRiveter.fixtures.keys())
+				.map((name: string) => fixtureRiveter.fixtures.get(name) as any)
 				.map((f) => f.name);
 			expect(result).to.deep.equal(["user", "oldUser"]);
 		});
@@ -154,7 +153,7 @@ describe("FixtureRiveter", function() {
 			const fixture = new FixtureRiveter();
 			fixture.fixture(name, DummyModel);
 			const t = fixture.getFixture(name);
-			const result = fixture.fixtures[name];
+			const result = fixture.fixtures.get(name);
 			expect(t).to.equal(result);
 		});
 
@@ -176,8 +175,8 @@ describe("FixtureRiveter", function() {
 			const fr = new FixtureRiveter();
 			const name = "email";
 			fr.sequence(name);
-			expect(Object.keys(fr.sequenceHandler.sequences)).to.deep.equal([name]);
-			expect(fr.sequenceHandler.sequences[name]).to.be.an.instanceof(Sequence);
+			expect(Array.from(fr.sequenceHandler.sequences.keys())).to.deep.equal([name]);
+			expect(fr.sequenceHandler.sequences.get(name)).to.be.an.instanceof(Sequence);
 		});
 	});
 
@@ -239,7 +238,7 @@ describe("FixtureRiveter", function() {
 			const name = "email";
 			const block = identity;
 			fr.trait(name, block);
-			const result = fr.traits[name];
+			const result = fr.traits.get(name) as any;
 
 			expect(result.name).to.equal(name);
 			expect(result.block).to.equal(block);
@@ -252,7 +251,7 @@ describe("FixtureRiveter", function() {
 			const fixture = new FixtureRiveter();
 			fixture.trait(name, identity);
 			const t = fixture.getTrait(name);
-			const result = fixture.traits[name];
+			const result = fixture.traits.get(name);
 			expect(t).to.equal(result);
 		});
 

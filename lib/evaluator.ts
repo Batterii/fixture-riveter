@@ -8,10 +8,10 @@ import {omit} from "lodash";
 import {Pojo} from "./types";
 
 export class Evaluator {
-	attributeFns: Record<string, (e: Evaluator) => any>;
+	attributeFns: Map<string, (e: Evaluator) => any>;
 	attributes: Attribute[];
 	buildStrategy: Strategy;
-	cachedValues: Record<string, any>;
+	cachedValues: Map<string, any>;
 	fixtureRiveter: FixtureRiveter;
 	overrides: Record<string, any>;
 
@@ -24,9 +24,12 @@ export class Evaluator {
 		this.fixtureRiveter = fixtureRiveter;
 		this.buildStrategy = buildStrategy;
 		this.attributes = attributes;
-		this.cachedValues = overrides;
+		this.cachedValues = new Map();
+		for (const [key, val] of Object.entries(overrides)) {
+			this.cachedValues.set(key, val);
+		}
 		this.overrides = overrides;
-		this.attributeFns = {};
+		this.attributeFns = new Map();
 
 		this.defineAttributes(attributes);
 	}
@@ -34,8 +37,8 @@ export class Evaluator {
 	defineAttributes(givenAttributes: Attribute[]): void {
 		for (const attribute of givenAttributes.reverse()) {
 			const {name} = attribute;
-			if (!Object.prototype.hasOwnProperty.call(this.attributeFns, name)) {
-				this.attributeFns[name] = attribute.evaluate(this);
+			if (!this.attributeFns.has(name)) {
+				this.attributeFns.set(name, attribute.evaluate(this));
 			}
 		}
 	}
@@ -45,11 +48,13 @@ export class Evaluator {
 	}
 
 	async attr(name: string): Promise<any> {
-		if (!Object.prototype.hasOwnProperty.call(this.cachedValues, name)) {
-			const fn = this.attributeFns[name];
-			this.cachedValues[name] = await fn(this);
+		if (!this.cachedValues.has(name)) {
+			const fn = this.attributeFns.get(name);
+			if (fn !== undefined) {
+				this.cachedValues.set(name, await fn(this));
+			}
 		}
-		return this.cachedValues[name];
+		return this.cachedValues.get(name);
 	}
 
 	relation<R = Pojo>(
@@ -80,11 +85,16 @@ export class Evaluator {
 		}
 
 		const StrategyRiveter = this.fixtureRiveter.strategyHandler.getStrategy(strategyName);
-		const strategyOverride = new StrategyRiveter(
-			strategyName,
-			this.fixtureRiveter,
-			this.buildStrategy.adapter,
-		);
+		let strategyOverride: Strategy;
+		if (StrategyRiveter) {
+			strategyOverride = new StrategyRiveter(
+				strategyName,
+				this.fixtureRiveter,
+				this.buildStrategy.adapter,
+			);
+		} else {
+			throw new Error(`Strategy ${strategyName} hasn't been defined`);
+		}
 
 		traitOrOverrides.push(omit(overrides, "strategy"));
 

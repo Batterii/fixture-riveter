@@ -22,8 +22,8 @@ describe("SequenceHandler", function() {
 			const name = "email";
 			seq.registerSequence(name);
 
-			expect(Object.keys(seq.sequences)).to.deep.equal([name]);
-			expect(seq.sequences[name]).to.be.an.instanceof(Sequence);
+			expect(Array.from(seq.sequences.keys())).to.deep.equal([name]);
+			expect(seq.sequences.get(name)).to.be.an.instanceof(Sequence);
 		});
 
 		it("returns the new sequence", function() {

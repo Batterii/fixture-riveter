@@ -53,8 +53,8 @@ export function nameGuard<T>(fixtureName: FixtureName<T>): string {
 }
 
 export class FixtureRiveter implements DefaultStrategyMethods {
-	fixtures: Record<string, Fixture<any>>;
-	traits: Record<string, Trait<any>>;
+	fixtures: Map<string, Fixture<any>>;
+	traits: Map<string, Trait<any>>;
 	instances: [string, any][];
 	adapterHandler: AdapterHandler;
 	sequenceHandler: SequenceHandler;
@@ -63,8 +63,8 @@ export class FixtureRiveter implements DefaultStrategyMethods {
 	strategyHandler: StrategyHandler;
 
 	constructor() {
-		this.fixtures = {};
-		this.traits = {};
+		this.fixtures = new Map();
+		this.traits = new Map();
 		this.instances = [];
 		this.adapterHandler = new AdapterHandler();
 		this.sequenceHandler = new SequenceHandler();
@@ -83,8 +83,8 @@ export class FixtureRiveter implements DefaultStrategyMethods {
 		return this.adapterHandler.setAdapter(adapter, fixtureNames);
 	}
 
-	getFixture<T = any>(name: string, throws = true): Fixture<T> {
-		const fixture = this.fixtures[name];
+	getFixture<T = any>(name: string, throws = true): Fixture<T> | undefined {
+		const fixture = this.fixtures.get(name);
 		if (throws && !fixture) {
 			throw new Error(`${name} hasn't been defined yet`);
 		}
@@ -93,10 +93,10 @@ export class FixtureRiveter implements DefaultStrategyMethods {
 
 	registerFixture<T>(fixture: Fixture<T>): void {
 		for (const name of fixture.names()) {
-			if (this.fixtures[name]) {
+			if (this.fixtures.has(name)) {
 				throw new Error(`Can't define ${name} fixture twice`);
 			}
-			this.fixtures[name] = fixture;
+			this.fixtures.set(name, fixture);
 		}
 	}
 
@@ -157,7 +157,7 @@ export class FixtureRiveter implements DefaultStrategyMethods {
 	}
 
 	getTrait<T>(name: string): Trait<T> {
-		const trait = this.traits[name];
+		const trait = this.traits.get(name);
 		if (!trait) {
 			throw new Error(`Trait ${name} hasn't been defined yet`);
 		}
@@ -166,7 +166,7 @@ export class FixtureRiveter implements DefaultStrategyMethods {
 
 	trait<T>(name: string, block: BlockFunction<T>): void {
 		const trait = new Trait(name, this, block);
-		this.traits[trait.name] = trait;
+		this.traits.set(trait.name, trait);
 	}
 
 	sequence<C extends string | number | (() => Generator<any, any, any>)>(
@@ -202,7 +202,7 @@ export class FixtureRiveter implements DefaultStrategyMethods {
 
 	resetSequences(): void {
 		this.sequenceHandler.resetSequences();
-		for (const fixture of Object.values(this.fixtures)) {
+		for (const fixture of this.fixtures.values()) {
 			fixture.sequenceHandler.resetSequences();
 		}
 	}
@@ -241,28 +241,36 @@ export class FixtureRiveter implements DefaultStrategyMethods {
 		const overrides = extractOverrides(traits);
 		let fixture = this.getFixture<T>(name);
 
-		fixture.compile();
+		if (fixture !== undefined) {
+			fixture.compile();
 
-		if (traits.length > 0) {
-			fixture = fixture.copy();
-			fixture.appendTraits(traits);
+			if (traits.length > 0) {
+				fixture = fixture.copy<Fixture<T>>();
+				fixture.appendTraits(traits);
+			}
+
+			const adapter = this.getAdapter(name);
+			const sName = nameGuard(strategyName as FixtureName<Strategy>);
+
+			let StrategyConstructor: typeof strategyName;
+			if (isString(strategyName)) {
+				const strategy = this.strategyHandler.getStrategy(sName);
+				if (strategy === undefined) {
+					throw new Error(`Strategy ${sName} hasn't been defined`);
+				} else {
+					StrategyConstructor = strategy;
+				}
+			} else {
+				StrategyConstructor = strategyName;
+			}
+			const strategy = new StrategyConstructor(sName, this, adapter);
+
+			const assembler = await fixture.prepare(strategy, overrides);
+			const instance = await strategy.result<T>(assembler, fixture.model);
+			this.instances.push([name, instance]);
+			return instance;
 		}
-
-		const adapter = this.getAdapter(name);
-		const sName = nameGuard(strategyName as FixtureName<Strategy>);
-
-		let StrategyConstructor: typeof strategyName;
-		if (isString(strategyName)) {
-			StrategyConstructor = this.strategyHandler.getStrategy(sName);
-		} else {
-			StrategyConstructor = strategyName;
-		}
-		const strategy = new StrategyConstructor(sName, this, adapter);
-
-		const assembler = await fixture.prepare(strategy, overrides);
-		const instance = await strategy.result<T>(assembler, fixture.model);
-		this.instances.push([name, instance]);
-		return instance;
+		throw new Error(`Fixture ${name} hasn't been defined`);
 	}
 
 	async runList<T = Pojo>(
@@ -290,7 +298,7 @@ export class FixtureRiveter implements DefaultStrategyMethods {
 
 		const instances: T[] = [];
 		for (let idx = 0; idx < count; idx += 1) {
-			const instance = await this.run<T>(name, strategy, cloneDeep(traitsAndOverrides));
+			const instance = await this.run<T>(name, strategy, ...cloneDeep(traitsAndOverrides));
 			instances.push(instance);
 		}
 		return instances;
@@ -341,7 +349,10 @@ export class FixtureRiveter implements DefaultStrategyMethods {
 		await Promise.all(this.instances.map(([name, instance]) => {
 			const fixture = this.getFixture(name);
 			const adapter = this.getAdapter(name);
-			return adapter.destroy(instance, fixture.model);
+			if (fixture && adapter) {
+				return adapter.destroy(instance, fixture.model);
+			}
+			return undefined;
 		}));
 		this.instances = [];
 	}

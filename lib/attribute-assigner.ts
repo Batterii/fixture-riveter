@@ -9,7 +9,7 @@ export class AttributeAssigner<T> {
 	model: ModelConstructor<T>;
 	evaluator: Evaluator;
 	attributes: Attribute[];
-	attributeNamesToAssign: string[];
+	attributeNamesToAssign?: string[];
 
 	constructor(
 		fixtureRiveter: FixtureRiveter,

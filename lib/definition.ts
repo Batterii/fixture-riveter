@@ -18,7 +18,7 @@ export class Definition<T> {
 	attributes: Attribute[];
 	baseTraits: string[];
 	additionalTraits: string[];
-	traitsCache?: Record<string, Trait<T>>;
+	traitsCache: Map<string, Trait<T>>;
 	compiled: boolean;
 	block?: BlockFunction<T>;
 	callbackHandler: CallbackHandler;
@@ -26,7 +26,6 @@ export class Definition<T> {
 	sequenceHandler: SequenceHandler;
 	declarationHandler: DeclarationHandler;
 
-	traits: Record<string, Trait<T>>;
 
 	constructor(name: string, fixtureRiveter: FixtureRiveter) {
 		this.name = name;
@@ -42,7 +41,7 @@ export class Definition<T> {
 		this.declarationHandler = new DeclarationHandler(name);
 		this.callbackHandler = new CallbackHandler(fixtureRiveter);
 
-		this.traits = {};
+		this.traitsCache = new Map();
 	}
 
 	names(): string[] {
@@ -65,8 +64,8 @@ export class Definition<T> {
 	}
 
 	defineTrait(newTrait: Trait<T>): void {
-		if (!this.traits[newTrait.name]) {
-			this.traits[newTrait.name] = newTrait;
+		if (!this.traitsCache.has(newTrait.name)) {
+			this.traitsCache.set(newTrait.name, newTrait);
 		}
 	}
 
@@ -81,7 +80,7 @@ export class Definition<T> {
 	traitByName(name: string): Trait<T> {
 		// This is overridden by both Fixture and Trait, so ignore it please
 		// I've only written this out so Typescript will shut up lol
-		return this.traits[name] || this.fixtureRiveter.getTrait(name);
+		return this.traitsCache.get(name) || this.fixtureRiveter.getTrait(name);
 	}
 
 	getInternalTraits(internalTraits: string[]): Trait<T>[] {
@@ -100,13 +99,10 @@ export class Definition<T> {
 		return this.getInternalTraits(this.additionalTraits);
 	}
 
-	copy<C>(): C {
-		const copy = Object.assign(Object.create(Object.getPrototypeOf(this)), this);
-
+	copy<C extends Definition<T>>(): C {
+		const copy: C = Object.assign(Object.create(Object.getPrototypeOf(this)), this);
 		copy.compiled = false;
-		delete copy.attributes;
-		delete copy.traitsCache;
-
+		copy.attributes = [];
 		return copy;
 	}
 

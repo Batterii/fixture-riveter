@@ -1,10 +1,10 @@
 import {Sequence, SequenceCallback} from "./sequence";
 
 export class SequenceHandler {
-	sequences: Record<string, Sequence<any>>;
+	sequences: Map<string, Sequence<any>>;
 
 	constructor() {
-		this.sequences = {};
+		this.sequences = new Map();
 	}
 
 	registerSequence<C extends string | number | (() => Generator<any, any, any>)>(
@@ -38,20 +38,20 @@ export class SequenceHandler {
 		const newSequence = new Sequence(sequenceName, ...rest);
 
 		for (const name of newSequence.names()) {
-			if (this.sequences[name]) {
+			if (this.sequences.has(name)) {
 				throw new Error(`Can't define ${name} sequence twice`);
 			}
-			this.sequences[name] = newSequence;
+			this.sequences.set(name, newSequence);
 		}
 
 		return newSequence;
 	}
 
 	resetSequences(): void {
-		Object.values(this.sequences).forEach((seq) => seq.reset());
+		this.sequences.forEach((seq) => seq.reset());
 	}
 
 	findSequence(name: string): Sequence<any> | undefined {
-		return this.sequences[name];
+		return this.sequences.get(name);
 	}
 }

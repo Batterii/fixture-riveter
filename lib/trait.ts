@@ -22,8 +22,12 @@ export class Trait<T> extends Definition<T> {
 		proxy.execute();
 
 		if (proxy.childFixtures.length > 0) {
-			const [[fixtureName]] = proxy.childFixtures;
-			throw new Error(`Can't define a fixture (${fixtureName}) inside trait (${this.name})`);
+			const [fixtureTuple] = proxy.childFixtures;
+			if (fixtureTuple) {
+				throw new Error(
+					`Can't define a fixture (${fixtureTuple[0] || ""}) inside trait (${this.name})`,
+				);
+			}
 		}
 	}
 
