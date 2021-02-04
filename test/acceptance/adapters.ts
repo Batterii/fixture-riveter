@@ -1,7 +1,7 @@
 import {DefaultAdapter} from "../../lib/adapters/default-adapter";
 import {ObjectionAdapter} from "../../lib/adapters/objection-adapter";
 import {FixtureRiveter} from "../../lib/fixture-riveter";
-import {DummyModel} from "../test-fixtures/dummy-model";
+import {DummyModel} from "../support/dummy-model";
 
 import {expect} from "chai";
 

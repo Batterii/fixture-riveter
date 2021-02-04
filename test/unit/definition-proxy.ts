@@ -6,7 +6,7 @@ import {FixtureRiveter} from "../../lib/fixture-riveter";
 import {Sequence} from "../../lib/sequence";
 import {RelationDeclaration} from "../../lib/declarations/relation-declaration";
 
-import {DummyModel} from "../test-fixtures/dummy-model";
+import {DummyModel} from "../support/dummy-model";
 
 import {expect} from "chai";
 import sinon from "sinon";

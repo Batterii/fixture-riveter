@@ -4,7 +4,7 @@ import {Fixture} from "../../lib/fixture";
 import {FixtureRiveter} from "../../lib/fixture-riveter";
 import {NullFixture} from "../../lib/null-fixture";
 
-import {DummyModel} from "../test-fixtures/dummy-model";
+import {DummyModel} from "../support/dummy-model";
 
 import {expect} from "chai";
 import sinon from "sinon";

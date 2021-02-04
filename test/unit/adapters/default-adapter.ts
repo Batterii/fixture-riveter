@@ -1,5 +1,5 @@
 import {DefaultAdapter} from "../../../lib/adapters/default-adapter";
-import {DummyModel} from "../../test-fixtures/dummy-model";
+import {DummyModel} from "../../support/dummy-model";
 
 import {expect} from "chai";
 

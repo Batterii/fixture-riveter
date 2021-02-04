@@ -11,6 +11,10 @@ import {Strategy} from "./strategies/strategy";
 import {Trait} from "./trait";
 import {fixtureOptionsParser} from "./fixture-options-parser";
 
+import fg from "fast-glob";
+import {resolve} from "path";
+
+
 import {
 	Pojo,
 	ModelConstructor,
@@ -343,6 +347,15 @@ export class FixtureRiveter implements DefaultStrategyMethods {
 
 	getCallbacks<T>(): Callback<T>[] {
 		return this.callbackHandler.callbacks;
+	}
+
+	async loadFixtures(directory = "."): Promise<void> {
+		const filepaths = await fg(
+			resolve(".", `${directory}/fixtures/**/*.js`),
+			{onlyFiles: true},
+		);
+
+		await Promise.all(filepaths.map((filepath) => import(filepath)));
 	}
 
 	async cleanUp(): Promise<void> {

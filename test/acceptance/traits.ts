@@ -1,7 +1,7 @@
-import {Model} from "../test-fixtures/model";
+import {Model} from "../support/model";
 import {FixtureRiveter} from "../../lib/fixture-riveter";
 import {ObjectionAdapter} from "../../lib/adapters/objection-adapter";
-import {createTable} from "../test-fixtures/define-helpers";
+import {createTable} from "../support/define-helpers";
 import {expect} from "chai";
 
 describe("Traits", function() {

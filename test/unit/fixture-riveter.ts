@@ -1,5 +1,5 @@
-import {DummyModel} from "../test-fixtures/dummy-model";
-import {Model} from "../test-fixtures/model";
+import {DummyModel} from "../support/dummy-model";
+import {Model} from "../support/model";
 
 import {Fixture} from "../../lib/fixture";
 import {extractOverrides, nameGuard, FixtureRiveter} from "../../lib/fixture-riveter";

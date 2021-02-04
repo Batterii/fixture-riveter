@@ -1,5 +1,5 @@
 import {Definition} from "../../lib/definition";
-import {DummyModel} from "../test-fixtures/dummy-model";
+import {DummyModel} from "../support/dummy-model";
 import {FixtureRiveter} from "../../lib/fixture-riveter";
 
 import {expect} from "chai";

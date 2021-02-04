@@ -1,5 +1,5 @@
-import {Model} from "../test-fixtures/model";
-import {createTable} from "../test-fixtures/define-helpers";
+import {Model} from "../support/model";
+import {createTable} from "../support/define-helpers";
 import {FixtureRiveter} from "../../lib/fixture-riveter";
 import {ObjectionAdapter} from "../../lib/adapters/objection-adapter";
 

@@ -1,4 +1,4 @@
-import {DummyModel} from "../../test-fixtures/dummy-model";
+import {DummyModel} from "../../support/dummy-model";
 import {FixtureRiveter} from "../../../lib/fixture-riveter";
 import {Fixture} from "../../../lib/fixture";
 import {ImplicitDeclaration} from "../../../lib/declarations/implicit-declaration";

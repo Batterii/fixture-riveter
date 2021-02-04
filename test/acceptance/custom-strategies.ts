@@ -1,5 +1,5 @@
-import {Model} from "../test-fixtures/model";
-import {createTable} from "../test-fixtures/define-helpers";
+import {Model} from "../support/model";
+import {createTable} from "../support/define-helpers";
 
 import {Assembler} from "../../lib/assembler";
 import {Strategy} from "../../lib/strategies/strategy";

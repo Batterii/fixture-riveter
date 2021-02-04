@@ -1,4 +1,4 @@
-import {Model} from "../test-fixtures/model";
+import {Model} from "../support/model";
 import {FixtureRiveter} from "../../lib/fixture-riveter";
 import {SequenceHandler} from "../../lib/sequence-handler";
 import {expect} from "chai";
