@@ -25,11 +25,12 @@ export class ImplicitDeclaration<T> extends Declaration {
 	}
 
 	build(): Attribute[] {
-		if (this.fixtureRiveter.getFixture(this.name, false)) {
+		const fixture = this.fixtureRiveter.getFixture(this.name, false);
+		if (fixture !== undefined) {
 			return [new RelationAttribute(this.name, this.name, [])];
 		}
 		const sequence = this.fixtureRiveter.findSequence(this.name);
-		if (sequence) {
+		if (sequence !== undefined) {
 			return [new SequenceAttribute(this.name, this.ignored, sequence)];
 		}
 		if (this.checkSelfReference()) {

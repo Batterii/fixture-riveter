@@ -7,11 +7,7 @@ export class RelationAttribute extends Attribute {
 
 	constructor(name: string, fixture: string | string[], overrides: any[]) {
 		super(name, false);
-		if (Array.isArray(fixture)) {
-			this.fixture = fixture;
-		} else {
-			this.fixture = [fixture];
-		}
+		this.fixture = Array.isArray(fixture) ? fixture : [fixture];
 		this.overrides = overrides;
 		this.isRelation = true;
 	}

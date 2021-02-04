@@ -6,15 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 does not adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-### Fixed
-- ObjectionAdapter: only call delete on instances that might be in the database,
-    and wrap call in a try-catch for when we call it on instances that were
-    constructed with `build`.
+### Changed
 - Move all default build method overloads to separate interfaces
 - Change `fixture#run` to `fixture#prepare`
 - Revert `_methodMissing` back to `methodMissing`
 - Enforce RelationAttribute fixture property being only an array
 - Clean up eslint rules, update @batterii/eslint-config-ts
+- Remove unnecessary type indirection from AdapterHandler
+
+### Fixed
+- ObjectionAdapter: only call delete on instances that might be in the database,
+    and wrap call in a try-catch for when we call it on instances that were
+    constructed with `build`.
 
 
 ## [v2.0.0] - 2021-01-29

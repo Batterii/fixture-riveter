@@ -4,6 +4,7 @@ import {DefinitionProxy} from "../../lib/definition-proxy";
 import {Fixture} from "../../lib/fixture";
 import {FixtureRiveter} from "../../lib/fixture-riveter";
 import {Sequence} from "../../lib/sequence";
+import {RelationDeclaration} from "../../lib/declarations/relation-declaration";
 
 import {DummyModel} from "../test-fixtures/dummy-model";
 
@@ -44,49 +45,76 @@ describe("DefinitionProxy", function() {
 
 			expect(result).to.equal(1);
 		});
-
-		it("doesn't call the definition's block when no block is given", function() {
-			const result = undefined;
-			const fixtureRiveter = new FixtureRiveter();
-			const fixture = new Fixture(fixtureRiveter, "dummy", DummyModel);
-			const proxy = new DefinitionProxy(fixture);
-			proxy.execute();
-
-			expect(result).to.be.undefined;
-		});
 	});
 
 	describe("#attr", function() {
-		context("when given no block", function() {
-			it("calls declareAttribute with an ImplicitDeclaration", function() {
-				const fixtureRiveter = new FixtureRiveter();
-				const fixture = new Fixture(fixtureRiveter, "dummy", DummyModel);
-				const proxy = new DefinitionProxy(fixture);
-				const name = "email";
-				sinon.spy(fixture, "declareAttribute");
-				proxy.attr(name);
+		context("when given multiple args", function() {
+			context("and the last arg is a function", function() {
+				it("creates a DynamicDeclaration", function() {
+					const fixtureRiveter = new FixtureRiveter();
+					const fixture = new Fixture(fixtureRiveter, "dummy", DummyModel);
+					const proxy = new DefinitionProxy(fixture);
+					const block = () => 1;
+					proxy.attr("name", block);
+					const decl = fixture.declarationHandler.declarations[0] as any;
+					expect(decl).to.be.an.instanceof(DynamicDeclaration);
+				});
 
-				expect(fixture.declareAttribute).to.be.calledOnce;
-				expect(
-					fixture.declarationHandler.declarations[0],
-				).to.be.an.instanceof(ImplicitDeclaration);
+				it("sets ignore to the same value", function() {
+					const fixtureRiveter = new FixtureRiveter();
+					const fixture = new Fixture(fixtureRiveter, "dummy", DummyModel);
+					const proxy = new DefinitionProxy(fixture);
+					proxy.ignore = 100 as any;
+					const block = () => 1;
+					proxy.attr("name", block);
+					const decl = fixture.declarationHandler.declarations[0] as any;
+					expect(decl.ignored).to.equal(proxy.ignore);
+					expect(decl.block).to.equal(block);
+				});
+			});
+
+			context("and the last arg isn't a function", function() {
+				it("creates a RelationDeclaration", function() {
+					const fixtureRiveter = new FixtureRiveter();
+					const fixture = new Fixture(fixtureRiveter, "dummy", DummyModel);
+					const proxy = new DefinitionProxy(fixture);
+					proxy.attr("name", ["trait"]);
+					const decl = fixture.declarationHandler.declarations[0] as any;
+					expect(decl).to.be.an.instanceof(RelationDeclaration);
+				});
+
+				it("sets the traits", function() {
+					const fixtureRiveter = new FixtureRiveter();
+					const fixture = new Fixture(fixtureRiveter, "dummy", DummyModel);
+					const proxy = new DefinitionProxy(fixture);
+					const traits = ["trait"];
+					proxy.attr("name", traits);
+					const decl = fixture.declarationHandler.declarations[0] as any;
+					expect(decl.traits).to.deep.equal(traits);
+				});
 			});
 		});
 
-		context("when given a Function block", function() {
-			it("calls declareAttribute with a DynamicDeclaration", function() {
+		context("when given only one arg", function() {
+			it("creates an ImplicitDeclaration", function() {
 				const fixtureRiveter = new FixtureRiveter();
 				const fixture = new Fixture(fixtureRiveter, "dummy", DummyModel);
 				const proxy = new DefinitionProxy(fixture);
-				const name = "email";
-				const block = () => 1;
-				sinon.spy(fixture, "declareAttribute");
-				proxy.attr(name, block);
+				proxy.attr("name");
+				const decl = fixture.declarationHandler.declarations[0] as any;
+				expect(decl).to.be.an.instanceof(ImplicitDeclaration);
+			});
 
-				expect(fixture.declareAttribute).to.be.calledOnce;
-				expect(
-					fixture.declarationHandler.declarations[0],
-				).to.be.an.instanceof(DynamicDeclaration);
+			it("sets internal values correctly", function() {
+				const fixtureRiveter = new FixtureRiveter();
+				const fixture = new Fixture(fixtureRiveter, "dummy", DummyModel);
+				const proxy = new DefinitionProxy(fixture);
+				proxy.ignore = 100 as any;
+				proxy.attr("name");
+				const decl = fixture.declarationHandler.declarations[0] as any;
+				expect(decl.ignored).to.equal(proxy.ignore);
+				expect(decl.fixture).to.equal(fixture);
+				expect(decl.fixtureRiveter).to.equal(fixtureRiveter);
 			});
 		});
 	});
@@ -99,6 +127,17 @@ describe("DefinitionProxy", function() {
 			proxy.fixture("newFixture", DummyModel);
 
 			expect(proxy.childFixtures).to.deep.equal([["newFixture", DummyModel]]);
+		});
+
+		it("can accept a variable number of arguments", function() {
+			const fixtureRiveter = new FixtureRiveter();
+			const fixture = new Fixture(fixtureRiveter, "dummy", DummyModel);
+			const proxy = new DefinitionProxy(fixture);
+			const options = {};
+			const block = () => 1;
+			proxy.fixture("newFixture", DummyModel, options, block);
+
+			expect(proxy.childFixtures).to.deep.equal([["newFixture", DummyModel, options, block]]);
 		});
 	});
 

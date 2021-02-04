@@ -12,6 +12,7 @@ describe("DynamicDeclaration", function() {
 		expect(result).to.be.an.instanceof(DynamicDeclaration);
 		expect(result.name).to.equal(name);
 		expect(result.block).to.equal(identity);
+		expect(result.ignored).to.be.false;
 	});
 
 	describe("#build", function() {
@@ -32,6 +33,7 @@ describe("DynamicDeclaration", function() {
 			expect(result).to.be.an.instanceof(DynamicAttribute);
 			expect(result.name).to.equal(name);
 			expect(result.block).to.equal(identity);
+			expect(result.ignored).to.equal(declaration.ignored);
 		});
 	});
 });

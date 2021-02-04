@@ -73,7 +73,7 @@ export class DefinitionProxy<T> {
 			if (isFunction(block)) {
 				declaration = new DynamicDeclaration(name, this.ignore, block);
 			} else {
-				declaration = new RelationDeclaration(name, rest);
+				declaration = new RelationDeclaration(name, rest.flat(2));
 			}
 		} else {
 			declaration = new ImplicitDeclaration(

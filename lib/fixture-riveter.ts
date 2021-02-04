@@ -1,4 +1,4 @@
-import {AdapterHandler, FixtureNames} from "./adapter-handler";
+import {AdapterHandler} from "./adapter-handler";
 import {Adapter} from "./adapters/adapter";
 import {CallbackFunction, Callback} from "./callback";
 import {CallbackHandler} from "./callback-handler";
@@ -79,7 +79,7 @@ export class FixtureRiveter implements DefaultStrategyMethods {
 		return this.adapterHandler.getAdapter(fixtureName);
 	}
 
-	setAdapter(adapter: Adapter, fixtureNames?: FixtureNames): Adapter {
+	setAdapter(adapter: Adapter, fixtureNames?: string | string[]): Adapter {
 		return this.adapterHandler.setAdapter(adapter, fixtureNames);
 	}
 
@@ -213,7 +213,7 @@ export class FixtureRiveter implements DefaultStrategyMethods {
 
 	generate(name: string): any | undefined {
 		const sequence = this.findSequence(name);
-		if (sequence) {
+		if (sequence !== undefined) {
 			return sequence.next();
 		}
 	}

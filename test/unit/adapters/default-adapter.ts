@@ -2,22 +2,13 @@ import {DefaultAdapter} from "../../../lib/adapters/default-adapter";
 import {DummyModel} from "../../test-fixtures/dummy-model";
 
 import {expect} from "chai";
-import sinon from "sinon";
 
 describe("DefaultAdapter", function() {
-	it("can be created", function() {
-		const adapter = new DefaultAdapter();
-		expect(adapter).to.exist;
-		expect(adapter).to.be.an.instanceof(DefaultAdapter);
-	});
-
 	describe("#build", function() {
 		it("builds the model", async function() {
 			const adapter = new DefaultAdapter();
-			const spiedDM = sinon.spy(DummyModel as any);
-			const model = adapter.build(spiedDM);
+			const model = adapter.build(DummyModel);
 			expect(model).to.be.an.instanceof(DummyModel);
-			expect(spiedDM).to.be.calledOnce;
 		});
 	});
 
@@ -25,15 +16,18 @@ describe("DefaultAdapter", function() {
 		it("calls save on the model", async function() {
 			const adapter = new DefaultAdapter();
 			const model = new DummyModel();
-			sinon.spy(model, "save");
+			let i = 0;
+			model.save = function() {
+				i += 1;
+				return this;
+			};
 			await adapter.save(model);
-			expect(model.save).to.be.calledOnce;
+			expect(i).to.equal(1);
 		});
 
 		it("returns a promise", function() {
 			const adapter = new DefaultAdapter();
 			const model = new DummyModel();
-			sinon.spy(model, "save");
 			const result = adapter.save(model);
 			expect(result.then).to.be.a("function");
 			return expect(result).to.be.eventually.fulfilled;

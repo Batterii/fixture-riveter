@@ -49,8 +49,8 @@ export class Evaluator {
 
 	async attr(name: string): Promise<any> {
 		if (!this.cachedValues.has(name)) {
-			const fn = this.attributeFns.get(name);
-			if (fn !== undefined) {
+			if (this.attributeFns.has(name)) {
+				const fn = this.attributeFns.get(name)!;
 				this.cachedValues.set(name, await fn(this));
 			}
 		}

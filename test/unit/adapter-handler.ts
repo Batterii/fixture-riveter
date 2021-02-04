@@ -1,35 +1,8 @@
 import {AdapterHandler, coerceNames} from "../../lib/adapter-handler";
 import {DefaultAdapter} from "../../lib/adapters/default-adapter";
 import {expect} from "chai";
-import sinon from "sinon";
 
 describe("Adapters", function() {
-	describe("creation", function() {
-		it("can be instanced", function() {
-			const handler = new AdapterHandler();
-
-			expect(handler).to.exist;
-			expect(handler).to.be.an.instanceOf(AdapterHandler);
-		});
-
-		it("sets the defaults correctly", function() {
-			const handler = new AdapterHandler();
-
-			expect(handler.adapters).to.be.an.instanceOf(Map);
-			expect(handler.adapters.size).to.equal(0);
-			expect(handler.defaultAdapter).to.be.an.instanceOf(DefaultAdapter);
-			expect(handler.currentAdapter).to.be.an.instanceOf(DefaultAdapter);
-		});
-
-		it("can set the currentAdapter", function() {
-			const adapter = new DefaultAdapter();
-			const handler = new AdapterHandler(adapter);
-
-			expect(handler.defaultAdapter).to.not.equal(handler.currentAdapter);
-			expect(handler.currentAdapter).to.equal(adapter);
-		});
-	});
-
 	describe("#getAdapter", function() {
 		it("returns the current adapter", function() {
 			const adapter = new DefaultAdapter();
@@ -61,18 +34,6 @@ describe("Adapters", function() {
 			const handler = new AdapterHandler();
 			expect(handler.setAdapter(adapter)).to.equal(adapter);
 		});
-
-		it("calls setAdapters", function() {
-			const key = "key";
-			const adapter = new DefaultAdapter();
-			const handler = new AdapterHandler();
-			const stub = sinon.stub(handler, "setAdapters");
-
-			handler.setAdapter(adapter, key);
-
-			expect(stub).to.be.calledOnce;
-			expect(stub).to.be.calledWithExactly(adapter, key);
-		});
 	});
 
 	describe("#coerceNames", function() {
@@ -99,17 +60,6 @@ describe("Adapters", function() {
 	});
 
 	describe("#setAdapters", function() {
-		it("assigns to all given names", function() {
-			const key = "key";
-			const adapter = new DefaultAdapter();
-			const handler = new AdapterHandler();
-			sinon.stub(handler, "assignMultiple");
-			handler.setAdapters(adapter, key);
-
-			expect(handler.assignMultiple).to.be.calledOnce;
-			expect(handler.assignMultiple).to.be.calledOnceWithExactly(adapter, [key]);
-		});
-
 		it("works with both single strings and lists of strings", function() {
 			const key = "key";
 			const listOfKeys = ["key1", "key2"];

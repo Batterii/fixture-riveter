@@ -28,6 +28,7 @@ export class AttributeAssigner<T> {
 		if (!this.attributeNamesToAssign) {
 			const attributeNames = this.attributes.map((a) => a.name);
 			const overrideNames = Object.keys(this.evaluator.overrides);
+
 			const ignoredNames = this.attributes
 				.filter((a) => a.ignored)
 				.map((a) => a.name);
@@ -47,22 +48,17 @@ export class AttributeAssigner<T> {
 
 	attributesForObject(): string[] {
 		const relationNames = this.relationNames();
-
-		// Remove all relations
-		return this.getAttributeNamesToAssign()
-			.filter((a) => !relationNames.includes(a));
+		return this.getAttributeNamesToAssign().filter((a) => !relationNames.includes(a));
 	}
 
 	attributesForInstance(): string[] {
-		// To do: Need to implement other checks here too
 		return this.getAttributeNamesToAssign();
 	}
 
 	async toObject(): Promise<Record<string, any>> {
 		const instance = {};
 		for (const name of this.attributesForObject()) {
-			const attribute = await this._get(name);
-			instance[name] = attribute;
+			instance[name] = await this._get(name);
 		}
 
 		return instance;

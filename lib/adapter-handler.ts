@@ -1,8 +1,6 @@
 import {Adapter} from "./adapters/adapter";
 import {DefaultAdapter} from "./adapters/default-adapter";
 
-export type FixtureNames = string | string[];
-
 export class AdapterHandler {
 	adapters: Map<string, Adapter>;
 	defaultAdapter: Adapter;
@@ -16,28 +14,22 @@ export class AdapterHandler {
 
 	getAdapter(fixtureName?: string): Adapter {
 		if (fixtureName) {
-			const adapter = this.adapters.get(fixtureName);
-			if (adapter !== undefined) {
-				return adapter;
+			if (this.adapters.has(fixtureName)) {
+				return this.adapters.get(fixtureName)!;
 			}
 		}
 		return this.currentAdapter;
 	}
 
-	assignMultiple(adapter: Adapter, names: string[]): void {
-		names.forEach((name) => {
+	setAdapters(adapter: Adapter, names?: string | string[]): void {
+		coerceNames(names).forEach((name) => {
 			this.adapters.set(name, adapter);
 		});
 	}
 
-	setAdapters(adapter: Adapter, fixtureNames?: FixtureNames): void {
-		const names = coerceNames(fixtureNames);
-		this.assignMultiple(adapter, names);
-	}
-
-	setAdapter(adapter: Adapter, fixtureNames?: FixtureNames): Adapter {
-		if (fixtureNames) {
-			this.setAdapters(adapter, fixtureNames);
+	setAdapter(adapter: Adapter, names?: string | string[]): Adapter {
+		if (names) {
+			this.setAdapters(adapter, names);
 		} else {
 			this.currentAdapter = adapter;
 		}
@@ -45,9 +37,9 @@ export class AdapterHandler {
 	}
 }
 
-export function coerceNames(fixtureNames?: FixtureNames): string[] {
-	if (fixtureNames) {
-		return Array.isArray(fixtureNames) ? fixtureNames : [fixtureNames];
+export function coerceNames(names?: string | string[]): string[] {
+	if (names) {
+		return Array.isArray(names) ? names : [names];
 	}
 	return [];
 }
