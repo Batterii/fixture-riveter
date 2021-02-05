@@ -2,10 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and
-does not adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
+### Added
+- Moved docs to use [VuePress](https://github.com/vuepress/vuepress-next).
+- Host docs at [github.io](...).
+
 ### Changed
 - Move all default build method overloads to separate interfaces
 - Change `fixture#run` to `fixture#prepare`
@@ -39,7 +42,7 @@ does not adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
     share a name with global sequences
 
 ### Removed
-- Inline sequences can't specify aliases
+- Inline sequences can no longer specify aliases
 
 
 ## [v1.6.0] - 2021-01-28
