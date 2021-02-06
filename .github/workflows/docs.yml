@@ -51,3 +51,4 @@ jobs:
           target_branch: gh-pages
           # deploy the default output dir of VuePress
           build_dir: docs/.vuepress/dist
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
