@@ -52,4 +52,4 @@ jobs:
           # deploy the default output dir of VuePress
           build_dir: docs/.vuepress/dist
         env:
-          GH_PAT: ${{ secrets.GH_PAGES_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
