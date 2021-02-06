@@ -2,11 +2,11 @@ const config = {
 	lang: "en-US",
 	title: "fixture-riveter",
 	description: "A fixture replacement library",
+	base: "/fixture-riveter/",
 
 	themeConfig: {
 		repo: "Batterii/fixture-riveter",
 
-		docsBranch: "master",
 		docsDir: "docs",
 		editLinkPattern: ":repo/edit/:branch/:path",
 
