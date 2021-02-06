@@ -1,16 +1,12 @@
 # Intro
 
-The guides listed in the sidebar are high-level overviews of the various use-cases and
-features of `fixture-riveter`, linking to the [API](/api/) docs where necessary to
-provide a full understanding.
+The guides listed in the sidebar are high-level overviews of the various use-cases and features of `fixture-riveter`, linking to the [API](/api/) docs where necessary to provide a full understanding.
 
 ::: tip NOTE
-Because this library is written in Typescript and designed to be used in a Typescript
-codebase, all code in the guides will be in Typescript.
+Because this library is written in Typescript and designed to be used in a Typescript codebase, all code in the guides will be in Typescript.
 :::
 
-As a brief overview, here is the example from the [tutorial](/tutorial/) with
-explanatory comments.
+As a brief overview, here is the example from the [tutorial](/tutorial/) with explanatory comments.
 
 ```typescript
 import {fr, ObjectionAdapter} from "fixture-riveter";

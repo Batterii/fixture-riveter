@@ -1,13 +1,8 @@
 # Traits
-Traits are collections of attributes and transients that can be applied to a given
-fixture, during definition or at creation time. They can be defined globally or in
-a given fixture. If defined globally, any fixture may reference it, while if defined in
-a fixture, only that fixture and all child fixtures may reference it. (In other words,
-traits are lexically scoped.)
+Traits are collections of attributes and transients that can be applied to a given fixture, during definition or at creation time. They can be defined globally or in a given fixture. If defined globally, any fixture may reference it, while if defined in a fixture, only that fixture and all child fixtures may reference it. (In other words, traits are lexically scoped.)
 
 ## Defining traits
-Traits are defined just like fixtures, and can be referenced when creating fixtures or
-child fixtures with the `{traits: []}` option.
+Traits are defined just like fixtures, and can be referenced when creating fixtures or child fixtures with the `{traits: []}` option.
 
 ```typescript
 // global trait
@@ -38,8 +33,7 @@ user.age
 ```
 
 ## Using traits
-Traits can be applied to a fixture inside of the definition, by referencing them like
-attributes or relations:
+Traits can be applied to a fixture inside of the definition, by referencing them like attributes or relations:
 
 ```typescript
 fr.trait("old", (t) => {
@@ -58,8 +52,9 @@ user.age
 // 100
 ```
 
-Note: Fixtures and sequences are checked before traits are, so if you try to reference
-a trait that shares a name with a fixture or sequence, it will reference those instead.
+::: tip NOTE
+Fixtures and sequences are checked before traits are, so if you try to reference a trait that shares a name with a fixture or sequence, it will reference those instead.
+:::
 
 ## Precedence
 
@@ -99,11 +94,9 @@ oldUser.favoriteColor
 ```
 
 ## Using traits
-As shown above, traits can be passed into factories and child factories using the
-`{traits: []}` options, and they can be referenced in fixture and trait definitions.
+As shown above, traits can be passed into factories and child factories using the `{traits: []}` options, and they can be referenced in fixture and trait definitions.
 
-They can also be used when constructing an instance of a fixture by passing in an array
-of trait names:
+They can also be used when constructing an instance of a fixture by passing in an array of trait names:
 
 ```typescript
 fr.fixture("user", User, (f) => {

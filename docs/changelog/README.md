@@ -18,9 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Remove unnecessary type indirection from AdapterHandler
 
 ### Fixed
-- ObjectionAdapter: only call delete on instances that might be in the database,
-    and wrap call in a try-catch for when we call it on instances that were
-    constructed with `build`.
+- ObjectionAdapter: only call delete on instances that might be in the database, and wrap call in a try-catch for when we call it on instances that were constructed with `build`.
 
 
 ## [v2.0.0] - 2021-01-29
@@ -38,8 +36,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Make Sequence generic on `next` return type
 
 ### Fixed
-- Decouple inline sequences and globals as intended so internal sequences can
-    share a name with global sequences
+- Decouple inline sequences and globals as intended so internal sequences can share a name with global sequences
 
 ### Removed
 - Inline sequences can no longer specify aliases
@@ -59,14 +56,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Rewrite FixtureRiveter's `run` method to enforce internal types
 - Completely rewrite Sequence to rely on generators instead of subclasses
 - Use implementation of Ruby's `String#succ` method for string sequence
-- Change Strategy base class to be concrete (stub implementation is same as
-    attributeFor)
+- Change Strategy base class to be concrete (stub implementation is same as attributeFor)
 
 ### Removed
 - Remove IntegerSequence and StringSequence
 - Disallow defining multiple fixtures with the same name or aliases
-- Disallow defining multiple global sequences or sequences within a given
-    fixture with the same name or aliases
+- Disallow defining multiple global sequences or sequences within a given fixture with the same name or aliases
 
 
 ## [v1.5.0] - 2021-01-24
@@ -84,13 +79,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 - Add typed overloads to DefinitionProxy methods `attr` and `association`
 - Add typed overloads to Evaluator method `association`
-- Allow fixture definitions to accept just a Model, deriving the fixture name
-    implicitly
+- Allow fixture definitions to accept just a Model, deriving the fixture name implicitly
 
 ### Changed
 - Rename callbackFunction type to CallbackFunction
-- Change DefinitionProxy and Evaluator `attr` and implicit attribute methods to
-    properly type when they're attributes and when they're associations
+- Change DefinitionProxy and Evaluator `attr` and implicit attribute methods to properly type when they're attributes and when they're associations
 
 ### Fixed
 - Readd source-map-support, oops

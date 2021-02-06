@@ -1,7 +1,5 @@
 # Sequences
-Sequences are wrappers around [Generators][generator], useful in providing "unique"
-values for attributes (such as email addresses). They can directly as attributes in
-fixtures or globally on the `fr` object itself.
+Sequences are wrappers around [Generators][generator], useful in providing "unique" values for attributes (such as email addresses). They can directly as attributes in fixtures or globally on the `fr` object itself.
 
 [generator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator
 
@@ -70,8 +68,7 @@ fr.generate("plus2");
 // 2
 ```
 
-If the desired generator function takes arguments, it must be passed in wrapped in a
-function:
+If the desired generator function takes arguments, it must be passed in wrapped in a function:
 
 ```typescript
 function* generator(initial) {
@@ -89,8 +86,7 @@ fr.generate("double");
 // 6
 ```
 
-Global sequences can be given aliases, just like fixtures. The aliases point to the same
-generator, so they increment together:
+Global sequences can be given aliases, just like fixtures. The aliases point to the same generator, so they increment together:
 
 ```typescript
 fr.sequence("plus2", ["double", "increaser"])
