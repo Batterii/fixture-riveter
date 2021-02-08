@@ -26,8 +26,6 @@ import {
 	Overrides,
 } from "./types";
 
-import {DefaultStrategyMethods} from "./strategies/default-strategy-methods";
-
 import {
 	isPlainObject,
 	isString,
@@ -56,7 +54,7 @@ export function nameGuard<T>(fixtureName: FixtureName<T>): string {
 	throw new Error(`${fixtureName} isn't the right shape`);
 }
 
-export class FixtureRiveter implements DefaultStrategyMethods {
+export class FixtureRiveter {
 	fixtures: Map<string, Fixture<any>>;
 	traits: Map<string, Trait<any>>;
 	instances: [string, any][];
@@ -374,16 +372,127 @@ export class FixtureRiveter implements DefaultStrategyMethods {
 
 	// Typescript sucks for dynamically defined methods lol
 	// All of these will be overwritten on instantiation
+	async attributesFor<T = Pojo>(
+		name: FixtureName<T>,
+		traits?: string[],
+		overrides?: Overrides<T>,
+	): Promise<T>;
+
+	async attributesFor<T = Pojo>(
+		name: FixtureName<T>,
+		traitOrOverrides?: string[]|Overrides<T>,
+	): Promise<T>;
+
 	async attributesFor<T = Pojo>(..._args: any[]): Promise<T> { return undefined as any; }
+
+	async attributesForList<T = Pojo>(
+		name: FixtureName<T>,
+		count: number,
+		traits?: string[],
+		overrides?: Overrides<T>,
+	): Promise<T[]>;
+
+	async attributesForList<T = Pojo>(
+		name: FixtureName<T>,
+		count: number,
+		traitOrOverrides?: string[]|Overrides<T>,
+	): Promise<T[]>;
+
 	async attributesForList<T = Pojo>(..._args: any[]): Promise<T[]> { return undefined as any; }
+
+	attributesForPair<T = Pojo>(
+		name: FixtureName<T>,
+		traits?: string[],
+		overrides?: Overrides<T>,
+	): Promise<[T, T]>;
+
+	attributesForPair<T = Pojo>(
+		name: FixtureName<T>,
+		traitOrOverrides?: string[]|Overrides<T>,
+	): Promise<[T, T]>;
+
 	async attributesForPair<T = Pojo>(..._args: any[]): Promise<[T, T]> { return undefined as any; }
 
+	async build<T = Pojo>(
+		name: FixtureName<T>,
+		traitOrOverrides?: string[]|Overrides<T>,
+	): Promise<T>;
+
+	async build<T = Pojo>(
+		name: FixtureName<T>,
+		traits?: string[],
+		overrides?: Overrides<T>,
+	): Promise<T>;
+
 	async build<T = Pojo>(..._args: any[]): Promise<T> { return undefined as any; }
+
+	async buildList<T = Pojo>(
+		name: FixtureName<T>,
+		count: number,
+		traits?: string[],
+		overrides?: Overrides<T>,
+	): Promise<T[]>;
+
+	async buildList<T = Pojo>(
+		name: FixtureName<T>,
+		count: number,
+		traitOrOverrides?: string[]|Overrides<T>,
+	): Promise<T[]>;
+
 	async buildList<T = Pojo>(..._args: any[]): Promise<T[]> { return undefined as any; }
+
+	async buildPair<T = Pojo>(
+		name: FixtureName<T>,
+		traits?: string[],
+		overrides?: Overrides<T>,
+	): Promise<[T, T]>;
+
+	async buildPair<T = Pojo>(
+		name: FixtureName<T>,
+		traitOrOverrides?: string[]|Overrides<T>,
+	): Promise<[T, T]>;
+
 	async buildPair<T = Pojo>(..._args: any[]): Promise<[T, T]> { return undefined as any; }
 
+	async create<T = Pojo>(
+		name: FixtureName<T>,
+		traits?: string[],
+		overrides?: Overrides<T>,
+	): Promise<T>;
+
+	async create<T = Pojo>(
+		name: FixtureName<T>,
+		traitOrOverrides?: string[]|Overrides<T>,
+	): Promise<T>;
+
 	async create<T = Pojo>(..._args: any[]): Promise<T> { return undefined as any; }
+
+	async createList<T = Pojo>(
+		name: FixtureName<T>,
+		count: number,
+		traits?: string[],
+		overrides?: Overrides<T>,
+	): Promise<T[]>;
+
+	async createList<T = Pojo>(
+		name: FixtureName<T>,
+		count: number,
+		traitOrOverrides?: string[]|Overrides<T>,
+	): Promise<T[]>;
+
 	async createList<T = Pojo>(..._args: any[]): Promise<T[]> { return undefined as any; }
+
+	async createPair<T = Pojo>(
+		name: FixtureName<T>,
+		traits?: string[],
+		overrides?: Overrides<T>,
+	): Promise<[T, T]>;
+
+	async createPair<T = Pojo>(
+		name: FixtureName<T>,
+		traitOrOverrides?: string[]|Overrides<T>,
+	): Promise<[T, T]>;
+
 	async createPair<T = Pojo>(..._args: any[]): Promise<[T, T]> { return undefined as any; }
 	/* eslint-enable */
 }
