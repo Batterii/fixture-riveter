@@ -169,12 +169,22 @@ describe("DefinitionProxy", function() {
 			const fixtureRiveter = new FixtureRiveter();
 			const fixture = new Fixture(fixtureRiveter, "dummy", DummyModel);
 			const proxy = new DefinitionProxy(fixture);
-			sinon.stub(fixture.sequenceHandler, "registerSequence");
+			const registerSequence = sinon.stub(fixture.sequenceHandler, "registerSequence");
 			const name = "email";
 			proxy.sequence(name);
+			expect(registerSequence).to.be.calledOnce;
+			expect(registerSequence).to.be.calledOnceWithExactly(name);
+		});
 
-			expect(fixture.sequenceHandler.registerSequence).to.be.calledOnce;
-			expect(fixture.sequenceHandler.registerSequence).to.be.calledOnceWithExactly(name);
+		it("throws if given a sequence with an alias", function() {
+			const fixtureRiveter = new FixtureRiveter();
+			const fixture = new Fixture(fixtureRiveter, "dummy", DummyModel);
+			const proxy = new DefinitionProxy(fixture);
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			expect(() => proxy.sequence("email", ["alias"])).to.throw(
+				"Can't define the inline sequence email with aliases",
+			);
 		});
 	});
 
@@ -189,6 +199,32 @@ describe("DefinitionProxy", function() {
 			proxy.trait(name, block);
 
 			expect(fixture.defineTrait).to.be.calledOnce;
+		});
+	});
+
+	describe("#before", function() {
+		it("passes the call to the callback handler", function() {
+			const fixtureRiveter = new FixtureRiveter();
+			const fixture = new Fixture(fixtureRiveter, "dummy", DummyModel);
+			const proxy = new DefinitionProxy(fixture);
+			const name = "name";
+			const callback = (): any => true;
+			const before = sinon.spy(proxy.definition, "before");
+			proxy.before(name, callback);
+			expect(before).to.be.calledWith(name, callback);
+		});
+	});
+
+	describe("#after", function() {
+		it("passes the call to the callback handler", function() {
+			const fixtureRiveter = new FixtureRiveter();
+			const fixture = new Fixture(fixtureRiveter, "dummy", DummyModel);
+			const proxy = new DefinitionProxy(fixture);
+			const name = "name";
+			const callback = (): any => true;
+			const after = sinon.spy(proxy.definition, "after");
+			proxy.after(name, callback);
+			expect(after).to.be.calledWith(name, callback);
 		});
 	});
 });

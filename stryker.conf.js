@@ -8,7 +8,7 @@ module.exports = {
 	coverageAnalysis: "perTest",
 	buildCommand: 'npm run build',
 	mochaOptions: {
-		"config": ".mocharc.yaml",
+		"config": ".mocharc.json",
 		"spec": [ "dist/test/**/*.js"]
 	},
 	checkers: ["typescript"],

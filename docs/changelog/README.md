@@ -7,7 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 ### Added
 - Moved docs to use [VuePress](https://github.com/vuepress/vuepress-next).
-- Host docs at [github.io](...).
+- Host docs at [github.io](https://batterii.github.io/fixture-riveter).
+- Mutation testing with [Stryker](https://stryker-mutator.io).
 
 ### Changed
 - Move all default build method overloads to separate interfaces
@@ -16,9 +17,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Enforce RelationAttribute fixture property being only an array
 - Clean up eslint rules, update @batterii/eslint-config-ts
 - Remove unnecessary type indirection from AdapterHandler
+- Switch mocharc to json.
 
 ### Fixed
 - ObjectionAdapter: only call delete on instances that might be in the database, and wrap call in a try-catch for when we call it on instances that were constructed with `build`.
+- Make `fixture` property of `Trait` optional.
 
 
 ## [v2.0.0] - 2021-01-29

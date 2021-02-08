@@ -7,6 +7,7 @@ import {Sequence} from "../../lib/sequence";
 
 import {identity} from "lodash";
 import {expect} from "chai";
+import sinon from "sinon";
 
 describe("extractAttributes", function() {
 	it("returns an empty object", function() {
@@ -38,11 +39,20 @@ describe("nameGuard", function() {
 	it("accepts classes", function() {
 		expect(nameGuard(DummyModel)).to.equal(DummyModel.name);
 	});
+
+	it("throws if given anything else", function() {
+		expect(() => nameGuard({} as any)).to.throw("[object Object] isn't the right shape");
+	});
 });
 
 describe("FixtureRiveter", function() {
+	let fixtureRiveter: FixtureRiveter;
+
+	beforeEach(function() {
+		fixtureRiveter = new FixtureRiveter();
+	});
+
 	it("can be built", function() {
-		const fixtureRiveter = new FixtureRiveter();
 		expect(fixtureRiveter).to.exist;
 		expect(fixtureRiveter.fixtures).to.exist.and.to.be.empty;
 	});
@@ -53,44 +63,43 @@ describe("FixtureRiveter", function() {
 
 	describe("#registerFixture", function() {
 		it("adds the fixture by name", function() {
-			const fixtureRiveter = new FixtureRiveter();
 			const name = "testFixture";
 			const fixture = new Fixture(fixtureRiveter, name, DummyModel);
-
 			fixtureRiveter.registerFixture(fixture);
-
 			expect(fixtureRiveter.fixtures.get(name)).to.equal(fixture);
 		});
 
 		it("adds the fixture by alias", function() {
-			const fixtureRiveter = new FixtureRiveter();
 			const name = "testFixture";
 			const aliases = ["fixture1", "fixture2"];
 			const fixture = new Fixture(fixtureRiveter, name, DummyModel, {aliases});
-
 			fixtureRiveter.registerFixture(fixture);
-
 			expect(fixtureRiveter.fixtures.get("fixture1")).to.equal(fixture);
 			expect(fixtureRiveter.fixtures.get("fixture2")).to.equal(fixture);
 		});
 
 		it("adds the same fixture multiples times", function() {
-			const fixtureRiveter = new FixtureRiveter();
 			const name = "fixture1";
 			const alias = "fixture2";
 			const fixture = new Fixture(fixtureRiveter, name, DummyModel, {aliases: [alias]});
-
 			fixtureRiveter.registerFixture(fixture);
-
 			const {fixtures} = fixtureRiveter;
-
 			expect(fixtures[name]).to.deep.equal(fixtures[alias]);
+		});
+
+		it("throws if trying to register the same name twice", function() {
+			const name = "fixture1";
+			const fixture1 = new Fixture(fixtureRiveter, name, DummyModel);
+			const fixture2 = new Fixture(fixtureRiveter, name, DummyModel);
+			fixtureRiveter.registerFixture(fixture1);
+			expect(() => fixtureRiveter.registerFixture(fixture2)).to.throw(
+				"Can't define fixture1 fixture twice",
+			);
 		});
 	});
 
 	describe("#fixture", function() {
 		it("creates a fixture", function() {
-			const fixtureRiveter = new FixtureRiveter();
 			const name = "testFixture";
 			fixtureRiveter.fixture(name, DummyModel);
 
@@ -102,7 +111,6 @@ describe("FixtureRiveter", function() {
 		});
 
 		it("returns the created fixture", function() {
-			const fixtureRiveter = new FixtureRiveter();
 			const name = "testFixture";
 			const fixture = fixtureRiveter.fixture(name, DummyModel);
 
@@ -110,7 +118,6 @@ describe("FixtureRiveter", function() {
 		});
 
 		it("passes the options down to the fixture", function() {
-			const fixtureRiveter = new FixtureRiveter();
 			const name = "testFixture";
 			const aliases = ["fixture1", "fixture2"];
 			const fixture = fixtureRiveter.fixture(name, DummyModel, {aliases});
@@ -119,7 +126,6 @@ describe("FixtureRiveter", function() {
 		});
 
 		it("registers the fixture", function() {
-			const fixtureRiveter = new FixtureRiveter();
 			const name = "testFixture";
 			expect(fixtureRiveter.fixtures.get(name)).to.not.exist;
 			fixtureRiveter.fixture("testFixture", DummyModel);
@@ -127,16 +133,14 @@ describe("FixtureRiveter", function() {
 		});
 
 		it("doesn't register a fixture twice", function() {
-			const fixtureRiveter = new FixtureRiveter();
 			const testFn = () => {
 				fixtureRiveter.fixture("testFixture", DummyModel);
 			};
 			testFn();
-			expect(testFn).to.throw();
+			expect(testFn).to.throw("testFixture is already defined");
 		});
 
 		it("creates child fixtures", function() {
-			const fixtureRiveter = new FixtureRiveter();
 			fixtureRiveter.fixture("user", DummyModel, (f) => {
 				f.fixture("oldUser", DummyModel);
 			});
@@ -150,17 +154,15 @@ describe("FixtureRiveter", function() {
 	describe("#getFixture", function() {
 		it("returns the requested fixture", function() {
 			const name = "name";
-			const fixture = new FixtureRiveter();
-			fixture.fixture(name, DummyModel);
-			const t = fixture.getFixture(name);
-			const result = fixture.fixtures.get(name);
+			fixtureRiveter.fixture(name, DummyModel);
+			const t = fixtureRiveter.getFixture(name);
+			const result = fixtureRiveter.fixtures.get(name);
 			expect(t).to.equal(result);
 		});
 
 		it("throws if a non-existant fixture is requested", function() {
-			const fixture = new FixtureRiveter();
-			fixture.fixture("t", DummyModel);
-			expect(() => fixture.getFixture("f")).to.throw();
+			fixtureRiveter.fixture("t", DummyModel);
+			expect(() => fixtureRiveter.getFixture("f")).to.throw();
 		});
 	});
 
@@ -246,19 +248,72 @@ describe("FixtureRiveter", function() {
 	});
 
 	describe("#getTrait", function() {
-		it("returns the requested fixture", function() {
+		it("returns the requested trait", function() {
 			const name = "name";
-			const fixture = new FixtureRiveter();
-			fixture.trait(name, identity);
-			const t = fixture.getTrait(name);
-			const result = fixture.traits.get(name);
+			fixtureRiveter.trait(name, identity);
+			const t = fixtureRiveter.getTrait(name);
+			const result = fixtureRiveter.traits.get(name);
 			expect(t).to.equal(result);
 		});
 
-		it("throws if a non-existant fixture is requested", function() {
-			const fixture = new FixtureRiveter();
-			fixture.trait("t", identity);
-			expect(() => fixture.getTrait("f")).to.throw();
+		it("throws if a non-existant trait is requested", function() {
+			fixtureRiveter.trait("t", identity);
+			expect(() => fixtureRiveter.getTrait("f")).to.throw("Trait f hasn't been defined yet");
+		});
+	});
+
+	describe("#run", function() {
+		it("throws if fixture hasn't been defined yet", async function() {
+			return expect(
+				Promise.resolve(fixtureRiveter.run("test", "build")),
+			).to.eventually.be.rejectedWith("Fixture test hasn't been defined");
+		});
+
+		it("throws if strategy hasn't been defined", async function() {
+			const name = "testFixture";
+			const fixture = new Fixture(fixtureRiveter, name, DummyModel);
+			fixtureRiveter.registerFixture(fixture);
+			return expect(
+				Promise.resolve(fixtureRiveter.run(name, "test")),
+			).to.eventually.be.rejectedWith("Strategy test hasn't been defined");
+		});
+	});
+
+	describe("#before", function() {
+		it("passes the call to the callback handler", function() {
+			const name = "name";
+			const callback = (): any => true;
+			const before = sinon.spy(fixtureRiveter.callbackHandler, "before");
+			fixtureRiveter.before(name, callback);
+			expect(before).to.be.calledWith(name, callback);
+		});
+	});
+
+	describe("#after", function() {
+		it("passes the call to the callback handler", function() {
+			const name = "name";
+			const callback = (): any => true;
+			const after = sinon.spy(fixtureRiveter.callbackHandler, "after");
+			fixtureRiveter.after(name, callback);
+			expect(after).to.be.calledWith(name, callback);
+		});
+	});
+
+	describe("#addCallback", function() {
+		it("passes the call to the callback handler", function() {
+			const name = ["name"];
+			const callback = (): any => true;
+			const addCallback = sinon.spy(fixtureRiveter.callbackHandler, "addCallback");
+			fixtureRiveter.addCallback(name, callback);
+			expect(addCallback).to.be.calledWith(name, callback);
+		});
+	});
+
+	describe("#getCallbacks", function() {
+		it("returns the callbackHandler's callbacks", function() {
+			const callbacks = [];
+			fixtureRiveter.callbackHandler.callbacks = callbacks;
+			expect(fixtureRiveter.getCallbacks()).to.equal(callbacks);
 		});
 	});
 });

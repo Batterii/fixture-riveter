@@ -86,7 +86,7 @@ export class Fixture<T> extends Definition<T> {
 	}
 
 	mapTraitToThis(t: Trait<T>): Trait<T> {
-		t.fixture = this;
+		t.setFixture(this);
 		return t;
 	}
 

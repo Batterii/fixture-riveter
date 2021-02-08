@@ -51,7 +51,7 @@ export function nameGuard<T>(fixtureName: FixtureName<T>): string {
 	if (fixtureName.name) {
 		return fixtureName.name;
 	}
-	throw new Error(`${fixtureName} isn't the right shape`);
+	throw new Error(`${fixtureName.toString()} isn't the right shape`);
 }
 
 export class FixtureRiveter {
@@ -88,7 +88,7 @@ export class FixtureRiveter {
 	getFixture<T = any>(name: string, throws = true): Fixture<T> | undefined {
 		const fixture = this.fixtures.get(name);
 		if (throws && !fixture) {
-			throw new Error(`${name} hasn't been defined yet`);
+			throw new Error(`Fixture ${name} hasn't been defined`);
 		}
 		return fixture;
 	}
@@ -241,38 +241,35 @@ export class FixtureRiveter {
 		const name = nameGuard(fixtureName);
 		const traits = traitsAndOverrides.flat(2);
 		const overrides = extractOverrides(traits);
-		let fixture = this.getFixture<T>(name);
+		let fixture = this.getFixture<T>(name, true)!;
 
-		if (fixture !== undefined) {
-			fixture.compile();
+		fixture.compile();
 
-			if (traits.length > 0) {
-				fixture = fixture.copy<Fixture<T>>();
-				fixture.appendTraits(traits);
-			}
-
-			const adapter = this.getAdapter(name);
-			const sName = nameGuard(strategyName as FixtureName<Strategy>);
-
-			let StrategyConstructor: typeof strategyName;
-			if (isString(strategyName)) {
-				const strategy = this.strategyHandler.getStrategy(sName);
-				if (strategy === undefined) {
-					throw new Error(`Strategy ${sName} hasn't been defined`);
-				} else {
-					StrategyConstructor = strategy;
-				}
-			} else {
-				StrategyConstructor = strategyName;
-			}
-			const strategy = new StrategyConstructor(sName, this, adapter);
-
-			const assembler = await fixture.prepare(strategy, overrides);
-			const instance = await strategy.result<T>(assembler, fixture.model);
-			this.instances.push([name, instance]);
-			return instance;
+		if (traits.length > 0) {
+			fixture = fixture.copy<Fixture<T>>();
+			fixture.appendTraits(traits);
 		}
-		throw new Error(`Fixture ${name} hasn't been defined`);
+
+		const adapter = this.getAdapter(name);
+		const sName = nameGuard(strategyName as FixtureName<Strategy>);
+
+		let StrategyConstructor: typeof strategyName;
+		if (isString(strategyName)) {
+			const strategy = this.strategyHandler.getStrategy(sName);
+			if (strategy === undefined) {
+				throw new Error(`Strategy ${sName} hasn't been defined`);
+			} else {
+				StrategyConstructor = strategy;
+			}
+		} else {
+			StrategyConstructor = strategyName;
+		}
+		const strategy = new StrategyConstructor(sName, this, adapter);
+
+		const assembler = await fixture.prepare(strategy, overrides);
+		const instance = await strategy.result<T>(assembler, fixture.model);
+		this.instances.push([name, instance]);
+		return instance;
 	}
 
 	async runList<T = Pojo>(
