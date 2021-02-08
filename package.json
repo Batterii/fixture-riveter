@@ -27,6 +27,7 @@
 		"docs:dev": "vuepress dev docs",
 		"lint": "eslint . --ext .ts --cache",
 		"lintf": "eslint . --ext .ts --fix --cache",
+		"stryker": "stryker run",
 		"test": "npm run build && mocha dist/test",
 		"test:unit": "npm run build && mocha dist/test/unit",
 		"test:acceptance": "npm run build && mocha dist/test/acceptance"
@@ -35,6 +36,9 @@
 	"types": "dist/types/index.d.ts",
 	"devDependencies": {
 		"@batterii/eslint-config-ts": "^3.1.0",
+		"@stryker-mutator/core": "^4.4.1",
+		"@stryker-mutator/mocha-runner": "^4.4.1",
+		"@stryker-mutator/typescript-checker": "^4.4.1",
 		"@types/chai": "^4.2.11",
 		"@types/chai-as-promised": "^7.1.2",
 		"@types/knex": "^0.16.1",
