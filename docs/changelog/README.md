@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+
 ## [v2.1.0]
 ### Added
 - Moved docs to use [VuePress](https://github.com/vuepress/vuepress-next).
@@ -174,7 +175,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Barebones release of Fixture Riveter: fixtures, traits, associations
 - Barebones tutorial
 
-[Unreleased]: https://github.com/Batteri/fixture-riveter/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/Batteri/fixture-riveter/compare/v2.1.0...HEAD
+[v2.1.0]: https://github.com/Batterii/fixture-riveter/releases/tag/v2.1.0
 [v2.0.0]: https://github.com/Batterii/fixture-riveter/releases/tag/v2.0.0
 [v1.7.0]: https://github.com/Batterii/fixture-riveter/releases/tag/v1.7.0
 [v1.6.0]: https://github.com/Batterii/fixture-riveter/releases/tag/v1.6.0
