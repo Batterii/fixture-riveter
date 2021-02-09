@@ -6,9 +6,11 @@ const config = {
 
 	themeConfig: {
 		repo: "Batterii/fixture-riveter",
-
 		docsDir: "docs",
-		editLinkPattern: ":repo/edit/:branch/:path",
+
+		editLink: false,
+		lastUpdated: false,
+		contributors: false,
 
 		navbar: [
 			{
