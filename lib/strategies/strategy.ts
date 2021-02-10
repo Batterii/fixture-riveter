@@ -14,12 +14,12 @@ export class Strategy {
 		this.fixtureRiveter = fixtureRiveter;
 	}
 
-	async relation(fixtureName: string, traitsAndOverrides: any[]): Promise<any> {
-		return this.fixtureRiveter.run(fixtureName, "null", traitsAndOverrides);
-	}
-
 	async result<T>(assembler: Assembler<T>, model?: ModelConstructor<T>): Promise<any>;
 	async result<T>(assembler: Assembler<T>): Promise<any> {
 		return assembler.toObject();
+	}
+
+	async relation(fixtureName: string, traitsAndOverrides: any[]): Promise<any> {
+		return this.fixtureRiveter.run(fixtureName, "null", traitsAndOverrides);
 	}
 }

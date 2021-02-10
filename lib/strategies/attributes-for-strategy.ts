@@ -3,11 +3,12 @@ import {Strategy} from "./strategy";
 import {Pojo} from "../types";
 
 export class AttributesForStrategy extends Strategy {
-	async relation(fixtureName: string, traitsAndOverrides: any[]): Promise<any> {
-		return this.fixtureRiveter.run(fixtureName, "null", traitsAndOverrides);
-	}
-
 	async result<T>(assembler: Assembler<T>): Promise<Pojo> {
 		return assembler.toObject();
+	}
+
+	async relation(fixtureName: string, traitsAndOverrides: any[]): Promise<any> {
+		// TODO: Can we just return undefined here and remove the null strategy?
+		return this.fixtureRiveter.run(fixtureName, "null", traitsAndOverrides);
 	}
 }

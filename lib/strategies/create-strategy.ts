@@ -4,10 +4,6 @@ import {ModelConstructor} from "../types";
 
 /* eslint-disable class-methods-use-this */
 export class CreateStrategy extends Strategy {
-	async relation(fixtureName: string, traitsAndOverrides: any[]): Promise<any> {
-		return this.fixtureRiveter.run(fixtureName, "create", traitsAndOverrides);
-	}
-
 	async result<T>(assembler: Assembler<T>, model: ModelConstructor<T>): Promise<T> {
 		let instance = await assembler.toInstance();
 		await assembler.runCallbacks("afterBuild", instance);
@@ -16,5 +12,9 @@ export class CreateStrategy extends Strategy {
 		await assembler.runCallbacks("afterCreate", instance);
 
 		return instance;
+	}
+
+	async relation(fixtureName: string, traitsAndOverrides: any[]): Promise<any> {
+		return this.fixtureRiveter.run(fixtureName, "create", traitsAndOverrides);
 	}
 }

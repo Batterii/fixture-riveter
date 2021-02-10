@@ -1,4 +1,9 @@
-## `Adapter`
+---
+sidebar: auto
+title: Adapter
+---
+
+# `Adapter`
 
 Instead of writing ORM-specific code for instancing and persisting created objects, we rely on this interface (and the following default implementation of it). This handles the two aforementioned aspects of [factory_bot][factory_bot]: creating an instance of a given model, and then persisting it to the database. (There are other reasons to use it, but that's less important.)
 
@@ -12,29 +17,38 @@ The `DefaultAdapter` has barebones implementations of each of the interface's fu
 import {fr, DefaultAdapter} from "fixture-riveter";
 
 export class UserAdapter extends DefaultAdapter {
-	// This model needs `isNew` set before any fields are set.
-	build<T>(Model: any): T {
-		const instance = new Model();
-		instance.isNew = true;
-		return instance;
-	}
+    // This model needs `isNew` set before any fields are set.
+    build<T>(Model: any): T {
+        const instance = new Model();
+        instance.isNew = true;
+        return instance;
+    }
 }
 
 fr.setAdapter(new UserAdapter(), "user");
 ```
 
-### `Adapter` methods
+## `Adapter` methods
 
-None of the methods on an `Adapter` will be exposed to the user; they are called internally at various points in the generation of a given fixture. Therefore, the examples below are merely to demonstrate how the function works and will use the `DefaultAdapter`'s implementations.
+None of the methods on an `Adapter` will be exposed to the user; they are called internally at various points in the generation of a given fixture. Therefore, the examples below will use the `DefaultAdapter` to demonstrate how the methods work.
 
-#### build
+### build()
 
 Called to create an instance of the fixture's Model class. Unless specific arguments are required, `DefaultAdapter`'s implementation is generally good enough.
 
+```typescript
+export class DefaultAdapter implements Adapter {
+    // ...
+    build<T>(Model: any): T {
+        return new Model();
+    }
+    // ...
+```
+
 ##### Arguments
 
-| Argument | Type           | Description                                                                      | Optional? |
-|----------|----------------|----------------------------------------------------------------------------------|-----------|
+| Argument | Type           | Description                      | Optional? |
+|----------|----------------|----------------------------------|-----------|
 | Model    | Class function | The class function (constructor) | Required  |
 
 ##### Return value
@@ -53,9 +67,18 @@ user instanceof User
 // true
 ```
 
-#### save
+### save()
 
 Called to persist the instance to the database. Must return the persisted instance, not the parameter instance (if there is a difference). Accepts the class function to allow for static methods on the class to handle persistence (for example, Objection.js).
+
+```typescript
+export class DefaultAdapter implements Adapter {
+    // ...
+    async save<T>(instance: any): Promise<T> {
+        return instance.save();
+    }
+    // ...
+```
 
 ##### Arguments
 
@@ -83,9 +106,18 @@ user.id
 // 1
 ```
 
-#### destroy
+### destroy()
 
 Called to delete or remove the instance from the database. Must gracefully handle if the instance has not been persisted to the database (for instance, the instance was constructed with `fr.build`, not `fr.create`). Accepts the class function to allow for static methods on the class to handle deletion (for example, Objection.js).
+
+```typescript
+export class DefaultAdapter implements Adapter {
+    // ...
+    async destroy(instance: any): Promise<void> {
+        await instance.destroy();
+    }
+    // ...
+```
 
 ##### Arguments
 
@@ -112,13 +144,22 @@ await User.query().findById(user.id);
 // []
 ```
 
-#### relate
+### relate()
 
 Called to "join" two fixture instances together.
 
 ::: warning
 TODO: clean me up
 :::
+
+```typescript
+export class DefaultAdapter implements Adapter {
+    // ...
+    async relate(instance: any, name: string, other: any): Promise<any> {
+        return this.set(instance, name, other);
+    }
+    // ...
+```
 
 ##### Arguments
 
@@ -140,7 +181,7 @@ TODO: clean me up
 ```typescript
 class User {}
 class Post {
-	user: User;
+    user: User;
 }
 
 const user = new User();
@@ -152,13 +193,23 @@ post.user === user;
 // true
 ```
 
-#### set
+### set()
 
 Called to set a property on a fixture instance. Returns the whole instance just in case???
 
 ::: warning
 TODO: clean me up
 :::
+
+```typescript
+export class DefaultAdapter implements Adapter {
+    // ...
+    set(instance: any, key: string, value: any): any {
+        instance[key] = value;
+        return instance;
+    }
+    // ...
+```
 
 ##### Arguments
 

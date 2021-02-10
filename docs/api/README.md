@@ -1,5 +1,6 @@
 ---
 sidebar: auto
+title: API
 ---
 
 # Exports
@@ -8,44 +9,32 @@ sidebar: auto
 
 ```typescript
 import {
-	// primary export
-	fr,
-	FixtureRiveter,
+    // primary export
+    fr,
+    FixtureRiveter,
 
-	// ORM adapters
-	Adapter,
-	DefaultAdapter,
-	ObjectionAdapter,
-	SequelizeAdapter,
+    // ORM adapters
+    Adapter,
+    DefaultAdapter,
+    ObjectionAdapter,
+    SequelizeAdapter,
 
-	// object creation strategies
-	Strategy,
-	AttributesForStrategy,
-	BuildStrategy,
-	CreateStrategy,
+    // object creation strategies
+    Strategy,
+    AttributesForStrategy,
+    BuildStrategy,
+    CreateStrategy,
 } from "fixture-riveter";
 ```
 
 ## `fr` and `FixtureRiveter`
 
-The primary method for consuming the library. (The `FixtureRiveter` constructor is exposed as well, in case you need to instantiate it yourself). The functionality is discussed further in [fr api](./fr/README.md).
+The primary method for consuming the library. (The `FixtureRiveter` constructor is exposed as well, in case you need to instantiate it yourself). A full description of the internals can be found in [fixture-riveter](./fr/README.md).
 
-### Relative links
+## `Adapter`
 
-[in parent directory](../README.md)
+`Adapter` is the interface that `fixture-riveter` uses to interact with 1) a given fixture's class, and 2) the database (or ORM). It defines 5 methods that all subclasses must implement. A description of these methods, and instructions on writing your own, can be found in [Adapter](./adapter.md).
 
-[in same directory](./adapter.md)
+## `Strategy`
 
-[in child directory](./exports/README.md)
-
-[in adjacent directory](../guide/README.md)
-
-### Absolute links
-
-[in parent directory](/fixture-riveter/api/README.md)
-
-[in same directory](/fixture-riveter/api/adapter.md)
-
-[in child directory](/fixture-riveter/api/exports/README.md)
-
-[in adjacent directory](/fixture-riveter/api/guide/README.md)
+`Strategy` is the interface that `fixture-riveter` uses to turn fixture definitions into objects, whether it be Plain Old Javascript Objects or instances of a given class. A description of its methods, and instructions on writing one's own, can be found in [Strategy](./strategy.md).
