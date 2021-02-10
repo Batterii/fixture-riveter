@@ -29,7 +29,7 @@ import {
 
 ## `fr` and `FixtureRiveter`
 
-The primary method for consuming the library. (The `FixtureRiveter` constructor is exposed as well, in case you need to instantiate it yourself). The functionality is discussed further in [fr api](/api/fr/).
+The primary method for consuming the library. (The `FixtureRiveter` constructor is exposed as well, in case you need to instantiate it yourself). The functionality is discussed further in [fr api](./fr/README.md).
 
 ## `Adapter`
 
