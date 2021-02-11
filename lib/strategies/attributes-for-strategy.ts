@@ -7,8 +7,7 @@ export class AttributesForStrategy extends Strategy {
 		return assembler.toObject();
 	}
 
-	async relation(fixtureName: string, traitsAndOverrides: any[]): Promise<any> {
-		// TODO: Can we just return undefined here and remove the null strategy?
-		return this.fixtureRiveter.run(fixtureName, "null", traitsAndOverrides);
+	async relation(): Promise<any> {
+		return undefined;
 	}
 }

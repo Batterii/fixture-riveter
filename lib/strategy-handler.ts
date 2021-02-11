@@ -3,7 +3,6 @@ import {Strategy} from "./strategies/strategy";
 import {AttributesForStrategy} from "./strategies/attributes-for-strategy";
 import {BuildStrategy} from "./strategies/build-strategy";
 import {CreateStrategy} from "./strategies/create-strategy";
-import {NullStrategy} from "./strategies/null-strategy";
 import {FixtureName} from "./types";
 
 export class StrategyHandler {
@@ -28,7 +27,6 @@ export class StrategyHandler {
 		this.registerStrategy("attributesFor", AttributesForStrategy);
 		this.registerStrategy("build", BuildStrategy);
 		this.registerStrategy("create", CreateStrategy);
-		this.registerStrategy("null", NullStrategy);
 	}
 
 	defineStrategyMethods(strategyName: string): void {
