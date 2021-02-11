@@ -90,13 +90,6 @@ export class Definition<T> {
 		return this.additionalTraits.map((name) => this.traitByName(name));
 	}
 
-	copy<C extends Definition<T>>(): C {
-		const copy: C = Object.assign(Object.create(Object.getPrototypeOf(this)), this);
-		copy.compiled = false;
-		copy.attributes = [];
-		return copy;
-	}
-
 	before(...rest: any[]): void {
 		this.callbackHandler.before(...rest);
 	}
@@ -117,5 +110,12 @@ export class Definition<T> {
 			this.callbackHandler.callbacks,
 			this.getAdditionalTraits().map((t) => t.getCallbacks()),
 		].flat(2).filter(Boolean);
+	}
+
+	copy<C extends Definition<T>>(): C {
+		const copy: C = Object.assign(Object.create(Object.getPrototypeOf(this)), this);
+		copy.compiled = false;
+		copy.attributes = [];
+		return copy;
 	}
 }
