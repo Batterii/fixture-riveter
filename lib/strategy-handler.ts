@@ -19,8 +19,12 @@ export class StrategyHandler {
 		this.defineStrategyMethods(strategyName);
 	}
 
-	getStrategy(strategyName: string): typeof Strategy | undefined {
-		return this.strategies.get(strategyName);
+	getStrategy(strategyName: string): typeof Strategy {
+		const strategy = this.strategies.get(strategyName);
+		if (strategy === undefined) {
+			throw new Error(`Strategy ${strategyName} hasn't been defined`);
+		}
+		return strategy;
 	}
 
 	registerDefaultStategies(): void {

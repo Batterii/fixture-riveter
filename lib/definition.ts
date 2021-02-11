@@ -26,7 +26,6 @@ export class Definition<T> {
 	sequenceHandler: SequenceHandler;
 	declarationHandler: DeclarationHandler;
 
-
 	constructor(name: string, fixtureRiveter: FixtureRiveter) {
 		this.name = name;
 		this.fixtureRiveter = fixtureRiveter;
@@ -83,20 +82,12 @@ export class Definition<T> {
 		return this.traitsCache.get(name) || this.fixtureRiveter.getTrait(name);
 	}
 
-	getInternalTraits(internalTraits: string[]): Trait<T>[] {
-		const traits: Trait<T>[] = [];
-		for (const name of internalTraits) {
-			traits.push(this.traitByName(name));
-		}
-		return traits;
-	}
-
 	getBaseTraits(): Trait<T>[] {
-		return this.getInternalTraits(this.baseTraits);
+		return this.baseTraits.map((name) => this.traitByName(name));
 	}
 
 	getAdditionalTraits(): Trait<T>[] {
-		return this.getInternalTraits(this.additionalTraits);
+		return this.additionalTraits.map((name) => this.traitByName(name));
 	}
 
 	copy<C extends Definition<T>>(): C {

@@ -85,39 +85,46 @@ export class Fixture<T> extends Definition<T> {
 		}
 	}
 
+	getBaseTraits(): Trait<T>[] {
+		return super.getBaseTraits().map((t) => this.mapTraitToThis(t));
+	}
+
+	getAdditionalTraits(): Trait<T>[] {
+		return super.getAdditionalTraits().map((t) => this.mapTraitToThis(t));
+	}
+
 	mapTraitToThis(t: Trait<T>): Trait<T> {
 		t.setFixture(this);
 		return t;
 	}
 
-	getParentAttributes(): Attribute[] {
-		return this.parentFixture().getAttributes();
-	}
-
 	getAttributes(): Attribute[] {
 		this.compile();
 
-		const attributesToKeep = this.getParentAttributes();
+		const parentAttributes = this.parentFixture().getAttributes();
 
 		if (!this.attributes || this.attributes.length === 0) {
 			this.attributes = [
-				this.getBaseTraits()
-					.map((t) => this.mapTraitToThis(t))
-					.map((t) => t.getAttributes()),
+				this.getBaseTraits().map((t) => t.getAttributes()),
 				this.declarationHandler.getAttributes(),
-				this.getAdditionalTraits()
-					.map((t) => this.mapTraitToThis(t))
-					.map((t) => t.getAttributes()),
+				this.getAdditionalTraits().map((t) => t.getAttributes()),
 			].flat(2).filter(Boolean);
 		}
 
-		return attributesToKeep.concat(this.attributes);
+		return parentAttributes.concat(this.attributes);
 	}
 
 	getCallbacks(): Callback<T>[] {
+		this.compile();
+
 		const globalCallbacks = this.fixtureRiveter.getCallbacks();
 		const parentCallbacks = this.parentFixture().getCallbacks();
-		const definedCallbacks = super.getCallbacks();
+
+		const definedCallbacks = [
+			this.getBaseTraits().map((t) => t.getCallbacks()),
+			this.callbackHandler.callbacks,
+			this.getAdditionalTraits().map((t) => t.getCallbacks()),
+		].flat(2).filter(Boolean);
 
 		return globalCallbacks.concat(parentCallbacks, definedCallbacks);
 	}
@@ -128,10 +135,9 @@ export class Fixture<T> extends Definition<T> {
 			this.fixtureRiveter.getTrait(name);
 	}
 
-	async prepare(
-		buildStrategy: Strategy,
-		overrides: Record<string, any> = {},
-	): Promise<Assembler<T>> {
+	async run(buildStrategy: Strategy, overrides: Record<string, any> = {}): Promise<T> {
+		this.compile();
+
 		const evaluator = addMethodMissing(
 			new Evaluator(
 				this.fixtureRiveter,
@@ -148,6 +154,7 @@ export class Fixture<T> extends Definition<T> {
 			evaluator,
 		);
 
-		return new Assembler<T>(attributeAssigner, this.getCallbacks());
+		const assembler = new Assembler<T>(attributeAssigner, this.getCallbacks());
+		return buildStrategy.result(assembler, this.model) as unknown as T;
 	}
 }

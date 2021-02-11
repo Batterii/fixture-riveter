@@ -255,19 +255,13 @@ export class FixtureRiveter {
 
 		let StrategyConstructor: typeof strategyName;
 		if (isString(strategyName)) {
-			const strategy = this.strategyHandler.getStrategy(sName);
-			if (strategy === undefined) {
-				throw new Error(`Strategy ${sName} hasn't been defined`);
-			} else {
-				StrategyConstructor = strategy;
-			}
+			StrategyConstructor = this.strategyHandler.getStrategy(sName);
 		} else {
 			StrategyConstructor = strategyName;
 		}
 		const strategy = new StrategyConstructor(sName, this, adapter);
 
-		const assembler = await fixture.prepare(strategy, overrides);
-		const instance = await strategy.result<T>(assembler, fixture.model);
+		const instance = await fixture.run(strategy, overrides);
 		this.instances.push([name, instance]);
 		return instance;
 	}

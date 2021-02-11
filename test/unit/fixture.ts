@@ -136,62 +136,9 @@ describe("Fixture", function() {
 		});
 	});
 
-	describe("#getParentAttributes", function() {
-		beforeEach(function() {
-			fixtureRiveter = new FixtureRiveter();
-		});
-
-		it("calls parentFixture", function() {
-			const parentFixture = new Fixture(fixtureRiveter, "parent", DummyModel);
-			const childFixture = new Fixture(fixtureRiveter, "child", DummyModel);
-			sinon.stub(childFixture, "parentFixture")
-				.returns(parentFixture);
-
-			childFixture.getParentAttributes();
-			expect(childFixture.parentFixture).to.be.calledOnce;
-		});
-
-		it("calls getAttributes on the parent", function() {
-			const parentFixture = new Fixture(fixtureRiveter, "parent", DummyModel);
-			const attr = new DynamicAttribute("attr", false, () => true);
-			sinon.stub(parentFixture, "getAttributes")
-				.returns([attr]);
-			const childFixture = new Fixture(fixtureRiveter, "child", DummyModel);
-			sinon.stub(childFixture, "parentFixture")
-				.returns(parentFixture);
-
-			childFixture.getParentAttributes();
-			expect(parentFixture.getAttributes).to.be.calledOnce;
-		});
-
-		it("returns all non-filtered attributes", function() {
-			const parentFixture = new Fixture(fixtureRiveter, "parent", DummyModel);
-			const attr = new DynamicAttribute("attr", false, () => true);
-			sinon.stub(parentFixture, "getAttributes")
-				.returns([attr]);
-
-			const childFixture = new Fixture(fixtureRiveter, "child", DummyModel);
-			sinon.stub(childFixture, "parentFixture")
-				.returns(parentFixture);
-			sinon.stub(childFixture, "attributeNames")
-				.returns([]);
-
-			const result = childFixture.getParentAttributes();
-			expect(result).to.deep.equal([attr]);
-		});
-	});
-
 	describe("#getAttributes", function() {
 		beforeEach(function() {
 			fixtureRiveter = new FixtureRiveter();
-		});
-
-		it("calls getParentAttributes", function() {
-			const fixture = new Fixture(fixtureRiveter, "dummy", DummyModel);
-			sinon.spy(fixture, "getParentAttributes");
-			fixture.getAttributes();
-
-			expect(fixture.getParentAttributes).to.be.calledOnce;
 		});
 
 		it("concats child attributes to parent attributes", function() {
@@ -201,7 +148,8 @@ describe("Fixture", function() {
 			fixture.compiled = true;
 
 			const parentAttr = new DynamicAttribute("parent", false, () => true);
-			sinon.stub(fixture, "getParentAttributes").returns([parentAttr]);
+			sinon.stub(fixture, "parentFixture")
+				.returns({getAttributes: () => [parentAttr]} as any);
 
 			const result = fixture.getAttributes();
 			expect(result).to.deep.equal([parentAttr, childAttr]);

@@ -3,13 +3,11 @@ import {DefaultAdapter} from "./adapters/default-adapter";
 
 export class AdapterHandler {
 	adapters: Map<string, Adapter>;
-	defaultAdapter: Adapter;
 	currentAdapter: Adapter;
 
 	constructor(adapter?: Adapter) {
 		this.adapters = new Map();
-		this.defaultAdapter = new DefaultAdapter();
-		this.currentAdapter = adapter || this.defaultAdapter;
+		this.currentAdapter = adapter || new DefaultAdapter();
 	}
 
 	getAdapter(fixtureName?: string): Adapter {

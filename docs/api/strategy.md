@@ -64,10 +64,10 @@ When a fixture defines a relationship to another fixture, this method is called 
 
 ##### Arguments
 
-| Argument           | Type                                                                           | Description                                        | Optional? |
-|--------------------|--------------------------------------------------------------------------------|----------------------------------------------------|-----------|
-| fixtureName        | string                                                                         | Fixture name of relation                           | Required  |
-| traitsAndOverrides | [string[]] <br> [Record\<string, any\>] <br> [string[], Record\<string, any\>] | A list of traits and/or overrides for the relation | Optional  |
+| Argument           | Type                                                                           | Description                                                  | Optional? |
+|--------------------|--------------------------------------------------------------------------------|--------------------------------------------------------------|-----------|
+| fixtureName        | string                                                                         | Fixture name of relation                                     | Required  |
+| traitsAndOverrides | [string[]] <br> [Record\<string, any\>] <br> [string[], Record\<string, any\>] | A list of a list of traits and/or overrides for the relation | Optional  |
 
 ##### Return value
 
