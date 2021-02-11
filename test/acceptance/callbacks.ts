@@ -175,6 +175,12 @@ describe("global callbacks", function() {
 			f.after("build", (user) => {
 				user.name = user.name.toLowerCase();
 			});
+
+			f.fixture("child user", User, (ff) => {
+				ff.after("build", (user) => {
+					user.name = `childlike: ${user.name}`;
+				});
+			});
 		});
 
 		fr.fixture("company", Company, (f) => {
@@ -193,5 +199,8 @@ describe("global callbacks", function() {
 		expect(user.name).to.equal("A___john doe___!!!Z");
 		const company = await fr.build("company");
 		expect(company.name).to.equal("ACME SUPPLIERS");
+
+		const childUser = await fr.build("child user");
+		expect(childUser.name).to.equal("childlike: john doe");
 	});
 });

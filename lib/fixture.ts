@@ -117,7 +117,6 @@ export class Fixture<T> extends Definition<T> {
 	getCallbacks(): Callback<T>[] {
 		this.compile();
 
-		const globalCallbacks = this.fixtureRiveter.getCallbacks();
 		const parentCallbacks = this.parentFixture().getCallbacks();
 
 		const definedCallbacks = [
@@ -126,7 +125,7 @@ export class Fixture<T> extends Definition<T> {
 			this.getAdditionalTraits().map((t) => t.getCallbacks()),
 		].flat(2).filter(Boolean);
 
-		return globalCallbacks.concat(parentCallbacks, definedCallbacks);
+		return parentCallbacks.concat(definedCallbacks);
 	}
 
 	traitByName(name: string): Trait<T> {

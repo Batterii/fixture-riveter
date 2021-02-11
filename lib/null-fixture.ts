@@ -21,7 +21,7 @@ export class NullFixture<T> extends Definition<T> {
 	}
 
 	getCallbacks(): Callback<T>[] {
-		return [];
+		return this.fixtureRiveter.getCallbacks();
 	}
 
 	traitByName(name: string): Trait<T> {
