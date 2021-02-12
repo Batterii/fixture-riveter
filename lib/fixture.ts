@@ -2,6 +2,7 @@ import {addMethodMissing} from "./method-missing";
 import {Assembler} from "./assembler";
 import {Attribute} from "./attributes/attribute";
 import {AttributeAssigner} from "./attribute-assigner";
+import {Callback} from "./callback";
 import {Definition} from "./definition";
 import {Evaluator} from "./evaluator";
 import {FixtureRiveter} from "./fixture-riveter";
@@ -10,8 +11,7 @@ import {fixtureOptionsParser} from "./fixture-options-parser";
 import {Strategy} from "./strategies/strategy";
 import {Trait} from "./trait";
 
-import {isFunction} from "lodash";
-import {Callback} from "./callback";
+import {isFunction, last} from "lodash";
 
 import {
 	BlockFunction,
@@ -19,6 +19,7 @@ import {
 	FixtureOptions,
 	ModelConstructor,
 } from "./types";
+import { Adapter } from "./adapters/adapter";
 
 export class Fixture<T> extends Definition<T> {
 	fixtureRiveter: FixtureRiveter;
@@ -85,6 +86,17 @@ export class Fixture<T> extends Definition<T> {
 		}
 	}
 
+	traitByName(name: string): Trait<T> {
+		return this.traitsCache.get(name) ||
+			this.parentFixture().traitByName(name) ||
+			this.fixtureRiveter.getTrait(name);
+	}
+
+	mapTraitToThis(t: Trait<T>): Trait<T> {
+		t.setFixture(this);
+		return t;
+	}
+
 	getBaseTraits(): Trait<T>[] {
 		return super.getBaseTraits().map((t) => this.mapTraitToThis(t));
 	}
@@ -93,45 +105,20 @@ export class Fixture<T> extends Definition<T> {
 		return super.getAdditionalTraits().map((t) => this.mapTraitToThis(t));
 	}
 
-	mapTraitToThis(t: Trait<T>): Trait<T> {
-		t.setFixture(this);
-		return t;
-	}
-
 	getAttributes(): Attribute[] {
-		this.compile();
-
+		const attributes = super.getAttributes();
 		const parentAttributes = this.parentFixture().getAttributes();
-
-		if (!this.attributes || this.attributes.length === 0) {
-			this.attributes = [
-				this.getBaseTraits().map((t) => t.getAttributes()),
-				this.declarationHandler.getAttributes(),
-				this.getAdditionalTraits().map((t) => t.getAttributes()),
-			].flat(2).filter(Boolean);
-		}
-
-		return parentAttributes.concat(this.attributes);
+		return parentAttributes.concat(attributes);
 	}
 
 	getCallbacks(): Callback<T>[] {
-		this.compile();
-
+		const callbacks = super.getCallbacks();
 		const parentCallbacks = this.parentFixture().getCallbacks();
-
-		const definedCallbacks = [
-			this.getBaseTraits().map((t) => t.getCallbacks()),
-			this.callbackHandler.callbacks,
-			this.getAdditionalTraits().map((t) => t.getCallbacks()),
-		].flat(2).filter(Boolean);
-
-		return parentCallbacks.concat(definedCallbacks);
+		return parentCallbacks.concat(callbacks);
 	}
 
-	traitByName(name: string): Trait<T> {
-		return this.traitsCache.get(name) ||
-			this.parentFixture().traitByName(name) ||
-			this.fixtureRiveter.getTrait(name);
+	toBuild(): <U = T>(Model: any) => U {
+		return super.toBuild() || this.parentFixture().toBuild();
 	}
 
 	async run(buildStrategy: Strategy, overrides: Record<string, any> = {}): Promise<T> {
@@ -151,6 +138,7 @@ export class Fixture<T> extends Definition<T> {
 			this.name,
 			this.model,
 			evaluator,
+			this.buildAdapter(),
 		);
 
 		const assembler = new Assembler<T>(attributeAssigner, this.getCallbacks());

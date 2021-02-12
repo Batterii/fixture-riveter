@@ -47,6 +47,8 @@ export class Trait<T> extends Definition<T> {
 	getAttributes(): Attribute[] {
 		this.compile();
 
+		// Need to re-compute this every time, instead of relying on the
+		// definition's getAttributes memoizing with this.attributes
 		return [
 			this.getBaseTraits().map((t) => t.getAttributes()),
 			this.declarationHandler.getAttributes(),

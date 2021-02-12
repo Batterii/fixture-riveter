@@ -27,4 +27,34 @@ export class NullFixture<T> extends Definition<T> {
 	traitByName(name: string): Trait<T> {
 		return undefined as any;
 	}
+
+	toBuild(): <U = T>(Model: any) => U {
+		const currentAdapter = this.fixtureRiveter.getAdapter(this.name);
+		return (...args) => currentAdapter.build(...args);
+	}
+
+	toSave(): <U = T>(instance: any, Model?: any) => Promise<U> {
+		const currentAdapter = this.fixtureRiveter.getAdapter(this.name);
+		return async(...args) => currentAdapter.save(...args);
+	}
+
+	toDestroy(): (instance: any, Model?: any) => Promise<void> {
+		const currentAdapter = this.fixtureRiveter.getAdapter(this.name);
+		return async(...args) => currentAdapter.destroy(...args);
+	}
+
+	toRelate(): (
+		instance: any,
+		name: string,
+		other: any,
+		Model?: any,
+	) => Promise<Record<string, any>> {
+		const currentAdapter = this.fixtureRiveter.getAdapter(this.name);
+		return async(...args) => currentAdapter.relate(...args);
+	}
+
+	toSet(): (instance: any, key: any, value: any) => Promise<Record<string, any>> {
+		const currentAdapter = this.fixtureRiveter.getAdapter(this.name);
+		return async(...args) => currentAdapter.set(...args);
+	}
 }

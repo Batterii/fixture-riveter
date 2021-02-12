@@ -161,4 +161,8 @@ export class DefinitionProxy<T> {
 	after(...rest: any[]): void {
 		this.definition.after(...rest);
 	}
+
+	toBuild(block: (...args: any[]) => any): any {
+		this.definition.adapter.build = block;
+	}
 }

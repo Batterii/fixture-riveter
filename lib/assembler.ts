@@ -26,4 +26,8 @@ export class Assembler<T> {
 			await callback.run(instance, this.attributeAssigner.evaluator);
 		}
 	}
+
+	async save(instance: T, Model?: any): Promise<T> {
+		return this.attributeAssigner.save(instance, Model);
+	}
 }
