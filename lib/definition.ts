@@ -1,8 +1,5 @@
 import {Attribute} from "./attributes/attribute";
-import {
-	Callback,
-	CallbackFunction,
-} from "./callback";
+import {Callback, CallbackFunction} from "./callback";
 import {CallbackHandler} from "./callback-handler";
 import {Declaration} from "./declarations/declaration";
 import {DeclarationHandler} from "./declaration-handler";
@@ -10,6 +7,8 @@ import {Trait} from "./trait";
 import {FixtureRiveter} from "./fixture-riveter";
 import {SequenceHandler} from "./sequence-handler";
 import {BlockFunction} from "./types";
+
+import {last} from "lodash";
 
 export class Definition<T> {
 	fixtureRiveter: FixtureRiveter;
@@ -25,6 +24,12 @@ export class Definition<T> {
 
 	sequenceHandler: SequenceHandler;
 	declarationHandler: DeclarationHandler;
+
+	_toBuild?: any;
+	_toSave?: any;
+	_toDestroy?: any;
+	_toRelate?: any;
+	_toSet?: any;
 
 	constructor(name: string, fixtureRiveter: FixtureRiveter) {
 		this.name = name;
@@ -62,6 +67,20 @@ export class Definition<T> {
 		this.declarationHandler.declareAttribute(declaration);
 	}
 
+	getAttributes(): Attribute[] {
+		this.compile();
+
+		if (this.attributes.length === 0) {
+			this.attributes = this.aggregateFromTraitsAndSelf(
+				"getAttributes",
+				() => this.declarationHandler.getAttributes(),
+			);
+		}
+
+		return this.attributes;
+	}
+
+
 	defineTrait(newTrait: Trait<T>): void {
 		if (!this.traitsCache.has(newTrait.name)) {
 			this.traitsCache.set(newTrait.name, newTrait);
@@ -77,8 +96,6 @@ export class Definition<T> {
 	}
 
 	traitByName(name: string): Trait<T> {
-		// This is overridden by both Fixture and Trait, so ignore it please
-		// I've only written this out so Typescript will shut up lol
 		return this.traitsCache.get(name) || this.fixtureRiveter.getTrait(name);
 	}
 
@@ -103,19 +120,39 @@ export class Definition<T> {
 	}
 
 	getCallbacks(): Callback<T>[] {
+		return this.aggregateFromTraitsAndSelf(
+			"getCallbacks",
+			() => this.callbackHandler.callbacks,
+		);
+	}
+
+	aggregateFromTraitsAndSelf(traitMethod: string, block: () => any|any[]): any[] {
 		this.compile();
 
 		return [
-			this.getBaseTraits().map((t) => t.getCallbacks()),
-			this.callbackHandler.callbacks,
-			this.getAdditionalTraits().map((t) => t.getCallbacks()),
+			this.getBaseTraits().map((t) => t[traitMethod]()),
+			block(),
+			this.getAdditionalTraits().map((t) => t[traitMethod]()),
 		].flat(2).filter(Boolean);
 	}
 
-	copy<C extends Definition<T>>(): C {
-		const copy: C = Object.assign(Object.create(Object.getPrototypeOf(this)), this);
-		copy.compiled = false;
-		copy.attributes = [];
-		return copy;
+	toBuild(): ((...args: any[]) => any)|undefined {
+		return last(this.aggregateFromTraitsAndSelf("toBuild", () => this._toBuild));
+	}
+
+	toSave(): ((...args: any[]) => any)|undefined {
+		return last(this.aggregateFromTraitsAndSelf("toSave", () => this._toSave));
+	}
+
+	toDestroy(): ((...args: any[]) => any)|undefined {
+		return last(this.aggregateFromTraitsAndSelf("toDestroy", () => this._toDestroy));
+	}
+
+	toRelate(): ((...args: any[]) => any)|undefined {
+		return last(this.aggregateFromTraitsAndSelf("toRelate", () => this._toRelate));
+	}
+
+	toSet(): ((...args: any[]) => any)|undefined {
+		return last(this.aggregateFromTraitsAndSelf("toSet", () => this._toSet));
 	}
 }

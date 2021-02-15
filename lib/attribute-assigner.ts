@@ -1,3 +1,4 @@
+import {Adapter} from "./adapters/adapter";
 import {Attribute} from "./attributes/attribute";
 import {Evaluator} from "./evaluator";
 import {FixtureRiveter} from "./fixture-riveter";
@@ -11,17 +12,21 @@ export class AttributeAssigner<T> {
 	attributes: Attribute[];
 	attributeNamesToAssign?: string[];
 
+	adapter: Adapter;
+
 	constructor(
 		fixtureRiveter: FixtureRiveter,
 		name: string,
 		model: ModelConstructor<T>,
 		evaluator: Evaluator,
+		adapter: Adapter,
 	) {
 		this.fixtureRiveter = fixtureRiveter;
 		this.name = name;
 		this.model = model;
 		this.evaluator = evaluator;
 		this.attributes = evaluator.attributes;
+		this.adapter = adapter;
 	}
 
 	getAttributeNamesToAssign(): string[] {
@@ -52,7 +57,8 @@ export class AttributeAssigner<T> {
 	}
 
 	attributesForInstance(): string[] {
-		return this.getAttributeNamesToAssign();
+		const invokedMethods = Array.from(this.evaluator.fetchedAttributes.keys());
+		return this.getAttributeNamesToAssign().filter((a) => !invokedMethods.includes(a));
 	}
 
 	async toObject(): Promise<Record<string, any>> {
@@ -65,17 +71,16 @@ export class AttributeAssigner<T> {
 	}
 
 	async toInstance(): Promise<T> {
-		const adapter = this.fixtureRiveter.getAdapter(this.name);
-		const instance = adapter.build<T>(this.model);
+		const instance = await this.adapter.build<T>(this.model, this.evaluator);
 		const relationNames = this.relationNames();
 		const attributeNames = this.attributesForInstance();
 
 		for (const name of attributeNames) {
 			const attribute = await this._get(name);
 			if (relationNames.includes(name)) {
-				await adapter.relate(instance, name, attribute, this.model);
+				await this.adapter.relate(instance, name, attribute, this.model);
 			} else {
-				adapter.set(instance, name, attribute);
+				this.adapter.set(instance, name, attribute);
 			}
 		}
 

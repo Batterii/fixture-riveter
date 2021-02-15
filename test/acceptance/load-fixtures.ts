@@ -6,7 +6,7 @@ import {resolve} from "path";
 function fixtureFile(dir: string) {
 	return `"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const fr = require("${dir}/lib/index").fr;
+const {fr} = require("${dir}/lib/index");
 
 class User {}
 
@@ -29,6 +29,11 @@ describe("#loadFixtures", function() {
 		fr.instances = [];
 	});
 
+	after(async function() {
+		await fs.remove(resolve(".", "fixtures"));
+		await fs.remove(resolve(".", "dist/test/support/fixtures"));
+	});
+
 	it("defaults to node's '.'", async function() {
 		const dirPath = resolve(".", "fixtures");
 		await fs.ensureDir(dirPath);
@@ -38,8 +43,6 @@ describe("#loadFixtures", function() {
 		await fr.loadFixtures();
 		const user = await fr.build("user");
 		expect(user).to.exist;
-
-		await fs.remove(dirPath);
 	});
 
 	it("accepts a file path", async function() {
@@ -51,7 +54,5 @@ describe("#loadFixtures", function() {
 		await fr.loadFixtures("dist/test/support");
 		const user = await fr.build("user");
 		expect(user).to.exist;
-
-		await fs.remove(dirPath);
 	});
 });

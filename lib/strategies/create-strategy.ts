@@ -8,7 +8,7 @@ export class CreateStrategy extends Strategy {
 		let instance = await assembler.toInstance();
 		await assembler.runCallbacks("afterBuild", instance);
 		await assembler.runCallbacks("beforeCreate", instance);
-		instance = await this.adapter.save(instance, model);
+		instance = await assembler.save(instance, model);
 		await assembler.runCallbacks("afterCreate", instance);
 
 		return instance;

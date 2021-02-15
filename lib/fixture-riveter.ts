@@ -166,7 +166,7 @@ export class FixtureRiveter {
 		return trait;
 	}
 
-	trait<T>(name: string, block: BlockFunction<T>): void {
+	trait<T=any>(name: string, block: BlockFunction<T>): void {
 		const trait = new Trait(name, this, block);
 		this.traits.set(trait.name, trait);
 	}

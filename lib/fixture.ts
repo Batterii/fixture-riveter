@@ -1,8 +1,13 @@
+/* eslint-disable max-classes-per-file */
+
+import {Adapter} from "./adapters/adapter";
 import {addMethodMissing} from "./method-missing";
 import {Assembler} from "./assembler";
 import {Attribute} from "./attributes/attribute";
 import {AttributeAssigner} from "./attribute-assigner";
+import {Callback} from "./callback";
 import {Definition} from "./definition";
+import {DefinitionHierarchy} from "./definition-hierarchy";
 import {Evaluator} from "./evaluator";
 import {FixtureRiveter} from "./fixture-riveter";
 import {NullFixture} from "./null-fixture";
@@ -11,7 +16,6 @@ import {Strategy} from "./strategies/strategy";
 import {Trait} from "./trait";
 
 import {isFunction} from "lodash";
-import {Callback} from "./callback";
 
 import {
 	BlockFunction,
@@ -24,6 +28,9 @@ export class Fixture<T> extends Definition<T> {
 	fixtureRiveter: FixtureRiveter;
 	model: ModelConstructor<T>;
 	parent?: string;
+
+	_hierarchyClass?: typeof DefinitionHierarchy;
+	_hierarchyInstance?: any;
 
 	constructor(
 		fixtureRiveter: FixtureRiveter,
@@ -81,8 +88,14 @@ export class Fixture<T> extends Definition<T> {
 		if (!this.compiled) {
 			this.parentFixture().compile();
 			super.compile();
+			this.buildHierarchy();
 			this.compiled = true;
 		}
+	}
+
+	mapTraitToThis(t: Trait<T>): Trait<T> {
+		t.setFixture(this);
+		return t;
 	}
 
 	getBaseTraits(): Trait<T>[] {
@@ -93,22 +106,16 @@ export class Fixture<T> extends Definition<T> {
 		return super.getAdditionalTraits().map((t) => this.mapTraitToThis(t));
 	}
 
-	mapTraitToThis(t: Trait<T>): Trait<T> {
-		t.setFixture(this);
-		return t;
-	}
-
 	getAttributes(): Attribute[] {
 		this.compile();
 
 		const parentAttributes = this.parentFixture().getAttributes();
 
 		if (!this.attributes || this.attributes.length === 0) {
-			this.attributes = [
-				this.getBaseTraits().map((t) => t.getAttributes()),
-				this.declarationHandler.getAttributes(),
-				this.getAdditionalTraits().map((t) => t.getAttributes()),
-			].flat(2).filter(Boolean);
+			this.attributes = this.aggregateFromTraitsAndSelf(
+				"getAttributes",
+				() => this.declarationHandler.getAttributes(),
+			);
 		}
 
 		return parentAttributes.concat(this.attributes);
@@ -119,11 +126,10 @@ export class Fixture<T> extends Definition<T> {
 
 		const parentCallbacks = this.parentFixture().getCallbacks();
 
-		const definedCallbacks = [
-			this.getBaseTraits().map((t) => t.getCallbacks()),
-			this.callbackHandler.callbacks,
-			this.getAdditionalTraits().map((t) => t.getCallbacks()),
-		].flat(2).filter(Boolean);
+		const definedCallbacks = this.aggregateFromTraitsAndSelf(
+			"getCallbacks",
+			() => this.callbackHandler.callbacks,
+		);
 
 		return parentCallbacks.concat(definedCallbacks);
 	}
@@ -132,6 +138,24 @@ export class Fixture<T> extends Definition<T> {
 		return this.traitsCache.get(name) ||
 			this.parentFixture().traitByName(name) ||
 			this.fixtureRiveter.getTrait(name);
+	}
+
+	hierarchyClass(): typeof DefinitionHierarchy {
+		if (!this._hierarchyClass) {
+			this._hierarchyClass = class extends this.parentFixture().hierarchyClass() {};
+		}
+		return this._hierarchyClass;
+	}
+
+	buildHierarchy(): void {
+		this.hierarchyClass().setAdapterMethods(this);
+	}
+
+	hierarchyInstance(): Adapter {
+		if (!this._hierarchyInstance) {
+			this._hierarchyInstance = new (this.hierarchyClass())(this.fixtureRiveter, this.name);
+		}
+		return this._hierarchyInstance;
 	}
 
 	async run(buildStrategy: Strategy, overrides: Record<string, any> = {}): Promise<T> {
@@ -146,14 +170,27 @@ export class Fixture<T> extends Definition<T> {
 			),
 		);
 
+		const adapter = this.hierarchyInstance();
+
 		const attributeAssigner = new AttributeAssigner<T>(
 			this.fixtureRiveter,
 			this.name,
 			this.model,
 			evaluator,
+			adapter,
 		);
 
-		const assembler = new Assembler<T>(attributeAssigner, this.getCallbacks());
+		const assembler = new Assembler<T>(attributeAssigner, this.getCallbacks(), adapter);
+
 		return buildStrategy.result(assembler, this.model) as unknown as T;
+	}
+
+	copy<C extends Fixture<T>>(): C {
+		const copy: C = Object.assign(Object.create(Object.getPrototypeOf(this)), this);
+		copy.compiled = false;
+		copy.attributes = [];
+		copy._hierarchyClass = undefined;
+		copy._hierarchyInstance = undefined;
+		return copy;
 	}
 }
