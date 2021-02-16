@@ -4,9 +4,11 @@
 		"sort-imports": "off",
 		"no-await-in-loop": "off",
 		"class-methods-use-this": "off",
+		"no-underscore-dangle": "off",
 		"@typescript-eslint/ban-ts-ignore": "off",
 		"@typescript-eslint/generic-type-naming": "off",
 		"@typescript-eslint/no-non-null-assertion": "off",
+		"@typescript-eslint/naming-convention": "off",
 		"@typescript-eslint/member-naming": "off"
 	}
 }

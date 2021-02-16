@@ -14,6 +14,7 @@ import {
 	FixtureOptions,
 	ModelConstructor,
 	OverrideForRelation,
+	CurrentEvaluator,
 } from "./types";
 import {CallbackFunction} from "./callback";
 import {FixtureRiveter, nameGuard} from "./fixture-riveter";
@@ -160,5 +161,27 @@ export class DefinitionProxy<T> {
 	after(name: string, name2: string, name3: string, block: CallbackFunction<T>): void;
 	after(...rest: any[]): void {
 		this.definition.after(...rest);
+	}
+
+	toBuild<U = T>(
+		fn: (Model: ModelConstructor<U>, evaluator: CurrentEvaluator<U>) => T|Promise<T>,
+	): void {
+		this.definition._toBuild = fn;
+	}
+
+	toSave(fn: (instance: any, Model?: any) => Promise<any>): void {
+		this.definition._toSave = fn;
+	}
+
+	toDestroy(fn: (instance: any, Model?: any) => Promise<void>): void {
+		this.definition._toDestroy = fn;
+	}
+
+	toRelate(fn: (instance: any, name: string, other: any, Model?: any) => Promise<any>): void {
+		this.definition._toRelate = fn;
+	}
+
+	toSet(fn: (instance: any, key: string, value: any) => Promise<any>): void {
+		this.definition._toSet = fn;
 	}
 }

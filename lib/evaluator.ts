@@ -15,6 +15,8 @@ export class Evaluator {
 	fixtureRiveter: FixtureRiveter;
 	overrides: Record<string, any>;
 
+	fetchedAttributes: Set<string>;
+
 	constructor(
 		fixtureRiveter: FixtureRiveter,
 		buildStrategy: Strategy,
@@ -30,6 +32,7 @@ export class Evaluator {
 		}
 		this.overrides = overrides;
 		this.attributeFns = new Map();
+		this.fetchedAttributes = new Set();
 
 		this.defineAttributes(attributes);
 	}
@@ -54,6 +57,7 @@ export class Evaluator {
 				this.cachedValues.set(name, await fn(this));
 			}
 		}
+		this.fetchedAttributes.add(name);
 		return this.cachedValues.get(name);
 	}
 

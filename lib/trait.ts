@@ -43,14 +43,4 @@ export class Trait<T> extends Definition<T> {
 		}
 		return this.fixtureRiveter.getTrait(name);
 	}
-
-	getAttributes(): Attribute[] {
-		this.compile();
-
-		return [
-			this.getBaseTraits().map((t) => t.getAttributes()),
-			this.declarationHandler.getAttributes(),
-			this.getAdditionalTraits().map((t) => t.getAttributes()),
-		].flat(2).filter(Boolean);
-	}
 }

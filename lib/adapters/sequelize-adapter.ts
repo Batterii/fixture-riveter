@@ -1,6 +1,5 @@
 import {DefaultAdapter} from "./default-adapter";
 
-/* eslint-disable class-methods-use-this */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 export class SequelizeAdapter extends DefaultAdapter {
 	build(Model: any): any {

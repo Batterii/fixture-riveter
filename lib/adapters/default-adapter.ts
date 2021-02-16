@@ -1,14 +1,13 @@
 import {Adapter} from "./adapter";
 
-/* eslint-disable class-methods-use-this */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 export class DefaultAdapter implements Adapter {
-	build<T>(Model: any): T {
+	build(Model: any): any {
 		return new Model();
 	}
 
-	async save<T>(instance: any, _Model?: any): Promise<T> {
+	async save(instance: any, _Model?: any): Promise<any> {
 		return instance.save();
 	}
 
@@ -16,8 +15,9 @@ export class DefaultAdapter implements Adapter {
 		await instance.destroy();
 	}
 
-	async relate(instance: any, name: string, other: any, _Model?: any): Promise<any> {
-		return this.set(instance, name, other);
+	relate(instance: any, name: string, other: any, _Model?: any): any {
+		instance[name] = other;
+		return instance;
 	}
 
 	set(instance: any, key: string, value: any): any {

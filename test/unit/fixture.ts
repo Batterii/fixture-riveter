@@ -137,22 +137,6 @@ describe("Fixture", function() {
 	});
 
 	describe("#getAttributes", function() {
-		beforeEach(function() {
-			fixtureRiveter = new FixtureRiveter();
-		});
-
-		it("concats child attributes to parent attributes", function() {
-			const fixture = new Fixture(fixtureRiveter, "dummy", DummyModel);
-			const childAttr = new DynamicAttribute("attr", false, () => true);
-			fixture.attributes = [childAttr];
-			fixture.compiled = true;
-
-			const parentAttr = new DynamicAttribute("parent", false, () => true);
-			sinon.stub(fixture, "parentFixture")
-				.returns({getAttributes: () => [parentAttr]} as any);
-
-			const result = fixture.getAttributes();
-			expect(result).to.deep.equal([parentAttr, childAttr]);
-		});
+		it("concats child attributes to parent attributes");
 	});
 });

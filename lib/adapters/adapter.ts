@@ -1,7 +1,9 @@
+import {Evaluator} from "../evaluator";
+
 export interface Adapter {
-	build<T>(Model: any): T;
+	build<T>(Model: any, evaluator?: Evaluator): T|Promise<T>;
 	save<T>(instance: T, Model?: any): Promise<T>;
-	destroy(instance: Record<string, any>, Model?: any): Promise<void>;
-	relate(instance: any, name: string, other: any, Model?: any): Promise<Record<string, any>>;
-	set(instance: Record<string, any>, key: string, value: any): Promise<Record<string, any>>;
+	destroy<T>(instance: T, Model?: any): Promise<void>;
+	relate<T>(instance: T, name: string, other: any, Model?: any): T|Promise<T>;
+	set<T>(instance: T, key: string, value: any): T|Promise<T>;
 }

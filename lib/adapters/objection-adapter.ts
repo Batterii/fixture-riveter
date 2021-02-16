@@ -1,9 +1,8 @@
 import {DefaultAdapter} from "./default-adapter";
 
-/* eslint-disable class-methods-use-this */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 export class ObjectionAdapter extends DefaultAdapter {
-	async save<T>(instance: T, Model: any): Promise<T> {
+	async save(instance: any, Model: any): Promise<any> {
 		return Model.query().insertAndFetch(instance);
 	}
 

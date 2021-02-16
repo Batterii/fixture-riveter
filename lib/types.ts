@@ -28,7 +28,7 @@ type ConvertToFn<T, ArgFN = () => any> = {
 	[Key in keyof T]-?: TraitsFn<T, T[Key], ArgFN>;
 };
 
-type CurrentEvaluator<T> = {
+export type CurrentEvaluator<T> = {
 	[Key in keyof T]-?: () => Promise<T[Key]>;
 } & Exclude<Evaluator, "methodMissing">;
 
