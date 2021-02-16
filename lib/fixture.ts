@@ -108,29 +108,15 @@ export class Fixture<T> extends Definition<T> {
 
 	getAttributes(): Attribute[] {
 		this.compile();
-
 		const parentAttributes = this.parentFixture().getAttributes();
-
-		if (!this.attributes || this.attributes.length === 0) {
-			this.attributes = this.aggregateFromTraitsAndSelf(
-				"getAttributes",
-				() => this.declarationHandler.getAttributes(),
-			);
-		}
-
-		return parentAttributes.concat(this.attributes);
+		const definedAttributes = super.getAttributes();
+		return parentAttributes.concat(definedAttributes);
 	}
 
 	getCallbacks(): Callback<T>[] {
 		this.compile();
-
 		const parentCallbacks = this.parentFixture().getCallbacks();
-
-		const definedCallbacks = this.aggregateFromTraitsAndSelf(
-			"getCallbacks",
-			() => this.callbackHandler.callbacks,
-		);
-
+		const definedCallbacks = super.getCallbacks();
 		return parentCallbacks.concat(definedCallbacks);
 	}
 

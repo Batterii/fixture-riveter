@@ -70,14 +70,10 @@ export class Definition<T> {
 	getAttributes(): Attribute[] {
 		this.compile();
 
-		if (this.attributes.length === 0) {
-			this.attributes = this.aggregateFromTraitsAndSelf(
-				"getAttributes",
-				() => this.declarationHandler.getAttributes(),
-			);
-		}
-
-		return this.attributes;
+		return this.aggregateFromTraitsAndSelf(
+			"getAttributes",
+			() => this.declarationHandler.getAttributes(),
+		);
 	}
 
 
@@ -136,23 +132,25 @@ export class Definition<T> {
 		].flat(2).filter(Boolean);
 	}
 
-	toBuild(): ((...args: any[]) => any)|undefined {
+	toBuild(): ((Model: any) => any) | undefined {
 		return last(this.aggregateFromTraitsAndSelf("toBuild", () => this._toBuild));
 	}
 
-	toSave(): ((...args: any[]) => any)|undefined {
+	toSave(): ((instance: any, Model?: any) => Promise<any>) | undefined {
 		return last(this.aggregateFromTraitsAndSelf("toSave", () => this._toSave));
 	}
 
-	toDestroy(): ((...args: any[]) => any)|undefined {
+	toDestroy(): ((instance: any, Model?: any) => Promise<any>) | undefined {
 		return last(this.aggregateFromTraitsAndSelf("toDestroy", () => this._toDestroy));
 	}
 
-	toRelate(): ((...args: any[]) => any)|undefined {
+	toRelate(): (
+		(instance: any, name: string, other: any, Model?: any) => Promise<any> | any
+	) | undefined {
 		return last(this.aggregateFromTraitsAndSelf("toRelate", () => this._toRelate));
 	}
 
-	toSet(): ((...args: any[]) => any)|undefined {
+	toSet(): ((instance: any, key: string, value: any) => Promise<any> | any) | undefined {
 		return last(this.aggregateFromTraitsAndSelf("toSet", () => this._toSet));
 	}
 }
