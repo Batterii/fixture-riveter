@@ -486,3 +486,30 @@ describe("#968", function() {
 		expect(child.value).to.equal("child value");
 	});
 });
+
+describe("traitsForEnum", function() {
+	let fr: FixtureRiveter;
+
+	class User extends Model {
+		name: string;
+	}
+
+	before(function() {
+		fr = new FixtureRiveter();
+		fr.fixture(User, (f) => {
+			f.name(() => "Noah");
+			f.traitsForEnum("name", ["Robert", "Jaime", "Mortimer"]);
+		});
+	});
+
+	it("correctly generates all possible traits", async function() {
+		let user = await fr.build(User);
+		expect(user.name).to.equal("Noah");
+		user = await fr.build(User, ["robert"]);
+		expect(user.name).to.equal("Robert");
+		user = await fr.build(User, ["jaime"]);
+		expect(user.name).to.equal("Jaime");
+		user = await fr.build(User, ["mortimer"]);
+		expect(user.name).to.equal("Mortimer");
+	});
+});

@@ -184,4 +184,10 @@ export class DefinitionProxy<T> {
 	toSet(fn: (instance: any, key: string, value: any) => Promise<any>): void {
 		this.definition._toSet = fn;
 	}
+
+	traitsForEnum(name: string, values: string[]): void {
+		for (const value of values) {
+			this.trait(value.toLowerCase(), (t) => t.attr(name, () => value));
+		}
+	}
 }
