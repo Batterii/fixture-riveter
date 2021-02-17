@@ -9,6 +9,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
+### Added
+- Global `traitsForEnum` callback through `setTraitsForEnumCallback` method on FixtureRiveter.
+- `instance` property on Evaluator which is the currently built object, for use in relations.
+
+### Changed
+- `traitsForEnum` accepts a callback that is applied to the value to create the trait name.
+- `traitsForEnum` global callback defaults to identity (no change on given string), and per invocation defaults to global if none is given.
+
+### Removed
+- Removed Definition's `attributes` array as the attribute are generated each call.
+
+
+## [v2.2.0]
+### Added
+- `traitsForEnum` method on DefinitionProxy.
+- Implement DefinitionHierarchy and setting specific adapter methods instead of creating a whole new clas.
+
+### Changed
+- Updated Typescript to 4.1.4.
+- Clean up attribute and callback getters, associated methods.
+- Throw error if `getStrategy` on StrategyHandler fails.
+- Move global `getCallbacks` to NullFixture. (Still unsure about this, but whatever.)
+- Move CI to Github Actions.
+
+### Removed
+- Removed `NullStrategy`, directly return `undefined` from `attributeFor`.
 
 
 ## [v2.1.0]
@@ -179,7 +205,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Barebones release of Fixture Riveter: fixtures, traits, associations
 - Barebones tutorial
 
-[Unreleased]: https://github.com/Batteri/fixture-riveter/compare/v2.1.0...HEAD
+[Unreleased]: https://github.com/Batteri/fixture-riveter/compare/v2.2.0...HEAD
+[v2.2.0]: https://github.com/Batterii/fixture-riveter/releases/tag/v2.2.0
 [v2.1.0]: https://github.com/Batterii/fixture-riveter/releases/tag/v2.1.0
 [v2.0.0]: https://github.com/Batterii/fixture-riveter/releases/tag/v2.0.0
 [v1.7.0]: https://github.com/Batterii/fixture-riveter/releases/tag/v1.7.0

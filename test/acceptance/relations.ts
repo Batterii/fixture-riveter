@@ -458,7 +458,7 @@ describe("Relations with a join table", function() {
 			f.attr("title", () => "The City & The City");
 
 			f.transient((t) => {
-				t.attr("users", () => []);
+				t.attr("users", () => false);
 				t.attr("userCount", () => 1);
 			});
 
@@ -467,7 +467,7 @@ describe("Relations with a join table", function() {
 					let users: User[] = await evaluator.attr("users");
 					const userCount: number = await evaluator.attr("userCount");
 
-					if (users.length === 0) {
+					if (!users) {
 						users = await fr.createList<User>("user", userCount);
 					}
 
@@ -583,5 +583,133 @@ describe("not relying on built-in relation methods", function() {
 		const model = await User.query().findById(post.userId);
 		expect(model.id).to.equal(post.userId);
 		expect(model.id).to.equal(post.user.id);
+	});
+});
+
+describe("exposing 'instance' on evaluator", function() {
+	class User extends Model {
+		static relationMappings = {};
+
+		id: number;
+		name: string;
+		teams?: Team[];
+
+		get props() {
+			return {
+				name: "string",
+			};
+		}
+	}
+
+	class Team extends Model {
+		static relationMappings = {};
+
+		id: number;
+		title: string;
+		users?: User[];
+
+		get props() {
+			return {
+				title: "string",
+			};
+		}
+	}
+
+	class Membership extends Model {
+		static idColumn = ["teamId", "userId"];
+		static relationMappings = {};
+
+		teamId: number;
+		userId: number;
+
+		team?: Team;
+		user?: User;
+
+		get props() {
+			return {
+				teamId: "integer",
+				userId: "integer",
+			};
+		}
+	}
+
+	User.relationMappings = {
+		teams: {
+			relation: Model.ManyToManyRelation,
+			modelClass: Team,
+			join: {
+				from: "users.id",
+				through: {
+					from: "memberships.userId",
+					to: "memberships.teamId",
+				},
+				to: "teams.id",
+			},
+		},
+	};
+
+	Team.relationMappings = {
+		users: {
+			relation: Model.ManyToManyRelation,
+			modelClass: User,
+			join: {
+				from: "teams.id",
+				through: {
+					from: "memberships.teamId",
+					to: "memberships.userId",
+				},
+				to: "users.id",
+			},
+		},
+	};
+
+	Membership.relationMappings = {
+		team: {
+			relation: Model.BelongsToOneRelation,
+			modelClass: Team,
+			join: {
+				from: "memberships.teamId",
+				to: "teams.id",
+			},
+		},
+		user: {
+			relation: Model.BelongsToOneRelation,
+			modelClass: User,
+			join: {
+				from: "memberships.userId",
+				to: "users.id",
+			},
+		},
+	};
+
+	let fr: FixtureRiveter;
+
+	before(async function() {
+		await createTable(User);
+		await createTable(Team);
+
+		fr = new FixtureRiveter();
+		fr.setAdapter(new ObjectionAdapter());
+
+		fr.fixture("user", User, (f) => {
+			f.attr("name", () => "Noah");
+			f.attr("teams", async(e) => [await e.relation("team", {users: [e.instance]})]);
+		});
+
+		fr.fixture("team", Team, (f) => {
+			f.attr("title", () => "The City & The City");
+		});
+
+		fr.fixture("membership", Membership, (f) => {
+			f.user();
+			f.team();
+		});
+	});
+
+	it("works", async function() {
+		const user = await fr.create("user");
+		expect(user.teams).to.exist.and.to.have.length(1);
+		expect(user.teams[0].users).to.exist.and.to.have.length(1);
+		expect(user.teams[0].users[0].id).to.equal(user.id);
 	});
 });

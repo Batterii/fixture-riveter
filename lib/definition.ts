@@ -14,7 +14,6 @@ export class Definition<T> {
 	fixtureRiveter: FixtureRiveter;
 	name: string;
 	aliases: string[];
-	attributes: Attribute[];
 	baseTraits: string[];
 	additionalTraits: string[];
 	traitsCache: Map<string, Trait<T>>;
@@ -36,7 +35,6 @@ export class Definition<T> {
 		this.fixtureRiveter = fixtureRiveter;
 
 		this.aliases = [];
-		this.attributes = [];
 		this.baseTraits = [];
 		this.additionalTraits = [];
 		this.compiled = false;
@@ -60,7 +58,7 @@ export class Definition<T> {
 	}
 
 	attributeNames(): string[] {
-		return this.attributes.map((a) => a.name);
+		return this.getAttributes().map((a) => a.name);
 	}
 
 	declareAttribute(declaration: Declaration): void {

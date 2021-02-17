@@ -16,6 +16,7 @@ export class Evaluator {
 	overrides: Record<string, any>;
 
 	fetchedAttributes: Set<string>;
+	instance: any;
 
 	constructor(
 		fixtureRiveter: FixtureRiveter,
@@ -61,13 +62,13 @@ export class Evaluator {
 		return this.cachedValues.get(name);
 	}
 
-	relation<R = Pojo>(
+	async relation<R = Pojo>(
 		name: string,
 		traits: string[],
 		overrides?: Partial<R & {strategy: string}>,
 	): Promise<R>;
 
-	relation<R = Pojo>(
+	async relation<R = Pojo>(
 		name: string,
 		traitOrOverrides?: (
 			| string[]

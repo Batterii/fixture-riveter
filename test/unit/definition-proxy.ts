@@ -226,5 +226,26 @@ describe("DefinitionProxy", function() {
 			proxy.after(name, callback);
 			expect(after).to.be.calledWith(name, callback);
 		});
+
+		it("passes the call to the callback handler", async function() {
+			const fixtureRiveter = new FixtureRiveter();
+			let i = 0;
+			fixtureRiveter.fixture("dummy", DummyModel, (f) => {
+				f.attr("name", () => "Noah");
+				f.age(() => 32);
+				f.after("build", async(dummy, evaluator) => {
+					i += 1;
+					const name = await evaluator.attr("name");
+					dummy.age = name.length;
+				});
+			});
+			fixtureRiveter.fixture("dummy2", DummyModel, (f) => {
+				f.attr("name", () => "Noah");
+				f.age(() => 32);
+			});
+			const user = await fixtureRiveter.build("dummy");
+			await fixtureRiveter.build("dummy2");
+			expect(i).to.equal(1);
+		});
 	});
 });

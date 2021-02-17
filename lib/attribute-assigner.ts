@@ -62,29 +62,29 @@ export class AttributeAssigner<T> {
 	}
 
 	async toObject(): Promise<Record<string, any>> {
-		const instance = {};
+		this.evaluator.instance = {};
 		for (const name of this.attributesForObject()) {
-			instance[name] = await this._get(name);
+			this.evaluator.instance[name] = await this._get(name);
 		}
 
-		return instance;
+		return this.evaluator.instance;
 	}
 
 	async toInstance(): Promise<T> {
-		const instance = await this.adapter.build<T>(this.model, this.evaluator);
+		this.evaluator.instance = await this.adapter.build<T>(this.model, this.evaluator);
 		const relationNames = this.relationNames();
 		const attributeNames = this.attributesForInstance();
 
 		for (const name of attributeNames) {
 			const attribute = await this._get(name);
 			if (relationNames.includes(name)) {
-				await this.adapter.relate(instance, name, attribute, this.model);
+				await this.adapter.relate(this.evaluator.instance, name, attribute, this.model);
 			} else {
-				this.adapter.set(instance, name, attribute);
+				this.adapter.set(this.evaluator.instance, name, attribute);
 			}
 		}
 
-		return instance;
+		return this.evaluator.instance;
 	}
 
 	private async _get(name: string): Promise<any> {

@@ -174,7 +174,6 @@ export class Fixture<T> extends Definition<T> {
 	copy<C extends Fixture<T>>(): C {
 		const copy: C = Object.assign(Object.create(Object.getPrototypeOf(this)), this);
 		copy.compiled = false;
-		copy.attributes = [];
 		copy._hierarchyClass = undefined;
 		copy._hierarchyInstance = undefined;
 		return copy;
