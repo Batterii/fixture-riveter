@@ -586,130 +586,233 @@ describe("not relying on built-in relation methods", function() {
 	});
 });
 
-describe("exposing 'instance' on evaluator", function() {
-	class User extends Model {
-		static relationMappings = {};
 
-		id: number;
-		name: string;
-		teams?: Team[];
-
-		get props() {
-			return {
-				name: "string",
-			};
+describe("when building interrelated relations", function() {
+	it("assigns the instance pass as a relation attribute", async function() {
+		class Supplier extends Model {
+			account: Account;
 		}
-	}
 
-	class Team extends Model {
-		static relationMappings = {};
-
-		id: number;
-		title: string;
-		users?: User[];
-
-		get props() {
-			return {
-				title: "string",
-			};
+		class Account extends Model {
+			supplier: Supplier;
 		}
-	}
 
-	class Membership extends Model {
-		static idColumn = ["teamId", "userId"];
-		static relationMappings = {};
+		const fr = new FixtureRiveter();
 
-		teamId: number;
-		userId: number;
-
-		team?: Team;
-		user?: User;
-
-		get props() {
-			return {
-				teamId: "integer",
-				userId: "integer",
-			};
-		}
-	}
-
-	User.relationMappings = {
-		teams: {
-			relation: Model.ManyToManyRelation,
-			modelClass: Team,
-			join: {
-				from: "users.id",
-				through: {
-					from: "memberships.userId",
-					to: "memberships.teamId",
-				},
-				to: "teams.id",
-			},
-		},
-	};
-
-	Team.relationMappings = {
-		users: {
-			relation: Model.ManyToManyRelation,
-			modelClass: User,
-			join: {
-				from: "teams.id",
-				through: {
-					from: "memberships.teamId",
-					to: "memberships.userId",
-				},
-				to: "users.id",
-			},
-		},
-	};
-
-	Membership.relationMappings = {
-		team: {
-			relation: Model.BelongsToOneRelation,
-			modelClass: Team,
-			join: {
-				from: "memberships.teamId",
-				to: "teams.id",
-			},
-		},
-		user: {
-			relation: Model.BelongsToOneRelation,
-			modelClass: User,
-			join: {
-				from: "memberships.userId",
-				to: "users.id",
-			},
-		},
-	};
-
-	let fr: FixtureRiveter;
-
-	before(async function() {
-		await createTable(User);
-		await createTable(Team);
-
-		fr = new FixtureRiveter();
-		fr.setAdapter(new ObjectionAdapter());
-
-		fr.fixture("user", User, (f) => {
-			f.attr("name", () => "Noah");
-			f.attr("teams", async(e) => [await e.relation("team", {users: [e.instance]})]);
+		fr.fixture("supplier", Supplier);
+		fr.fixture("account", Account, (f) => {
+			f.supplier((e) => e.relation("supplier", {account: e.instance}));
 		});
 
-		fr.fixture("team", Team, (f) => {
-			f.attr("title", () => "The City & The City");
-		});
-
-		fr.fixture("membership", Membership, (f) => {
-			f.user();
-			f.team();
-		});
+		const account = await fr.build("account");
+		expect(account.supplier.account).to.equal(account);
 	});
 
-	it("works", async function() {
-		const user = await fr.create("user");
-		expect(user.teams).to.exist.and.to.have.length(1);
-		expect(user.teams[0].users).to.exist.and.to.have.length(1);
-		expect(user.teams[0].users[0].id).to.equal(user.id);
+	it("connects records with interdependent relationships", async function() {
+		class School extends Model {
+			static relationMappings = {};
+			id: number;
+			students: Student[];
+			profiles: Profile[];
+		}
+
+		class Student extends Model {
+			static relationMappings = {};
+			id: number;
+			schoolId: number;
+			school: School;
+			profile: Profile;
+
+			get props() {
+				return {
+					schoolId: "integer",
+				};
+			}
+		}
+
+		class Profile extends Model {
+			static relationMappings = {};
+			id: number;
+			schoolId: number;
+			school: School;
+			studentId: number;
+			student: Student;
+
+			get props() {
+				return {
+					schoolId: "integer",
+					studentId: "integer",
+				};
+			}
+		}
+
+		School.relationMappings = {
+			students: {
+				relation: Model.HasManyRelation,
+				modelClass: Student,
+				join: {
+					from: "schools.id",
+					to: "students.id",
+				},
+			},
+			profiles: {
+				relation: Model.HasManyRelation,
+				modelClass: Profile,
+				join: {
+					from: "schools.id",
+					to: "profiles.id",
+				},
+			},
+		};
+
+		Student.relationMappings = {
+			school: {
+				relation: Model.BelongsToOneRelation,
+				modelClass: School,
+				join: {
+					from: "students.id",
+					to: "schools.id",
+				},
+			},
+			profile: {
+				relation: Model.HasOneRelation,
+				modelClass: Profile,
+				join: {
+					from: "students.id",
+					to: "profiles.id",
+				},
+			},
+		};
+
+		Profile.relationMappings = {
+			school: {
+				relation: Model.BelongsToOneRelation,
+				modelClass: School,
+				join: {
+					from: "profiles.id",
+					to: "schools.id",
+				},
+			},
+			student: {
+				relation: Model.BelongsToOneRelation,
+				modelClass: Student,
+				join: {
+					from: "profiles.id",
+					to: "students.id",
+				},
+			},
+		};
+
+		await createTable(School);
+		await createTable(Student);
+		await createTable(Profile);
+
+		const fr = new FixtureRiveter();
+		fr.setAdapter(new ObjectionAdapter());
+
+		fr.fixture("student", Student, (f) => {
+			f.school();
+			f.profile(async(e) => e.relation(
+				"profile",
+				{student: e.instance, school: await e.school()},
+			));
+		});
+
+		fr.fixture("profile", Profile, (f) => {
+			f.school();
+			f.student(async(e) => e.relation(
+				"student",
+				{profile: e.instance, school: await e.school()},
+			));
+		});
+
+		fr.fixture("school", School);
+
+		const student = await fr.create("student");
+		expect(student.profile.school).to.equal(student.school);
+		expect(student.profile.student).to.equal(student);
+
+		const profile = await fr.create("profile");
+		expect(profile.student.school).to.equal(profile.school);
+		expect(profile.student.profile).to.equal(profile);
+	});
+});
+
+describe("when building collection relations", function() {
+	it("builds the relation according to the strategy", async function() {
+		class Photo extends Model {
+			static relationMappings = {};
+
+			id: number;
+			name: string;
+			listingId: number;
+			listing: Listing;
+
+			get props() {
+				return {
+					name: "string",
+					listingId: "integer",
+				};
+			}
+		}
+
+		class Listing extends Model {
+			static relationMappings = {};
+
+			id: number;
+			title: string;
+			photos?: Photo[];
+
+			get props() {
+				return {
+					title: "string",
+				};
+			}
+		}
+
+		Photo.relationMappings = {
+			listing: {
+				relation: Model.BelongsToOneRelation,
+				modelClass: Listing,
+				join: {
+					from: "photos.id",
+					to: "listings.id",
+				},
+			},
+		};
+
+		Listing.relationMappings = {
+			photos: {
+				relation: Model.HasManyRelation,
+				modelClass: Photo,
+				join: {
+					from: "listings.id",
+					to: "photos.id",
+				},
+			},
+		};
+
+		await createTable(Photo);
+		await createTable(Listing);
+
+		const fr = new FixtureRiveter();
+		fr.setAdapter(new ObjectionAdapter());
+
+		fr.fixture("photo", Photo);
+
+		fr.fixture("listing", Listing, (f) => {
+			f.attr("photos", async(e) => [await e.relation("photo")]);
+		});
+
+		const createdListing = await fr.create("listing");
+		expect(createdListing.photos[0]).to.be.an.instanceof(Photo);
+		expect(createdListing.photos[0].id).to.exist;
+
+		const builtListing = await fr.build("listing");
+		expect(builtListing.photos[0]).to.be.an.instanceof(Photo);
+		expect(builtListing.photos[0].id).to.not.exist;
+
+		const recordListing = await fr.attributesFor("listing");
+		expect(recordListing.photos[0]).to.be.undefined;
 	});
 });
