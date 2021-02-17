@@ -3,6 +3,7 @@ import {FixtureRiveter} from "../../lib/fixture-riveter";
 import {ObjectionAdapter} from "../../lib/adapters/objection-adapter";
 import {createTable} from "../support/define-helpers";
 import {expect} from "chai";
+import {camelCase} from "lodash";
 
 describe("Traits", function() {
 	let fr: FixtureRiveter;
@@ -290,11 +291,8 @@ describe("tests from fixture_bot", function() {
 	describe("looking up traits that don't exist", function() {
 		it("raises an error", async function() {
 			const fr = new FixtureRiveter();
-
 			fr.fixture("user", User);
-
 			const fn = async() => fr.build("user", ["missing trait"]);
-
 			return expect(Promise.resolve(fn())).to.eventually.be.rejected;
 		});
 	});
@@ -494,22 +492,77 @@ describe("traitsForEnum", function() {
 		name: string;
 	}
 
-	before(function() {
+	it("correctly generates all possible traits", async function() {
 		fr = new FixtureRiveter();
 		fr.fixture(User, (f) => {
 			f.name(() => "Noah");
-			f.traitsForEnum("name", ["Robert", "Jaime", "Mortimer"]);
+			f.traitsForEnum("name", ["Robert Bobert", "Jaime", "Mortimer"]);
 		});
-	});
 
-	it("correctly generates all possible traits", async function() {
 		let user = await fr.build(User);
 		expect(user.name).to.equal("Noah");
-		user = await fr.build(User, ["robert"]);
-		expect(user.name).to.equal("Robert");
+		user = await fr.build(User, ["Robert Bobert"]);
+		expect(user.name).to.equal("Robert Bobert");
+		user = await fr.build(User, ["Jaime"]);
+		expect(user.name).to.equal("Jaime");
+		user = await fr.build(User, ["Mortimer"]);
+		expect(user.name).to.equal("Mortimer");
+	});
+
+	it("accepts a function to change trait string", async function() {
+		fr = new FixtureRiveter();
+		fr.fixture(User, (f) => {
+			f.name(() => "Noah");
+			f.traitsForEnum(
+				"name",
+				["Robert Bobert", "Jaime", "Mortimer"],
+				(s) => s.toUpperCase(),
+			);
+		});
+
+		let user = await fr.build(User);
+		expect(user.name).to.equal("Noah");
+		user = await fr.build(User, ["ROBERT BOBERT"]);
+		expect(user.name).to.equal("Robert Bobert");
+		user = await fr.build(User, ["JAIME"]);
+		expect(user.name).to.equal("Jaime");
+		user = await fr.build(User, ["MORTIMER"]);
+		expect(user.name).to.equal("Mortimer");
+	});
+
+	it("global converter can be set", async function() {
+		fr = new FixtureRiveter();
+		fr.setTraitsForEnumCallback((s) => camelCase(s));
+
+		fr.fixture(User, (f) => {
+			f.name(() => "Noah");
+			f.traitsForEnum(
+				"name",
+				["Robert Bobert", "Jaime", "Mortimer"],
+			);
+		});
+
+		let user = await fr.build(User);
+		expect(user.name).to.equal("Noah");
+		user = await fr.build(User, ["robertBobert"]);
+		expect(user.name).to.equal("Robert Bobert");
 		user = await fr.build(User, ["jaime"]);
 		expect(user.name).to.equal("Jaime");
 		user = await fr.build(User, ["mortimer"]);
 		expect(user.name).to.equal("Mortimer");
+	});
+
+	it("throws an error if callback isn't functioni", function() {
+		fr = new FixtureRiveter();
+
+		expect(() => {
+			fr.fixture(User, (f) => {
+				f.traitsForEnum(
+					"name",
+					["Robert Bobert", "Jaime", "Mortimer"],
+					"hello" as any,
+				);
+			});
+		}).to.throw("Callback hello for traitsForEnum name must be a function");
 	});
 });

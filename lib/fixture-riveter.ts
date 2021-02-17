@@ -27,6 +27,7 @@ import {
 } from "./types";
 
 import {
+	isFunction,
 	isPlainObject,
 	isString,
 	last,
@@ -63,6 +64,7 @@ export class FixtureRiveter {
 	useParentStrategy: boolean;
 	callbackHandler: CallbackHandler;
 	strategyHandler: StrategyHandler;
+	traitsForEnumCallback: (s: string) => string;
 
 	constructor() {
 		this.fixtures = new Map();
@@ -75,6 +77,7 @@ export class FixtureRiveter {
 
 		this.strategyHandler.registerDefaultStategies();
 		this.useParentStrategy = true;
+		this.traitsForEnumCallback = (s: string) => s;
 	}
 
 	getAdapter(fixtureName?: string): Adapter {
@@ -357,6 +360,13 @@ export class FixtureRiveter {
 			return undefined;
 		}));
 		this.instances = [];
+	}
+
+	setTraitsForEnumCallback(callback: (s: string) => string): void {
+		if (!isFunction(callback)) {
+			throw new Error(`Callback ${callback} for global traitsForEnum must be a function`);
+		}
+		this.traitsForEnumCallback = callback;
 	}
 
 	/* eslint-disable */

@@ -185,9 +185,13 @@ export class DefinitionProxy<T> {
 		this.definition._toSet = fn;
 	}
 
-	traitsForEnum(name: string, values: string[]): void {
+	traitsForEnum(name: string, values: string[], callback?: (s: string) => string): void {
+		if (callback && !isFunction(callback)) {
+			throw new Error(`Callback ${callback} for traitsForEnum ${name} must be a function`);
+		}
+		const converter = callback || this.fixtureRiveter.traitsForEnumCallback;
 		for (const value of values) {
-			this.trait(value.toLowerCase(), (t) => t.attr(name, () => value));
+			this.trait(converter(value), (t) => t.attr(name, () => value));
 		}
 	}
 }
