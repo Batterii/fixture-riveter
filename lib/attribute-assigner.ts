@@ -77,10 +77,12 @@ export class AttributeAssigner<T> {
 
 		for (const name of attributeNames) {
 			const attribute = await this._get(name);
-			if (relationNames.includes(name)) {
-				await this.adapter.relate(this.evaluator.instance, name, attribute, this.model);
-			} else {
-				this.adapter.set(this.evaluator.instance, name, attribute);
+			if (attribute !== undefined && attribute !== null) {
+				if (relationNames.includes(name)) {
+					await this.adapter.relate(this.evaluator.instance, name, attribute, this.model);
+				} else {
+					this.adapter.set(this.evaluator.instance, name, attribute);
+				}
 			}
 		}
 
