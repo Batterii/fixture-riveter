@@ -3,6 +3,7 @@ import {Attribute} from "./attributes/attribute";
 import {Evaluator} from "./evaluator";
 import {FixtureRiveter} from "./fixture-riveter";
 import {ModelConstructor} from "./types";
+import {uniq} from "lodash";
 
 export class AttributeAssigner<T> {
 	fixtureRiveter: FixtureRiveter;
@@ -53,18 +54,23 @@ export class AttributeAssigner<T> {
 
 	attributesForObject(): string[] {
 		const relationNames = this.relationNames();
-		return this.getAttributeNamesToAssign().filter((a) => !relationNames.includes(a));
+		return uniq(this.getAttributeNamesToAssign().filter((a) => !relationNames.includes(a)));
 	}
 
 	attributesForInstance(): string[] {
 		const invokedMethods = Array.from(this.evaluator.fetchedAttributes.keys());
-		return this.getAttributeNamesToAssign().filter((a) => !invokedMethods.includes(a));
+		return uniq(this.getAttributeNamesToAssign().filter((a) => !invokedMethods.includes(a)));
 	}
 
 	async toObject(): Promise<Record<string, any>> {
 		this.evaluator.instance = {};
 		for (const name of this.attributesForObject()) {
-			this.evaluator.instance[name] = await this._get(name);
+			const attribute = await this._get(name);
+			if (attribute === undefined || attribute === null) {
+				this.evaluator.instance[name] = undefined;
+			} else {
+				this.evaluator.instance[name] = attribute;
+			}
 		}
 
 		return this.evaluator.instance;
@@ -77,12 +83,12 @@ export class AttributeAssigner<T> {
 
 		for (const name of attributeNames) {
 			const attribute = await this._get(name);
-			if (attribute !== undefined && attribute !== null) {
-				if (relationNames.includes(name)) {
-					await this.adapter.relate(this.evaluator.instance, name, attribute, this.model);
-				} else {
-					this.adapter.set(this.evaluator.instance, name, attribute);
-				}
+			if (attribute === undefined || attribute === null) {
+				this.adapter.set(this.evaluator.instance, name, undefined);
+			} else if (relationNames.includes(name)) {
+				await this.adapter.relate(this.evaluator.instance, name, attribute, this.model);
+			} else {
+				this.adapter.set(this.evaluator.instance, name, attribute);
 			}
 		}
 

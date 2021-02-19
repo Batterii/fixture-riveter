@@ -69,6 +69,35 @@ describe("Sequelize functionality", function() {
 			expect(user).to.be.an.instanceof(User);
 			expect(user.name).to.equal("Noah");
 		});
+
+		describe("relations set to null or undefined are set to undefined", function() {
+			specify("build", async function() {
+				expect((await fr.build("post", {user: null})).user).to.be.undefined;
+				expect((await fr.build("post", {user: undefined})).user).to.be.undefined;
+			});
+
+			specify("create", async function() {
+				expect((await fr.create("post", {user: null})).user).to.be.undefined;
+				expect((await fr.create("post", {user: undefined})).user).to.be.undefined;
+			});
+		});
+
+		describe("attributes set to null or undefined are changed to undefined", function() {
+			specify("attributesFor", async function() {
+				expect((await fr.attributesFor("user", {name: null})).name).to.be.undefined;
+				expect((await fr.attributesFor("user", {name: undefined})).name).to.be.undefined;
+			});
+
+			specify("build", async function() {
+				expect((await fr.build("user", {name: null})).name).to.be.undefined;
+				expect((await fr.build("user", {name: undefined})).name).to.be.undefined;
+			});
+
+			specify("create", async function() {
+				expect((await fr.create("user", {name: null})).name).to.be.undefined;
+				expect((await fr.create("user", {name: undefined})).name).to.be.undefined;
+			});
+		});
 	});
 
 	describe(
