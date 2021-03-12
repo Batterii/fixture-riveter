@@ -1,14 +1,7 @@
 {
-	  "exclude": [
-		  "dist/test/*.*",
-		  "dist/test/lib/**"
-	  ],
 	  "file": [
-		  "dist/test/setup.js"
+		  "test/setup.ts"
 	  ],
 	  "recursive": true,
-	  "reporter": "dot",
-	  "require": [
-		  "source-map-support/register"
-	  ]
+	  "reporter": "dot"
 }

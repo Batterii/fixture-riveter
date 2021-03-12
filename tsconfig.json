@@ -8,9 +8,12 @@
 		"target": "es2017",
 		"strictNullChecks": true,
 		"sourceMap": true,
-		"removeComments": true,
+		"removeComments": false,
 		"esModuleInterop": true,
-		"incremental": true
+		"incremental": true,
+		"declaration": true,
+		"declarationDir": "dist/types",
+		"typeRoots": ["./src/types", "./node_modules/@types"]
 	},
 	"include": [
 		"lib/**/*",
