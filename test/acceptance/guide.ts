@@ -213,11 +213,11 @@ describe("All of the code from the guide", function() {
 				f.attr("entry1", () => "100");
 				f.attr("entry2", () => "200");
 
-				f.fixture("parentList", List, (ff) => {
+				f.fixture("parentList", (ff) => {
 					ff.entry2(() => "20");
 					ff.entry3(() => "30");
 
-					ff.fixture("childList", List, (fff) => {
+					ff.fixture("childList", (fff) => {
 						fff.entry3(() => "3");
 					});
 				});
@@ -227,6 +227,40 @@ describe("All of the code from the guide", function() {
 			expect(list.entry1).to.equal("100");
 			expect(list.entry2).to.equal("20");
 			expect(list.entry3).to.equal("3");
+		});
+
+		specify("nested fixtures with explicit model", async function() {
+			class List2 extends List {
+				entry4: string;
+
+				get props() {
+					return {
+						entry1: "string",
+						entry2: "string",
+						entry3: "string",
+						entry4: "string",
+					};
+				}
+			}
+
+			await createTable(List);
+			await createTable(List2);
+
+			fr.fixture("parentList", List, (f) => {
+				f.entry1(() => "1000");
+				f.entry2(() => "200");
+
+				f.fixture("childList", {model: List2}, (ff) => {
+					ff.entry3(() => "30");
+					ff.entry4(() => "4");
+				});
+			});
+
+			const list = await fr.build("childList");
+			expect(list.entry1).to.equal("1000");
+			expect(list.entry2).to.equal("200");
+			expect(list.entry3).to.equal("30");
+			expect(list.entry4).to.equal("4");
 		});
 
 		specify("nested fixtures with explicit parent", async function() {

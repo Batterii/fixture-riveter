@@ -124,9 +124,9 @@ describe("DefinitionProxy", function() {
 			const fixtureRiveter = new FixtureRiveter();
 			const fixture = new Fixture(fixtureRiveter, "dummy", DummyModel);
 			const proxy = new DefinitionProxy(fixture);
-			proxy.fixture("newFixture", DummyModel);
+			proxy.fixture("newFixture", {model: DummyModel});
 
-			expect(proxy.childFixtures).to.deep.equal([["newFixture", DummyModel]]);
+			expect(proxy.childFixtures).to.deep.equal([["newFixture", DummyModel, {}, undefined]]);
 		});
 
 		it("can accept a variable number of arguments", function() {
@@ -135,7 +135,7 @@ describe("DefinitionProxy", function() {
 			const proxy = new DefinitionProxy(fixture);
 			const options = {};
 			const block = () => 1;
-			proxy.fixture("newFixture", DummyModel, options, block);
+			proxy.fixture("newFixture", options, block);
 
 			expect(proxy.childFixtures).to.deep.equal([["newFixture", DummyModel, options, block]]);
 		});

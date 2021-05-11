@@ -9,7 +9,6 @@ import {Fixture} from "./fixture";
 import {
 	EvaluatorFunction,
 	BlockFunction,
-	FixtureRestArgs,
 	FixtureName,
 	FixtureOptions,
 	ModelConstructor,
@@ -20,8 +19,15 @@ import {CallbackFunction} from "./callback";
 import {FixtureRiveter, nameGuard} from "./fixture-riveter";
 import {Sequence, SequenceCallback} from "./sequence";
 import {SequenceHandler} from "./sequence-handler";
+import {fixtureOptionsParser} from "./fixture-options-parser";
 
-import {isFunction, last} from "lodash";
+import {isFunction, last, omit} from "lodash";
+
+interface ProxyFixtureOptions<T> extends FixtureOptions {
+	model?: ModelConstructor<T>,
+}
+
+type ProxyFixtureRestArgs<T> = ProxyFixtureOptions<T> | BlockFunction<T>;
 
 export class DefinitionProxy<T> {
 	definition: Definition<T>;
@@ -87,18 +93,27 @@ export class DefinitionProxy<T> {
 		this.definition.declareAttribute(declaration);
 	}
 
-	fixture(
-		name: FixtureName<T>,
-		model: ModelConstructor<T>,
-		options: FixtureOptions,
-		block?: BlockFunction<T>,
+	fixture<U = T>(
+		name: FixtureName<U>,
+		options: ProxyFixtureOptions<U>,
+		block?: BlockFunction<U>,
 	): void;
 
-	fixture(name: FixtureName<T>, model: ModelConstructor<T>, rest?: FixtureRestArgs<T>): void;
+	fixture<U = T>(name: FixtureName<U>, rest?: ProxyFixtureRestArgs<U>): void;
 
-	fixture(fixtureName: FixtureName<T>, model: ModelConstructor<T>, ...rest: any[]): void {
+	fixture<U = T>(fixtureName: FixtureName<U>, ...rest: any[]): void {
 		const name = nameGuard(fixtureName);
-		this.childFixtures.push([name, model, ...rest]);
+		const [options, block] = fixtureOptionsParser(...rest) as [
+			ProxyFixtureOptions<U>,
+			BlockFunction<U> | undefined,
+		];
+		let model: ModelConstructor<any>;
+		if (options.model) {
+			({model} = options);
+		} else {
+			({model} = this.definition as Fixture<any>);
+		}
+		this.childFixtures.push([name, model, omit(options, "model"), block]);
 	}
 
 	relation<R = undefined>(

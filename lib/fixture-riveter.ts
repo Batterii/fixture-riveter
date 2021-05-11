@@ -152,8 +152,7 @@ export class FixtureRiveter {
 		this.registerFixture(fixture);
 
 		proxy.childFixtures.forEach((child: any[]) => {
-			const [childName, childModel, ...childRest] = child;
-			const [childOptions, childBlock] = fixtureOptionsParser(...childRest);
+			const [childName, childModel, childOptions, childBlock] = child;
 			childOptions.parent = childOptions.parent || name;
 			this.fixture(childName, childModel, childOptions, childBlock);
 		});

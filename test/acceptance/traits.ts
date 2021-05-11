@@ -126,11 +126,11 @@ describe("tests from fixture_bot", function() {
 					t.attr("gender", () => "Female");
 				});
 
-				f.fixture("greatUser", User, (ff) => {
+				f.fixture("greatUser", (ff) => {
 					ff.attr("great");
 				});
 
-				f.fixture("evenGreaterUser", User, (ff) => {
+				f.fixture("evenGreaterUser", (ff) => {
 					ff.attr("great");
 
 					ff.trait("great", (t) => {
@@ -138,32 +138,32 @@ describe("tests from fixture_bot", function() {
 					});
 				});
 
-				f.fixture("admin", User, {traits: ["admin"]});
+				f.fixture("admin", {traits: ["admin"]});
 
-				f.fixture("maleUser", User, (ff) => {
+				f.fixture("maleUser", (ff) => {
 					ff.attr("male");
 
-					ff.fixture("childMaleUser", User, (fff) => {
+					ff.fixture("childMaleUser", (fff) => {
 						fff.attr("dateOfBirth", () => new Date("1/1/2020"));
 					});
 				});
 
-				f.fixture("female", User, {traits: ["female"]}, (ff) => {
+				f.fixture("female", {traits: ["female"]}, (ff) => {
 					ff.trait("admin", (t) => {
 						t.attr("admin", () => true);
 						t.attr("name", () => "Judy");
 					});
 
-					ff.fixture("femaleGreatUser", User, (fff) => {
+					ff.fixture("femaleGreatUser", (fff) => {
 						fff.attr("great");
 					});
 
-					ff.fixture("femaleAdminJudy", User, {traits: ["admin"]});
+					ff.fixture("femaleAdminJudy", {traits: ["admin"]});
 				});
 
-				f.fixture("femaleAdmin", User, {traits: ["female", "admin"]});
-				f.fixture("femaleAfterMaleAdmin", User, {traits: ["male", "female", "admin"]});
-				f.fixture("maleAfterFemaleAdmin", User, {traits: ["female", "male", "admin"]});
+				f.fixture("femaleAdmin", {traits: ["female", "admin"]});
+				f.fixture("femaleAfterMaleAdmin", {traits: ["male", "female", "admin"]});
+				f.fixture("maleAfterFemaleAdmin", {traits: ["female", "male", "admin"]});
 			});
 
 			fr.trait("email", (t) => {
@@ -345,8 +345,8 @@ describe("tests from fixture_bot", function() {
 					t.attr("status", () => "declined");
 				});
 
-				f.fixture("declinedAction", Action, {traits: ["declined"]});
-				f.fixture("extendedDeclinedAction", Action, {traits: ["declined"]}, (ff) => {
+				f.fixture("declinedAction", {traits: ["declined"]});
+				f.fixture("extendedDeclinedAction", {traits: ["declined"]}, (ff) => {
 					ff.attr("status", () => "extended declined");
 				});
 			});
@@ -411,7 +411,7 @@ describe("tests from fixture_bot", function() {
 				f.trait("female", (t) => t.attr("gender", () => "female"));
 				f.trait("admin", (t) => t.attr("role", () => "admin"));
 
-				f.fixture("femaleUser", User, (ff) => {
+				f.fixture("femaleUser", (ff) => {
 					ff.attr("female");
 				});
 			});
@@ -460,7 +460,7 @@ describe("#968", function() {
 				t.attr("y");
 			});
 
-			f.fixture("child", Demo, (ff) => {
+			f.fixture("child", (ff) => {
 				ff.trait("y", (t) => {
 					t.attr("value", () => "child value");
 				});

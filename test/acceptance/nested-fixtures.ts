@@ -3,7 +3,7 @@ import {FixtureRiveter} from "../../lib/fixture-riveter";
 
 import {expect} from "chai";
 
-describe("Nested factories", function() {
+describe("Nested fixtures", function() {
 	let fr: FixtureRiveter;
 
 	class User extends Model {
@@ -28,21 +28,18 @@ describe("Nested factories", function() {
 
 				f1.fixture(
 					"grand-parent",
-					User,
 					(f2) => {
 						f2.execute2(() => 20);
 						f2.execute3(() => 3);
 
 						f2.fixture(
 							"parent",
-							User,
 							(f3) => {
 								f3.execute3(() => 30);
 								f3.execute4(() => 4);
 
 								f3.fixture(
 									"child",
-									User,
 									(f4) => {
 										f4.execute4(() => 40);
 										f4.execute5(() => 5);
@@ -62,6 +59,43 @@ describe("Nested factories", function() {
 			execute3: 30,
 			execute4: 40,
 			execute5: 5,
+		});
+	});
+
+	class Author extends User {
+		execute6: number;
+	}
+
+	class GhostWriter extends Author {
+		static tableName: "ghostWriters";
+		execute7: number;
+	}
+
+	it("handles changing class", async function() {
+		fr.fixture("user", User, (f) => {
+			f.execute1(() => 1);
+
+			f.fixture("author", {model: Author}, (a) => {
+				a.execute6(() => 6);
+
+				a.fixture(GhostWriter, (as) => {
+					as.execute7(() => 7);
+				});
+			});
+		});
+
+		const author = await fr.attributesFor("author");
+		const ghostWriter = await fr.attributesFor("ghostWriters");
+
+		expect(author).to.deep.equal({
+			execute1: 1,
+			execute6: 6,
+		});
+
+		expect(ghostWriter).to.deep.equal({
+			execute1: 1,
+			execute6: 6,
+			execute7: 7,
 		});
 	});
 });

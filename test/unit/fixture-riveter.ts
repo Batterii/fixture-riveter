@@ -142,7 +142,7 @@ describe("FixtureRiveter", function() {
 
 		it("creates child fixtures", function() {
 			fixtureRiveter.fixture("user", DummyModel, (f) => {
-				f.fixture("oldUser", DummyModel);
+				f.fixture("oldUser");
 			});
 			const result = Array.from(fixtureRiveter.fixtures.keys())
 				.map((name: string) => fixtureRiveter.fixtures.get(name) as any)

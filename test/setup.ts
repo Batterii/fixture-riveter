@@ -19,6 +19,10 @@ const options: KnexCleanerOptions = {
 	ignoreTables: ["knex_migrations", "knex_migrations_lock"],
 };
 
+before(async function() {
+	await knex.raw("PRAGMA foreign_keys = ON;");
+});
+
 // Restore sinon's static sandbox after each test.
 afterEach(function() {
 	sinon.restore();

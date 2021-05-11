@@ -68,7 +68,7 @@ describe("Relations", function() {
 					t.admin(() => true);
 				});
 
-				f.fixture("oldUser", User, (ff) => {
+				f.fixture("oldUser", (ff) => {
 					ff.attr("age", () => 100);
 				});
 			});
@@ -224,7 +224,7 @@ describe("Relations", function() {
 
 					fr.fixture("user", User, (f) => {
 						f.attr("name", () => "Noah");
-						f.fixture("userWithPosts", User, (ff) => {
+						f.fixture("userWithPosts", (ff) => {
 							ff.transient((t) => {
 								t.attr("postCount", () => 5);
 							});

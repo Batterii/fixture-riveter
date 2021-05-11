@@ -160,18 +160,18 @@ Reflect.has(user, "cool");
 ```
 
 ## Nested fixtures
-By defining a fixture within a fixture, the child fixture will inherit and override any declared attributes on the parent, all the way up the inheritance chain. Currently, the child fixture's class must be specified as well, even when it's the same.
+By defining a fixture within a fixture, the child fixture will inherit and override any declared attributes on the parent, all the way up the inheritance chain.
 
 ```typescript
 fr.fixture("grandparentList", List, (f) => {
     f.entry1(() => "100");
     f.entry2(() => "200");
 
-    f.fixture("parentList", List, (ff) => {
+    f.fixture("parentList", (ff) => {
         ff.entry2(() => "20");
         ff.entry3(() => "30");
 
-        ff.fixture("childList", List, (fff) => {
+        ff.fixture("childList", (fff) => {
             fff.entry3(() => "3");
         });
     });
@@ -184,6 +184,24 @@ list.entry2
 // => 20
 list.entry3
 // => 3
+```
+
+The child fixture's class can be specified as well, by passing in a different `model` in the options map.
+
+```typescript
+fr.fixture("parentList", List, (f) => {
+    f.entry1(() => "10");
+
+    f.fixture("childList", {model: List2}, (ff) => {
+        ff.entry2(() => "2");
+    });
+});
+
+const list = await fr.build("childList");
+list.entry1
+// => 10
+list.entry2
+// => 2
 ```
 
 The parent fixture can be specified instead of nesting:

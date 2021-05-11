@@ -113,7 +113,7 @@ describe("Sequelize functionality", function() {
 
 				fr.fixture("user", User, (f) => {
 					f.attr("name", () => "Noah");
-					f.fixture("userWithPosts", User, (ff) => {
+					f.fixture("userWithPosts", (ff) => {
 						ff.transient((t) => {
 							t.attr("postCount", () => 5);
 						});

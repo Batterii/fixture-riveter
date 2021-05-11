@@ -176,7 +176,7 @@ describe("global callbacks", function() {
 				user.name = user.name.toLowerCase();
 			});
 
-			f.fixture("child user", User, (ff) => {
+			f.fixture("child user", (ff) => {
 				ff.after("build", (user) => {
 					user.name = `childlike: ${user.name}`;
 				});
