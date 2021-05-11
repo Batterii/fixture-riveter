@@ -1,6 +1,13 @@
-import {isFunction, isNumber, isObject, isString} from "lodash";
+import {first, isFunction, isNumber, isObject, isPlainObject, isString} from "lodash";
 
 export type SequenceCallback<C> = (result: C) => any;
+
+export interface SequenceOptions {
+	aliases?: string[];
+	callback?: SequenceCallback<any>;
+	gen?: (() => Generator<any, any, any>);
+	initial?: string | number;
+}
 
 export class Sequence<C extends string | number | (() => Generator<any, any, any>)> {
 	name: string;
@@ -13,28 +20,28 @@ export class Sequence<C extends string | number | (() => Generator<any, any, any
 
 	constructor(
 		sequenceName: string,
-		options?: C | string[] | SequenceCallback<number>,
+		options?: C | SequenceOptions | SequenceCallback<number>,
 	);
 
 	constructor(
 		sequenceName: string,
 		initial: C,
-		aliasesOrCallback?: (
-			| string[]
+		optionsOrCallback?: (
+			| Omit<SequenceOptions, "initial" | "gen">
 			| SequenceCallback<C extends (() => Generator<infer T, any, any>) ? T : C>
 		),
 	);
 
 	constructor(
 		sequenceName: string,
-		initialOrAliases: C | string[],
+		initialOrOptions: C | SequenceOptions,
 		callback?: SequenceCallback<C extends (() => Generator<infer T, any, any>) ? T : C>
 	);
 
 	constructor(
 		sequenceName: string,
 		initial: C,
-		aliases: string[],
+		options: {aliases: string[]},
 		callback?: SequenceCallback<C extends (() => Generator<infer T, any, any>) ? T : C>
 	);
 
@@ -42,27 +49,14 @@ export class Sequence<C extends string | number | (() => Generator<any, any, any
 		this.name = name;
 
 		const options = optionsParser(name, ...args);
-		this.aliases = options.aliases || [];
-		this.callback = options.callback || ((x: any) => x);
+		const {aliases, baseGenerator, callback, initial} = options;
+		this.aliases = aliases;
+		this.callback = callback;
 
-		const {gen} = options;
-		if (isString(gen)) {
-			this.baseGenerator = () => stringGen(gen);
-			this.value = gen;
-		} else if (isNumber(gen)) {
-			this.baseGenerator = () => numberGen(gen);
-			this.value = gen;
-		} else if (isFunction(gen)) {
-			this.baseGenerator = () => gen();
-		} else {
-			this.baseGenerator = () => numberGen(1);
-			this.value = 1;
-		}
+		this.baseGenerator = baseGenerator;
 		this.generator = this.baseGenerator();
 
-		if (!this.value) {
-			this.value = this.generator.next().value;
-		}
+		this.value = initial || this.generator.next().value;
 		this.initialValue = this.value;
 	}
 
@@ -88,40 +82,103 @@ export class Sequence<C extends string | number | (() => Generator<any, any, any
 	}
 }
 
-export interface SequenceOptions {
-	gen?: string | number | (() => Generator<any, any, any>);
-	aliases?: string[];
-	callback?: SequenceCallback<any>;
+export interface SequenceConstructorOptions {
+	aliases: string[];
+	baseGenerator: (() => Generator<any, any, any>);
+	callback: SequenceCallback<any>;
+	initial?: any;
 }
 
-export function optionsParser(name: string, ...args: any[]): SequenceOptions {
-	const options: SequenceOptions = {};
+export function optionsParser(name: string, ...args: any[]): SequenceConstructorOptions {
+	const options: Partial<SequenceConstructorOptions> = {};
 
-	const [gen] = args;
-	if (isNumber(gen) || isString(gen)) {
-		options.gen = args.shift();
-	} else if (isFunction(gen)) {
-		const result = gen();
+	// inline initial value or generator function
+	const inlineGen = first(args);
+	if (isNumber(inlineGen)) {
+		const gen = args.shift();
+		options.initial = gen;
+		options.baseGenerator = () => numberGen(gen);
+	} else if (isString(inlineGen)) {
+		const gen = args.shift();
+		options.initial = gen;
+		options.baseGenerator = () => stringGen(gen);
+	} else if (isFunction(inlineGen)) {
+		const result = inlineGen();
 		if (isObject(result) && Reflect.has(result, "next")) {
-			options.gen = args.shift();
+			options.baseGenerator = args.shift();
 		}
 	}
 
-	const [aliases] = args;
-	if (Array.isArray(aliases) && aliases.every((s) => isString(s))) {
-		options.aliases = args.shift();
+	// everything in a big options map
+	const optionsMap = first(args);
+	if (isPlainObject(optionsMap)) {
+		// Throw errors if the gen or initial value was provided inline (not in an object)
+		if (Reflect.has(options, "gen") && Reflect.has(optionsMap, "gen")) {
+			throw new Error(`Can't define two generator functions for sequence "${name}"`);
+		}
+		if (Reflect.has(options, "initial") && Reflect.has(optionsMap, "initial")) {
+			throw new Error(`Can't define two initial values for sequence "${name}"`);
+		}
+
+		const {aliases, callback, gen, initial} = args.shift();
+
+		if (Array.isArray(aliases)) {
+			if (!aliases.every((s) => isString(s))) {
+				throw new Error(`Can't use non-string aliases for sequence "${name}"`);
+			}
+			options.aliases = aliases;
+		}
+
+		if (isFunction(callback)) {
+			options.callback = callback;
+		}
+
+		if (initial && gen) {
+			throw new Error(
+				`Can't provide both initial value and generator function for sequence "${name}"`,
+			);
+		}
+
+		if (isNumber(initial)) {
+			options.baseGenerator = () => numberGen(initial);
+			options.initial = initial;
+		} else if (isString(initial)) {
+			options.baseGenerator = () => stringGen(initial);
+			options.initial = initial;
+		} else if (isFunction(gen)) {
+			const result = gen();
+			if (isObject(result) && Reflect.has(result, "next")) {
+				options.baseGenerator = gen;
+			}
+		}
 	}
 
-	const [fn] = args;
-	if (isFunction(fn)) {
+	// inline final place callback function
+	const inlineCallback = first(args);
+	if (isFunction(inlineCallback)) {
+		if (Reflect.has(options, "callback")) {
+			throw new Error(`Can't define two callbacks for sequence "${name}"`);
+		}
 		options.callback = args.shift();
 	}
 
-	if (args.length > 0) {
-		throw new Error(`Incorrect sequence options for "${name}"`);
+	// Set defaults
+	if (!options.baseGenerator) {
+		options.baseGenerator = () => numberGen(1);
+		options.initial = 1;
+	}
+	if (!options.aliases) {
+		options.aliases = [];
+	}
+	if (!options.callback) {
+		options.callback = (x: any) => x;
 	}
 
-	return options;
+	if (args.length > 0) {
+		throw new Error(`Incorrect options for sequence "${name}"`);
+	}
+
+	return options as SequenceConstructorOptions;
 }
 
 export function *numberGen(input: number): Generator<number, number, number> {

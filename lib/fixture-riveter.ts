@@ -4,17 +4,11 @@ import {CallbackFunction, Callback} from "./callback";
 import {CallbackHandler} from "./callback-handler";
 import {DefinitionProxy} from "./definition-proxy";
 import {Fixture} from "./fixture";
-import {Sequence, SequenceCallback} from "./sequence";
+import {Sequence, SequenceCallback, SequenceOptions} from "./sequence";
 import {SequenceHandler} from "./sequence-handler";
 import {StrategyHandler} from "./strategy-handler";
 import {Strategy} from "./strategies/strategy";
 import {Trait} from "./trait";
-import {fixtureOptionsParser} from "./fixture-options-parser";
-
-import fg from "fast-glob";
-import {resolve} from "path";
-
-
 import {
 	Pojo,
 	ModelConstructor,
@@ -26,6 +20,8 @@ import {
 	Overrides,
 } from "./types";
 
+import fg from "fast-glob";
+import {resolve} from "path";
 import {
 	isFunction,
 	isPlainObject,
@@ -174,30 +170,30 @@ export class FixtureRiveter {
 	}
 
 	sequence<C extends string | number | (() => Generator<any, any, any>)>(
-		name: string,
-		options?: C | string[] | SequenceCallback<number>,
+		sequenceName: string,
+		options?: C | SequenceOptions | SequenceCallback<number>,
 	): Sequence<C>;
 
 	sequence<C extends string | number | (() => Generator<any, any, any>)>(
-		name: string,
+		sequenceName: string,
 		initial: C,
-		aliasesOrCallback?: (
-			| string[]
-			| SequenceCallback<C extends (() => Generator<infer T, any, any>) ? T : C>
+		optionsOrCallback?: (
+			| Omit<SequenceOptions, "initial" | "gen">
+			| SequenceCallback<C extends (() => Generator<infer U, any, any>) ? U : C>
 		),
 	): Sequence<C>;
 
 	sequence<C extends string | number | (() => Generator<any, any, any>)>(
-		name: string,
-		initialOrAliases: C | string[],
-		callback?: SequenceCallback<C extends (() => Generator<infer T, any, any>) ? T : C>,
+		sequenceName: string,
+		initialOrOptions: C | SequenceOptions,
+		callback?: SequenceCallback<C extends (() => Generator<infer U, any, any>) ? U : C>
 	): Sequence<C>;
 
 	sequence<C extends string | number | (() => Generator<any, any, any>)>(
-		name: string,
+		sequenceName: string,
 		initial: C,
-		aliases: string[],
-		callback?: SequenceCallback<C extends (() => Generator<infer T, any, any>) ? T : C>,
+		options: {aliases: string[]},
+		callback?: SequenceCallback<C extends (() => Generator<infer U, any, any>) ? U : C>
 	): Sequence<C>;
 
 	sequence(name: string, ...rest: any[]): Sequence<any> {

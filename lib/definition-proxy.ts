@@ -17,7 +17,7 @@ import {
 } from "./types";
 import {CallbackFunction} from "./callback";
 import {FixtureRiveter, nameGuard} from "./fixture-riveter";
-import {Sequence, SequenceCallback} from "./sequence";
+import {Sequence, SequenceCallback, SequenceOptions} from "./sequence";
 import {SequenceHandler} from "./sequence-handler";
 import {fixtureOptionsParser} from "./fixture-options-parser";
 
@@ -135,14 +135,30 @@ export class DefinitionProxy<T> {
 	}
 
 	sequence<C extends string | number | (() => Generator<any, any, any>)>(
-		name: string,
-		options?: C | SequenceCallback<number>,
+		sequenceName: string,
+		options?: C | SequenceOptions | SequenceCallback<number>,
 	): Sequence<C>;
 
 	sequence<C extends string | number | (() => Generator<any, any, any>)>(
-		name: string,
+		sequenceName: string,
 		initial: C,
-		callback?: SequenceCallback<C extends string ? string : C extends | number ? number : any>,
+		optionsOrCallback?: (
+			| Omit<SequenceOptions, "initial" | "gen">
+			| SequenceCallback<C extends (() => Generator<infer U, any, any>) ? U : C>
+		),
+	): Sequence<C>;
+
+	sequence<C extends string | number | (() => Generator<any, any, any>)>(
+		sequenceName: string,
+		initialOrOptions: C | SequenceOptions,
+		callback?: SequenceCallback<C extends (() => Generator<infer U, any, any>) ? U : C>
+	): Sequence<C>;
+
+	sequence<C extends string | number | (() => Generator<any, any, any>)>(
+		sequenceName: string,
+		initial: C,
+		options: {aliases: string[]},
+		callback?: SequenceCallback<C extends (() => Generator<infer U, any, any>) ? U : C>
 	): Sequence<C>;
 
 	sequence(name: string, ...rest: any[]): Sequence<any> {

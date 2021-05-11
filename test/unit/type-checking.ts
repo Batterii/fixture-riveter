@@ -178,7 +178,7 @@ describe("type checking", function() {
 				fr.sequence("email2", "b");
 				expect(fr.generate("email2")).to.equal("b");
 
-				fr.sequence("email3", ["alias3"]);
+				fr.sequence("email3", {aliases: ["alias3"]});
 				expect(fr.generate("alias3")).to.equal(1);
 
 				fr.sequence("email4", (n) => `test${n}@gmail.com`);
@@ -186,31 +186,31 @@ describe("type checking", function() {
 			});
 
 			specify("3 args", function() {
-				fr.sequence("email1", 1, ["alias1"]);
+				fr.sequence("email1", 1, {aliases: ["alias1"]});
 				expect(fr.generate("email1")).to.equal(1);
 				expect(fr.generate("alias1")).to.equal(2);
 
 				fr.sequence("email2", 1, (n) => `test${n}@gmail.com`);
 				expect(fr.generate("email2")).to.equal("test1@gmail.com");
 
-				fr.sequence("email3", "a", ["alias3"]);
+				fr.sequence("email3", "a", {aliases: ["alias3"]});
 				expect(fr.generate("email3")).to.equal("a");
 				expect(fr.generate("alias3")).to.equal("b");
 
 				fr.sequence("email4", "a", (n) => `test${n}@gmail.com`);
 				expect(fr.generate("email4")).to.equal("testa@gmail.com");
 
-				fr.sequence("email5", ["alias5"], (n) => `test${n}@gmail.com`);
+				fr.sequence("email5", {aliases: ["alias5"]}, (n) => `test${n}@gmail.com`);
 				expect(fr.generate("email5")).to.equal("test1@gmail.com");
 				expect(fr.generate("alias5")).to.equal("test2@gmail.com");
 			});
 
 			specify("4 args", function() {
-				fr.sequence("email1", 1, ["alias1"], (n) => `test${n}@gmail.com`);
+				fr.sequence("email1", 1, {aliases: ["alias1"]}, (n) => `test${n}@gmail.com`);
 				expect(fr.generate("email1")).to.equal("test1@gmail.com");
 				expect(fr.generate("alias1")).to.equal("test2@gmail.com");
 
-				fr.sequence("email2", "a", ["alias2"], (n) => `test${n}@gmail.com`);
+				fr.sequence("email2", "a", {aliases: ["alias2"]}, (n) => `test${n}@gmail.com`);
 				expect(fr.generate("email2")).to.equal("testa@gmail.com");
 				expect(fr.generate("alias2")).to.equal("testb@gmail.com");
 			});
@@ -306,7 +306,7 @@ describe("type checking", function() {
 			seq.registerSequence("name2", 1);
 			expect(seq.findSequence("name2")?.next()).to.equal(1);
 
-			seq.registerSequence("name3", ["alias3"]);
+			seq.registerSequence("name3", {aliases: ["alias3"]});
 			expect(seq.findSequence("name3")?.next()).to.equal(1);
 			expect(seq.findSequence("alias3")?.next()).to.equal(2);
 
@@ -325,28 +325,28 @@ describe("type checking", function() {
 			}
 
 			const seq = new SequenceHandler();
-			seq.registerSequence("name1", "a", ["alias1"]);
+			seq.registerSequence("name1", "a", {aliases: ["alias1"]});
 			expect(seq.findSequence("name1")?.next()).to.equal("a");
 			expect(seq.findSequence("alias1")?.next()).to.equal("b");
 
 			seq.registerSequence("name2", "a", (x) => `2result${x}`);
 			expect(seq.findSequence("name2")?.next()).to.equal("2resulta");
 
-			seq.registerSequence("name3", 1, ["alias3"]);
+			seq.registerSequence("name3", 1, {aliases: ["alias3"]});
 			expect(seq.findSequence("name3")?.next()).to.equal(1);
 			expect(seq.findSequence("alias3")?.next()).to.equal(2);
 
 			seq.registerSequence("name4", 1, (x) => `4result${x}`);
 			expect(seq.findSequence("name4")?.next()).to.equal("4result1");
 
-			seq.registerSequence("name5", g, ["alias5"]);
+			seq.registerSequence("name5", g, {aliases: ["alias5"]});
 			expect(seq.findSequence("name5")?.next()).to.equal("X");
 			expect(seq.findSequence("alias5")?.next()).to.equal("X");
 
 			seq.registerSequence("name6", g, (x) => `6result${x}`);
 			expect(seq.findSequence("name6")?.next()).to.equal("6resultX");
 
-			seq.registerSequence("name7", ["alias7"], (x) => `7result${x}`);
+			seq.registerSequence("name7", {aliases: ["alias7"]}, (x) => `7result${x}`);
 			expect(seq.findSequence("name7")?.next()).to.equal("7result1");
 			expect(seq.findSequence("alias7")?.next()).to.equal("7result2");
 		});
@@ -358,15 +358,15 @@ describe("type checking", function() {
 				}
 			}
 			const seq = new SequenceHandler();
-			seq.registerSequence("name1", "a", ["alias1"], (x) => `1result${x}`);
+			seq.registerSequence("name1", "a", {aliases: ["alias1"]}, (x) => `1result${x}`);
 			expect(seq.findSequence("name1")?.next()).to.equal("1resulta");
 			expect(seq.findSequence("alias1")?.next()).to.equal("1resultb");
 
-			seq.registerSequence("name2", 1, ["alias2"], (x) => `2result${x}`);
+			seq.registerSequence("name2", 1, {aliases: ["alias2"]}, (x) => `2result${x}`);
 			expect(seq.findSequence("name2")?.next()).to.equal("2result1");
 			expect(seq.findSequence("alias2")?.next()).to.equal("2result2");
 
-			seq.registerSequence("name3", g, ["alias3"], (x) => `3result${x}`);
+			seq.registerSequence("name3", g, {aliases: ["alias3"]}, (x) => `3result${x}`);
 			expect(seq.findSequence("name3")?.next()).to.equal("3resultX");
 			expect(seq.findSequence("alias3")?.next()).to.equal("3resultX");
 		});

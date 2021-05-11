@@ -1,4 +1,4 @@
-import {Sequence, SequenceCallback} from "./sequence";
+import {Sequence, SequenceCallback, SequenceOptions} from "./sequence";
 
 export class SequenceHandler {
 	sequences: Map<string, Sequence<any>>;
@@ -9,29 +9,29 @@ export class SequenceHandler {
 
 	registerSequence<C extends string | number | (() => Generator<any, any, any>)>(
 		sequenceName: string,
-		options?: C | string[] | SequenceCallback<number>,
+		options?: C | SequenceOptions | SequenceCallback<number>,
 	): Sequence<C>;
 
 	registerSequence<C extends string | number | (() => Generator<any, any, any>)>(
 		sequenceName: string,
 		initial: C,
-		aliasesOrCallback?: (
-			| string[]
-			| SequenceCallback<C extends (() => Generator<infer T, any, any>) ? T : C>
+		optionsOrCallback?: (
+			| Omit<SequenceOptions, "initial" | "gen">
+			| SequenceCallback<C extends (() => Generator<infer U, any, any>) ? U : C>
 		),
 	): Sequence<C>;
 
 	registerSequence<C extends string | number | (() => Generator<any, any, any>)>(
 		sequenceName: string,
-		initialOrAliases: C | string[],
-		callback?: SequenceCallback<C extends (() => Generator<infer T, any, any>) ? T : C>,
+		initialOrOptions: C | SequenceOptions,
+		callback?: SequenceCallback<C extends (() => Generator<infer U, any, any>) ? U : C>
 	): Sequence<C>;
 
 	registerSequence<C extends string | number | (() => Generator<any, any, any>)>(
 		sequenceName: string,
 		initial: C,
-		aliases: string[],
-		callback?: SequenceCallback<C extends (() => Generator<infer T, any, any>) ? T : C>,
+		options: {aliases: string[]},
+		callback?: SequenceCallback<C extends (() => Generator<infer U, any, any>) ? U : C>
 	): Sequence<C>;
 
 	registerSequence(sequenceName: string, ...rest: any[]): Sequence<any> {

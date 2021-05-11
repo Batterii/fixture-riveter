@@ -40,20 +40,32 @@ user.dayNumber;
 `fr.generate` only works on global sequences. Global sequences must have unique names.
 
 ## Sequence options
-Sequences can be given initial values, either a number (as seen above) or a string:
+Sequences can be given initial values, either a number or a string or an object with key `initial` that contains a number or a string:
 
 ```typescript
-fr.sequence("email", "Hello");
-fr.generate("email");
+fr.sequence("counter", 3);
+fr.generate("counter");
+// 3
+fr.generate("counter");
+// 4
+
+fr.sequence("greeting", "Hello");
+fr.generate("greeting");
 // Hello
-fr.generate("email");
+fr.generate("greeting");
 // Hellp
+
+fr.sequence("age", {initial: 34});
+fr.generate("age");
+// 34
+fr.generate("age");
+// 35
 ```
 
-Instead of a number or string, a generator function can be passed in:
+Instead of a number or string, a generator function can be passed in, either by itself or in an object with the key `gen`:
 
 ```typescript
-function* generator() {
+function *generator() {
     let i = 0;
     while (true) {
         yield i;
@@ -66,12 +78,18 @@ fr.generate("plus2");
 // 0
 fr.generate("plus2");
 // 2
+
+fr.sequence("+2", {gen: generator});
+fr.generate("+2");
+// 0
+fr.generate("+2");
+// 2
 ```
 
 If the desired generator function takes arguments, it must be passed in wrapped in a function:
 
 ```typescript
-function* generator(initial) {
+function *generator(initial) {
     let i = initial;
     while (true) {
         yield i;
@@ -84,12 +102,18 @@ fr.generate("double");
 // 3
 fr.generate("double");
 // 6
+
+fr.sequence("double", {gen: () => generator(3)});
+fr.generate("double");
+// 3
+fr.generate("double");
+// 6
 ```
 
 Global sequences can be given aliases, just like fixtures. The aliases point to the same generator, so they increment together:
 
 ```typescript
-fr.sequence("plus2", ["double", "increaser"])
+fr.sequence("plus2", {aliases: ["double", "increaser"]})
 fr.generate("plus2");
 // 1
 fr.generate("double");
@@ -106,9 +130,15 @@ fr.generate("email");
 // test1@domain.com
 fr.generate("email");
 // test2@domain.com
+
+fr.sequence("email2", {callback: (x) => `test${x}@domain.com`});
+fr.generate("email2");
+// test1@domain.com
+fr.generate("email2");
+// test2@domain.com
 ```
 
-**NOTE**: Options must be ordered: initial value or generator, aliases, callback.
+**NOTE**: If the options aren't bundled in an object, they must be ordered: initial value or generator, aliases, callback.
 
 All sequences can be reset to their initial value, using the global `fr.resetSequences`:
 

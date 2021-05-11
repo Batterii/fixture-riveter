@@ -219,7 +219,7 @@ describe("FixtureRiveter", function() {
 					yield "a";
 				}
 			}
-			let sequenceInFixture = new Sequence("temp", g, [], () => 1);
+			let sequenceInFixture = new Sequence("temp", g, () => 1);
 			fr.fixture(name, DummyModel, (f) => {
 				sequenceInFixture = f.sequence("email");
 			});

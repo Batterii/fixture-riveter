@@ -1,3 +1,4 @@
+import sinon from "sinon";
 import {Sequence, optionsParser, numberGen, stringGen} from "../../lib/sequence";
 import {capitalize} from "lodash";
 import {expect} from "chai";
@@ -23,25 +24,27 @@ describe("Sequence", function() {
 		specify("2 args", function() {
 			expect(new Sequence("name1", "a")).to.exist;
 			expect(new Sequence("name2", 1)).to.exist;
-			expect(new Sequence("name3", ["alias3"])).to.exist;
+			expect(new Sequence("name3", {aliases: ["alias3"]})).to.exist;
 			expect(new Sequence("name4", (x) => `4result${x}`)).to.exist;
 			expect(new Sequence("name5", g)).to.exist;
 		});
 
 		specify("3 args", function() {
-			expect(new Sequence("name1", "a", ["alias1"])).to.exist;
+			expect(new Sequence("name1", "a", {aliases: ["alias1"]})).to.exist;
 			expect(new Sequence("name2", "a", (x) => `2result${x}`)).to.exist;
-			expect(new Sequence("name3", 1, ["alias3"])).to.exist;
+			expect(new Sequence("name3", 1, {aliases: ["alias3"]})).to.exist;
 			expect(new Sequence("name4", 1, (x) => `4result${x}`)).to.exist;
-			expect(new Sequence("name5", g, ["alias5"])).to.exist;
+			expect(new Sequence("name5", g, {aliases: ["alias5"]})).to.exist;
 			expect(new Sequence("name6", g, (x) => `6result${x}`)).to.exist;
-			expect(new Sequence("name7", ["alias7"], (x) => `7result${x}`)).to.exist;
+			expect(new Sequence("name7", {aliases: ["alias7"]}, (x) => `7result${x}`)).to.exist;
 		});
 
 		specify("4 args", function() {
-			expect(new Sequence("name1", "a", ["alias1"], (x) => `1result${x}`)).to.exist;
-			expect(new Sequence("name2", 1, ["alias2"], (x) => `2result${x}`)).to.exist;
-			expect(new Sequence("name3", g, ["alias3"], (x) => `3result${x}`)).to.exist;
+			expect(new Sequence("name1", "a", {aliases: ["alias1"]}, (x) => {
+				return `1result${x}`;
+			})).to.exist;
+			expect(new Sequence("name2", 1, {aliases: ["alias2"]}, (x) => `2result${x}`)).to.exist;
+			expect(new Sequence("name3", g, {aliases: ["alias3"]}, (x) => `3result${x}`)).to.exist;
 		});
 
 		it("throws up if the generator needs an argument to work", function() {
@@ -135,35 +138,54 @@ describe("Sequence", function() {
 describe("optionsParser", function() {
 	it("returns an empty object with no arguments", function() {
 		const result = optionsParser("name");
-		expect(result).to.deep.equal({});
+		sinon.assert.match(result, {
+			aliases: [],
+			baseGenerator: sinon.match.func,
+			callback: sinon.match.func,
+			initial: 1,
+		});
 	});
 
 	it("sets initial when given a function returning a generator", function() {
 		const initial = () => numberGen(1);
 		const result = optionsParser("name", initial);
-
-		expect(result).to.deep.equal({gen: initial});
+		sinon.assert.match(result, {
+			aliases: [],
+			baseGenerator: sinon.match.func,
+			callback: sinon.match.func,
+			initial: sinon.match(initial),
+		});
 	});
 
 	it("sets aliases when given an object with aliases key", function() {
 		const aliases = ["alias"];
-		const result = optionsParser("name", aliases);
+		const result = optionsParser("name", {aliases});
 
-		expect(result).to.deep.equal({aliases});
+		sinon.assert.match(result, {
+			aliases: sinon.match(aliases),
+			baseGenerator: sinon.match.func,
+			callback: sinon.match.func,
+			initial: 1,
+		});
 	});
 
 	it("sets callback when given a function", function() {
 		const callback = (x: any) => x;
 		const result = optionsParser("name", callback);
 
-		expect(result).to.deep.equal({callback});
+		sinon.assert.match(result, {
+			aliases: [],
+			baseGenerator: sinon.match.func,
+			callback: sinon.match(callback),
+			initial: 1,
+		});
 	});
 
 	it("only sets the first instance of each option type", function() {
 		const initial = () => stringGen("a");
 		const initial2 = () => stringGen("b");
-		const aliases = ["alias"];
-		const aliases2 = ["alias2"];
+		const aliases = {aliases: ["alias"]};
+		const aliases2 = {aliases: ["alias2"]};
 		const callback = (x: any) => x;
 		const callback2 = (x: any) => x.concat("c");
 		const args = [

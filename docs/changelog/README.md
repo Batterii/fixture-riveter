@@ -11,6 +11,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 ### Changed
 - Removed `Model` parameter from nested fixture definitions. Now passed in through the options map with the optional key `model`.
+- Change `Sequence` argument lists (and sequence-creating functions) to take aliases as an object instead of a list.
+- Allow for all arguments to `Sequence` (and sequence-creating functions) to be passed in a single object alongside `aliases`.
 
 
 ## [v2.3.1]
