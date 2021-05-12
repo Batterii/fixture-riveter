@@ -56,6 +56,7 @@ const config = {
 						"/guide/sequences.md",
 						"/guide/relations.md",
 						"/guide/traits.md",
+						"/guide/callbacks.md",
 					],
 				},
 			],

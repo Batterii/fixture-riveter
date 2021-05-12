@@ -81,7 +81,7 @@ When a fixture defines a relationship to another fixture, this method is called 
 
 #### result()
 
-Creates an instance of the fixture's model, assigns attributes, and then performs the "afterBuild" callback.
+Creates an instance of the fixture's model, assigns attributes, and then performs the `after("build")` callback.
 
 #### relation()
 
@@ -91,7 +91,7 @@ Calls `fr.run` with the "build" strategy, returning just the instance of the rel
 
 #### result()
 
-Creates an instance of the fixture's model and assigns attributes. Performs the "afterBuild" and "beforeCreate" callbacks. Calls the adapter's `save` method (detailed [here](./adapter.md#save)), and then performs the "afterCreate" callbacks.
+Creates an instance of the fixture's model and assigns attributes. Performs the `after("build")` and `before("create")` callbacks. Calls the adapter's `save` method (detailed [here](./adapter.md#save)), and then performs the `after("create")` callbacks.
 
 #### relation()
 
