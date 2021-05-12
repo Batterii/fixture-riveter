@@ -39,7 +39,26 @@ user.dayNumber;
 
 `fr.generate` only works on global sequences. Global sequences must have unique names.
 
+## Resetting sequences
+All sequences can be reset to their initial value, using the global `fr.resetSequences`:
+
+```typescript
+fr.sequence("email", (x) => `test${x}@domain.com`);
+fr.generate("email");
+// test1@domain.com
+fr.generate("email");
+// test2@domain.com
+fr.generate("email");
+// test3@domain.com
+
+fr.resetSequences();
+
+fr.generate("email");
+// test1@domain.com
+```
+
 ## Sequence options
+### Initial value
 Sequences can be given initial values, either a number or a string or an object with key `initial` that contains a number or a string:
 
 ```typescript
@@ -62,6 +81,9 @@ fr.generate("age");
 // 35
 ```
 
+**NOTE**: Behind the scenes, the initial value is used to select the appropriate pre-built generator. `{initial: "hello"}` is the same as `{gen: () => stringGen("hello")}`, and `{initial: 34}` is the same as `{gen: () => numberGen(34)}`.
+
+### Generator function
 Instead of a number or string, a generator function can be passed in, either by itself or in an object with the key `gen`:
 
 ```typescript
@@ -109,7 +131,7 @@ fr.generate("double");
 fr.generate("double");
 // 6
 ```
-
+### Aliases
 Global sequences can be given aliases, just like fixtures. The aliases point to the same generator, so they increment together:
 
 ```typescript
@@ -122,6 +144,7 @@ fr.generate("increaser");
 // 3
 ```
 
+### Callbacks
 Sequences can take a callback, which is where their true power lies:
 
 ```typescript
@@ -133,21 +156,3 @@ fr.generate("email");
 ```
 
 **NOTE**: If the options aren't bundled in an object, they must be ordered: initial value or generator, aliases, callback. To stay consistent with other functions, callbacks cannot be included in the options object.
-
-All sequences can be reset to their initial value, using the global `fr.resetSequences`:
-
-```typescript
-fr.sequence("email", (x) => `test${x}@domain.com`);
-fr.generate("email");
-// test1@domain.com
-fr.generate("email");
-// test2@domain.com
-fr.generate("email");
-// test3@domain.com
-
-fr.resetSequences();
-
-fr.generate("email");
-// test1@domain.com
-```
-

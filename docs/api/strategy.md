@@ -91,7 +91,7 @@ Calls `fr.run` with the "build" strategy, returning just the instance of the rel
 
 #### result()
 
-Creates an instance of the fixture's model and assigns attributes. Performs the "afterBuild" and "beforeCreate" callbacks. Calls the adapter's `save` method (detailed [here](./adapter.md)), and then performs the "afterCreate" callbacks.
+Creates an instance of the fixture's model and assigns attributes. Performs the "afterBuild" and "beforeCreate" callbacks. Calls the adapter's `save` method (detailed [here](./adapter.md#save)), and then performs the "afterCreate" callbacks.
 
 #### relation()
 
@@ -106,7 +106,3 @@ Assigns the fixture's attributes to a plain javacsript object.
 #### relation()
 
 Calls `fr.run` with the "null" strategy, returning `undefined`.
-
-::: danger TODO
-Look into whether we even need a null strategy?
-:::

@@ -21,7 +21,7 @@ import {Sequence, SequenceCallback, SequenceOptions} from "./sequence";
 import {SequenceHandler} from "./sequence-handler";
 import {fixtureOptionsParser} from "./fixture-options-parser";
 
-import {isFunction, last, omit} from "lodash";
+import {isFunction, isObjectLike, last, omit} from "lodash";
 
 interface ProxyFixtureOptions<T> extends FixtureOptions {
 	model?: ModelConstructor<T>,
@@ -136,33 +136,19 @@ export class DefinitionProxy<T> {
 
 	sequence<C extends string | number | (() => Generator<any, any, any>)>(
 		sequenceName: string,
-		options?: C | SequenceOptions | SequenceCallback<number>,
-	): Sequence;
-
-	sequence<C extends string | number | (() => Generator<any, any, any>)>(
-		sequenceName: string,
-		initial: C,
-		optionsOrCallback?: (
-			| Omit<SequenceOptions, "initial" | "gen">
-			| SequenceCallback<C extends (() => Generator<infer U, any, any>) ? U : C>
-		),
-	): Sequence;
-
-	sequence<C extends string | number | (() => Generator<any, any, any>)>(
-		sequenceName: string,
-		initialOrOptions: C | SequenceOptions,
+		initialOrOptions: C | Omit<SequenceOptions, "aliases">,
 		callback?: SequenceCallback<C extends (() => Generator<infer U, any, any>) ? U : C>
 	): Sequence;
 
 	sequence<C extends string | number | (() => Generator<any, any, any>)>(
 		sequenceName: string,
-		initial: C,
-		options: {aliases: string[]},
-		callback?: SequenceCallback<C extends (() => Generator<infer U, any, any>) ? U : C>
+		options?: C | Omit<SequenceOptions, "aliases"> | SequenceCallback<number>,
 	): Sequence;
 
 	sequence(name: string, ...rest: any[]): Sequence {
-		if (rest.some((s) => Array.isArray(s))) {
+		if (rest.some((s) => {
+			return isObjectLike(s) && Reflect.has(s, "aliases") && Array.isArray(s.aliases);
+		})) {
 			throw new Error(`Can't define the inline sequence ${name} with aliases`);
 		}
 		const sequence = this.sequenceHandler.registerSequence(name, ...rest);
