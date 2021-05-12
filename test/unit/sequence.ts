@@ -136,7 +136,7 @@ describe("Sequence", function() {
 });
 
 describe("optionsParser", function() {
-	it("returns an empty object with no arguments", function() {
+	it("returns an object with defaults", function() {
 		const result = optionsParser("name");
 		sinon.assert.match(result, {
 			aliases: [],
@@ -198,5 +198,44 @@ describe("optionsParser", function() {
 		];
 
 		expect(() => optionsParser("name", ...args)).to.throw;
+	});
+
+	describe("options in a map", function() {
+		let initial: number;
+		let aliases: string[];
+
+		function *gen() {
+			while (true) {
+				yield "X";
+			}
+		}
+
+		beforeEach(function() {
+			initial = 10;
+			aliases = ["alias"];
+		});
+
+		it("accepts initial", function() {
+			const options = optionsParser("name", {initial, aliases});
+			sinon.assert.match(options, {
+				aliases: sinon.match(aliases),
+				baseGenerator: sinon.match.func,
+				callback: sinon.match.func,
+				initial: 10,
+			});
+		});
+
+		it("accepts gen", function() {
+			const options = optionsParser("name", {gen, aliases});
+			sinon.assert.match(options, {
+				aliases: sinon.match(aliases),
+				baseGenerator: gen,
+				callback: sinon.match.func,
+			});
+		});
+
+		it("throws when given both initial and gen", function() {
+			expect(() => optionsParser("name", {initial, gen, aliases})).to.throw;
+		});
 	});
 });

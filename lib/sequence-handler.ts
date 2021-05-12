@@ -1,40 +1,13 @@
-import {Sequence, SequenceCallback, SequenceOptions} from "./sequence";
+import {Sequence} from "./sequence";
 
 export class SequenceHandler {
-	sequences: Map<string, Sequence<any>>;
+	sequences: Map<string, Sequence>;
 
 	constructor() {
 		this.sequences = new Map();
 	}
 
-	registerSequence<C extends string | number | (() => Generator<any, any, any>)>(
-		sequenceName: string,
-		options?: C | SequenceOptions | SequenceCallback<number>,
-	): Sequence<C>;
-
-	registerSequence<C extends string | number | (() => Generator<any, any, any>)>(
-		sequenceName: string,
-		initial: C,
-		optionsOrCallback?: (
-			| Omit<SequenceOptions, "initial" | "gen">
-			| SequenceCallback<C extends (() => Generator<infer U, any, any>) ? U : C>
-		),
-	): Sequence<C>;
-
-	registerSequence<C extends string | number | (() => Generator<any, any, any>)>(
-		sequenceName: string,
-		initialOrOptions: C | SequenceOptions,
-		callback?: SequenceCallback<C extends (() => Generator<infer U, any, any>) ? U : C>
-	): Sequence<C>;
-
-	registerSequence<C extends string | number | (() => Generator<any, any, any>)>(
-		sequenceName: string,
-		initial: C,
-		options: {aliases: string[]},
-		callback?: SequenceCallback<C extends (() => Generator<infer U, any, any>) ? U : C>
-	): Sequence<C>;
-
-	registerSequence(sequenceName: string, ...rest: any[]): Sequence<any> {
+	registerSequence(sequenceName: string, ...rest: any[]): Sequence {
 		const newSequence = new Sequence(sequenceName, ...rest);
 
 		for (const name of newSequence.names()) {
@@ -51,7 +24,7 @@ export class SequenceHandler {
 		this.sequences.forEach((seq) => seq.reset());
 	}
 
-	findSequence(name: string): Sequence<any> | undefined {
+	findSequence(name: string): Sequence | undefined {
 		return this.sequences.get(name);
 	}
 }

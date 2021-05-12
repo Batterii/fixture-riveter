@@ -10,9 +10,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 ### Changed
-- Removed `Model` parameter from nested fixture definitions. Now passed in through the options map with the optional key `model`.
-- Change `Sequence` argument lists (and sequence-creating functions) to take aliases as an object instead of a list.
-- Allow for all arguments to `Sequence` (and sequence-creating functions) to be passed in a single object alongside `aliases`.
+- Remove `Model` parameter from nested fixture definitions. Now passed in through the options map with the optional key `model`.
+- Remove `Sequence` constructor and `SequenceHandler.registerSequence` overloads. Only implement Sequence-related overloads in `DefinitionProxy` and `FixtureRiveter`.
+- Make `Sequence` not generic.
+- Change `Sequence` constructor to take aliases as an object instead of a list.
+- Allow for all arguments (except callback) in sequence-creating functions to be passed in a single object alongside `aliases`.
 
 
 ## [v2.3.1]
@@ -115,7 +117,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [v1.5.0] - 2021-01-24
 ### Added
-- FixtureRiveter `fixtuer` method overloads
+- FixtureRiveter `fixture` method overloads
 
 
 ## [v1.4.0] - 2021-01-22

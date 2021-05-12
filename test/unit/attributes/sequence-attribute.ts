@@ -6,7 +6,7 @@ import {expect} from "chai";
 describe("SequenceAttribute", function() {
 	it("creates an instance of SequenceAttribute", function() {
 		const name = "email";
-		const sequence = {} as Sequence<any>;
+		const sequence = {} as Sequence;
 		const result = new SequenceAttribute(name, false, sequence);
 
 		expect(result).to.be.an.instanceof(SequenceAttribute);

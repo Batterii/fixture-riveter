@@ -2,9 +2,9 @@ import {Attribute} from "./attribute";
 import {Sequence} from "../sequence";
 
 export class SequenceAttribute extends Attribute {
-	sequence: Sequence<any>;
+	sequence: Sequence;
 
-	constructor(name: string, ignored: boolean, sequence: Sequence<any>) {
+	constructor(name: string, ignored: boolean, sequence: Sequence) {
 		super(name, ignored);
 		this.sequence = sequence;
 	}

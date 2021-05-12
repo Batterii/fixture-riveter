@@ -1,15 +1,18 @@
-import {first, isFunction, isNumber, isObject, isPlainObject, isString} from "lodash";
+import {first, isFunction, isNumber, isObjectLike, isPlainObject, isString} from "lodash";
 
 export type SequenceCallback<C> = (result: C) => any;
 
-export interface SequenceOptions {
+export type SequenceOptions = {
 	aliases?: string[];
-	callback?: SequenceCallback<any>;
 	gen?: (() => Generator<any, any, any>);
+	initial?: undefined,
+} | {
+	aliases?: string[];
+	gen?: undefined;
 	initial?: string | number;
-}
+};
 
-export class Sequence<C extends string | number | (() => Generator<any, any, any>)> {
+export class Sequence {
 	name: string;
 	baseGenerator: () => Generator<any, any, any>;
 	initialValue: any;
@@ -18,46 +21,16 @@ export class Sequence<C extends string | number | (() => Generator<any, any, any
 	aliases: string[];
 	callback: SequenceCallback<any>;
 
-	constructor(
-		sequenceName: string,
-		options?: C | SequenceOptions | SequenceCallback<number>,
-	);
-
-	constructor(
-		sequenceName: string,
-		initial: C,
-		optionsOrCallback?: (
-			| Omit<SequenceOptions, "initial" | "gen">
-			| SequenceCallback<C extends (() => Generator<infer T, any, any>) ? T : C>
-		),
-	);
-
-	constructor(
-		sequenceName: string,
-		initialOrOptions: C | SequenceOptions,
-		callback?: SequenceCallback<C extends (() => Generator<infer T, any, any>) ? T : C>
-	);
-
-	constructor(
-		sequenceName: string,
-		initial: C,
-		options: {aliases: string[]},
-		callback?: SequenceCallback<C extends (() => Generator<infer T, any, any>) ? T : C>
-	);
-
 	constructor(name: string, ...args: any[]) {
 		this.name = name;
 
-		const options = optionsParser(name, ...args);
-		const {aliases, baseGenerator, callback, initial} = options;
+		const {aliases, baseGenerator, callback, initial} = optionsParser(name, ...args);
 		this.aliases = aliases;
 		this.callback = callback;
-
 		this.baseGenerator = baseGenerator;
 		this.generator = this.baseGenerator();
-
-		this.value = initial || this.generator.next().value;
-		this.initialValue = this.value;
+		this.value = initial;
+		this.initialValue = initial;
 	}
 
 	names(): string[] {
@@ -82,7 +55,7 @@ export class Sequence<C extends string | number | (() => Generator<any, any, any
 	}
 }
 
-export interface SequenceConstructorOptions {
+interface SequenceConstructorOptions {
 	aliases: string[];
 	baseGenerator: (() => Generator<any, any, any>);
 	callback: SequenceCallback<any>;
@@ -93,19 +66,20 @@ export function optionsParser(name: string, ...args: any[]): SequenceConstructor
 	const options: Partial<SequenceConstructorOptions> = {};
 
 	// inline initial value or generator function
-	const inlineGen = first(args);
-	if (isNumber(inlineGen)) {
+	const initialOrGen = first(args);
+	if (isNumber(initialOrGen)) {
 		const gen = args.shift();
 		options.initial = gen;
 		options.baseGenerator = () => numberGen(gen);
-	} else if (isString(inlineGen)) {
+	} else if (isString(initialOrGen)) {
 		const gen = args.shift();
 		options.initial = gen;
 		options.baseGenerator = () => stringGen(gen);
-	} else if (isFunction(inlineGen)) {
-		const result = inlineGen();
-		if (isObject(result) && Reflect.has(result, "next")) {
+	} else if (isFunction(initialOrGen)) {
+		const result = initialOrGen();
+		if (isObjectLike(result) && Reflect.has(result, "next")) {
 			options.baseGenerator = args.shift();
+			options.initial = result.next().value;
 		}
 	}
 
@@ -120,17 +94,13 @@ export function optionsParser(name: string, ...args: any[]): SequenceConstructor
 			throw new Error(`Can't define two initial values for sequence "${name}"`);
 		}
 
-		const {aliases, callback, gen, initial} = args.shift();
+		const {aliases, gen, initial} = args.shift();
 
 		if (Array.isArray(aliases)) {
 			if (!aliases.every((s) => isString(s))) {
 				throw new Error(`Can't use non-string aliases for sequence "${name}"`);
 			}
 			options.aliases = aliases;
-		}
-
-		if (isFunction(callback)) {
-			options.callback = callback;
 		}
 
 		if (initial && gen) {
@@ -147,8 +117,9 @@ export function optionsParser(name: string, ...args: any[]): SequenceConstructor
 			options.initial = initial;
 		} else if (isFunction(gen)) {
 			const result = gen();
-			if (isObject(result) && Reflect.has(result, "next")) {
+			if (isObjectLike(result) && Reflect.has(result, "next")) {
 				options.baseGenerator = gen;
+				options.initial = result.next().value;
 			}
 		}
 	}
@@ -156,9 +127,6 @@ export function optionsParser(name: string, ...args: any[]): SequenceConstructor
 	// inline final place callback function
 	const inlineCallback = first(args);
 	if (isFunction(inlineCallback)) {
-		if (Reflect.has(options, "callback")) {
-			throw new Error(`Can't define two callbacks for sequence "${name}"`);
-		}
 		options.callback = args.shift();
 	}
 

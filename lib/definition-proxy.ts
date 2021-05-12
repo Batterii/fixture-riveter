@@ -137,7 +137,7 @@ export class DefinitionProxy<T> {
 	sequence<C extends string | number | (() => Generator<any, any, any>)>(
 		sequenceName: string,
 		options?: C | SequenceOptions | SequenceCallback<number>,
-	): Sequence<C>;
+	): Sequence;
 
 	sequence<C extends string | number | (() => Generator<any, any, any>)>(
 		sequenceName: string,
@@ -146,22 +146,22 @@ export class DefinitionProxy<T> {
 			| Omit<SequenceOptions, "initial" | "gen">
 			| SequenceCallback<C extends (() => Generator<infer U, any, any>) ? U : C>
 		),
-	): Sequence<C>;
+	): Sequence;
 
 	sequence<C extends string | number | (() => Generator<any, any, any>)>(
 		sequenceName: string,
 		initialOrOptions: C | SequenceOptions,
 		callback?: SequenceCallback<C extends (() => Generator<infer U, any, any>) ? U : C>
-	): Sequence<C>;
+	): Sequence;
 
 	sequence<C extends string | number | (() => Generator<any, any, any>)>(
 		sequenceName: string,
 		initial: C,
 		options: {aliases: string[]},
 		callback?: SequenceCallback<C extends (() => Generator<infer U, any, any>) ? U : C>
-	): Sequence<C>;
+	): Sequence;
 
-	sequence(name: string, ...rest: any[]): Sequence<any> {
+	sequence(name: string, ...rest: any[]): Sequence {
 		if (rest.some((s) => Array.isArray(s))) {
 			throw new Error(`Can't define the inline sequence ${name} with aliases`);
 		}

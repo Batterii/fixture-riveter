@@ -172,31 +172,31 @@ export class FixtureRiveter {
 	sequence<C extends string | number | (() => Generator<any, any, any>)>(
 		sequenceName: string,
 		options?: C | SequenceOptions | SequenceCallback<number>,
-	): Sequence<C>;
+	): Sequence;
 
 	sequence<C extends string | number | (() => Generator<any, any, any>)>(
 		sequenceName: string,
 		initial: C,
 		optionsOrCallback?: (
-			| Omit<SequenceOptions, "initial" | "gen">
+			| {aliases: string[]}
 			| SequenceCallback<C extends (() => Generator<infer U, any, any>) ? U : C>
 		),
-	): Sequence<C>;
+	): Sequence;
 
 	sequence<C extends string | number | (() => Generator<any, any, any>)>(
 		sequenceName: string,
 		initialOrOptions: C | SequenceOptions,
 		callback?: SequenceCallback<C extends (() => Generator<infer U, any, any>) ? U : C>
-	): Sequence<C>;
+	): Sequence;
 
 	sequence<C extends string | number | (() => Generator<any, any, any>)>(
 		sequenceName: string,
 		initial: C,
 		options: {aliases: string[]},
 		callback?: SequenceCallback<C extends (() => Generator<infer U, any, any>) ? U : C>
-	): Sequence<C>;
+	): Sequence;
 
-	sequence(name: string, ...rest: any[]): Sequence<any> {
+	sequence(name: string, ...rest: any[]): Sequence {
 		return this.sequenceHandler.registerSequence(name, ...rest);
 	}
 
@@ -207,7 +207,7 @@ export class FixtureRiveter {
 		}
 	}
 
-	findSequence(name: string): Sequence<any> | undefined {
+	findSequence(name: string): Sequence | undefined {
 		return this.sequenceHandler.findSequence(name);
 	}
 
