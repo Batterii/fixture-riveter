@@ -176,13 +176,13 @@ describe("DefinitionProxy", function() {
 			expect(registerSequence).to.be.calledOnceWithExactly(name);
 		});
 
-		it("throws if given a sequence with an alias", function() {
+		it("throws if defined with an alias", function() {
 			const fixtureRiveter = new FixtureRiveter();
 			const fixture = new Fixture(fixtureRiveter, "dummy", DummyModel);
 			const proxy = new DefinitionProxy(fixture);
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
-			expect(() => proxy.sequence("email", ["alias"])).to.throw(
+			expect(() => proxy.sequence("email", {aliases: ["alias"]})).to.throw(
 				"Can't define the inline sequence email with aliases",
 			);
 		});
