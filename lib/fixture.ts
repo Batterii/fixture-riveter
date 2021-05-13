@@ -1,13 +1,13 @@
 /* eslint-disable max-classes-per-file */
 
 import {Adapter} from "./adapters/adapter";
+import {AdapterMethodBuilder} from "./adapter-method-builder";
 import {addMethodMissing} from "./method-missing";
 import {Assembler} from "./assembler";
 import {Attribute} from "./attributes/attribute";
 import {AttributeAssigner} from "./attribute-assigner";
 import {Callback} from "./callback";
 import {Definition} from "./definition";
-import {DefinitionHierarchy} from "./definition-hierarchy";
 import {Evaluator} from "./evaluator";
 import {FixtureRiveter} from "./fixture-riveter";
 import {NullFixture} from "./null-fixture";
@@ -29,8 +29,8 @@ export class Fixture<T> extends Definition<T> {
 	model: ModelConstructor<T>;
 	parent?: string;
 
-	_hierarchyClass?: typeof DefinitionHierarchy;
-	_hierarchyInstance?: any;
+	_adapterMethodsClass?: typeof AdapterMethodBuilder;
+	_adapterMethodsInstance?: any;
 
 	constructor(
 		fixtureRiveter: FixtureRiveter,
@@ -88,7 +88,7 @@ export class Fixture<T> extends Definition<T> {
 		if (!this.compiled) {
 			this.parentFixture().compile();
 			super.compile();
-			this.buildHierarchy();
+			this.setAdapterMethods();
 			this.compiled = true;
 		}
 	}
@@ -126,22 +126,23 @@ export class Fixture<T> extends Definition<T> {
 			this.fixtureRiveter.getTrait(name);
 	}
 
-	hierarchyClass(): typeof DefinitionHierarchy {
-		if (!this._hierarchyClass) {
-			this._hierarchyClass = class extends this.parentFixture().hierarchyClass() {};
+	adapterMethodsClass(): typeof AdapterMethodBuilder {
+		if (!this._adapterMethodsClass) {
+			this._adapterMethodsClass = class extends this.parentFixture().adapterMethodsClass() {};
 		}
-		return this._hierarchyClass;
+		return this._adapterMethodsClass;
 	}
 
-	buildHierarchy(): void {
-		this.hierarchyClass().setAdapterMethods(this);
+	setAdapterMethods(): void {
+		this.adapterMethodsClass().setAdapterMethods(this);
 	}
 
-	hierarchyInstance(): Adapter {
-		if (!this._hierarchyInstance) {
-			this._hierarchyInstance = new (this.hierarchyClass())(this.fixtureRiveter, this.name);
+	adapterMethodsInstance(): Adapter {
+		if (!this._adapterMethodsInstance) {
+			const AdapterMethodsClass = this.adapterMethodsClass();
+			this._adapterMethodsInstance = new AdapterMethodsClass(this.fixtureRiveter, this.name);
 		}
-		return this._hierarchyInstance;
+		return this._adapterMethodsInstance;
 	}
 
 	async run(buildStrategy: Strategy, overrides: Record<string, any> = {}): Promise<T> {
@@ -156,7 +157,7 @@ export class Fixture<T> extends Definition<T> {
 			),
 		);
 
-		const adapter = this.hierarchyInstance();
+		const adapter = this.adapterMethodsInstance();
 
 		const attributeAssigner = new AttributeAssigner<T>(
 			this.fixtureRiveter,
@@ -174,8 +175,8 @@ export class Fixture<T> extends Definition<T> {
 	copy<C extends Fixture<T>>(): C {
 		const copy: C = Object.assign(Object.create(Object.getPrototypeOf(this)), this);
 		copy.compiled = false;
-		copy._hierarchyClass = undefined;
-		copy._hierarchyInstance = undefined;
+		copy._adapterMethodsClass = undefined;
+		copy._adapterMethodsInstance = undefined;
 		return copy;
 	}
 }

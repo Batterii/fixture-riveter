@@ -1,6 +1,6 @@
+import {AdapterMethodBuilder} from "./adapter-method-builder";
 import {Callback} from "./callback";
 import {Definition} from "./definition";
-import {DefinitionHierarchy} from "./definition-hierarchy";
 import {FixtureRiveter} from "./fixture-riveter";
 import {ModelConstructor} from "./types";
 
@@ -18,7 +18,7 @@ export class NullFixture<T> extends Definition<T> {
 		return this.fixtureRiveter.getCallbacks();
 	}
 
-	hierarchyClass(): typeof DefinitionHierarchy {
-		return DefinitionHierarchy;
+	adapterMethodsClass(): typeof AdapterMethodBuilder {
+		return AdapterMethodBuilder;
 	}
 }

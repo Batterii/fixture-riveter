@@ -26,7 +26,7 @@ describe("transient attributes", function() {
 		fr = new FixtureRiveter();
 		fr.setAdapter(new ObjectionAdapter());
 
-		fr.sequence("name", (n: number) => `Noah ${n}`);
+		fr.sequence("name", (n) => `Noah ${n}`);
 
 		fr.fixture("user", User, (f) => {
 			f.transient((t) => {

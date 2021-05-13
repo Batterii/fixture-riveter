@@ -20,8 +20,8 @@ describe("toBuild", function() {
 		fr.setAdapter(new ObjectionAdapter());
 
 		fr.trait("100", (t) => {
-			t.toBuild((Mode) => {
-				const user = new Mode();
+			t.toBuild((Model_) => {
+				const user = new Model_();
 				user.id = 100;
 				return user;
 			});
@@ -33,17 +33,24 @@ describe("toBuild", function() {
 			f.sequence("email", (n) => `test${n}@foo.bar`);
 
 			f.trait("50", (t) => {
-				t.toBuild((Mode) => {
-					const user = new Mode();
+				t.toBuild((Model_) => {
+					const user = new Model_();
 					user.id = 50;
 					return user;
 				});
 			});
 
-			f.toBuild((Mode) => {
-				const user = new Mode();
+			f.toBuild((Model_) => {
+				const user = new Model_();
 				user.id = 20;
 				return user;
+			});
+
+			f.fixture("nested user", (ff) => {
+				ff.toSave((user) => {
+					user.name = "saved";
+					return user;
+				});
 			});
 		});
 	});
@@ -61,6 +68,12 @@ describe("toBuild", function() {
 	it("can use global trait", async function() {
 		const user = await fr.build("user", ["100"]);
 		expect(user.id).to.equal(100);
+	});
+
+	it("uses parent methods when available", async function() {
+		const user = await fr.create("nested user");
+		expect(user.id).to.equal(20);
+		expect(user.name).to.equal("saved");
 	});
 });
 

@@ -136,13 +136,13 @@ export class DefinitionProxy<T> {
 
 	sequence<C extends string | number | (() => Generator<any, any, any>)>(
 		sequenceName: string,
-		initialOrOptions: C | Omit<SequenceOptions, "aliases">,
-		callback?: SequenceCallback<C extends (() => Generator<infer U, any, any>) ? U : C>
+		options?: C | Omit<SequenceOptions, "aliases"> | SequenceCallback<number>,
 	): Sequence;
 
 	sequence<C extends string | number | (() => Generator<any, any, any>)>(
 		sequenceName: string,
-		options?: C | Omit<SequenceOptions, "aliases"> | SequenceCallback<number>,
+		initialOrOptions: C | Omit<SequenceOptions, "aliases">,
+		callback?: SequenceCallback<C extends (() => Generator<infer U, any, any>) ? U : C>
 	): Sequence;
 
 	sequence(name: string, ...rest: any[]): Sequence {

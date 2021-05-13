@@ -1,8 +1,7 @@
 import {Definition} from "./definition";
 import {FixtureRiveter} from "./fixture-riveter";
 
-/* eslint-disable @typescript-eslint/unbound-method */
-export class DefinitionHierarchy {
+export class AdapterMethodBuilder {
 	fixtureRiveter: FixtureRiveter;
 	fixtureName: string;
 

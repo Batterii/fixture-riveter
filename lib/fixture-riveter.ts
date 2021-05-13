@@ -171,8 +171,12 @@ export class FixtureRiveter {
 
 	sequence<C extends string | number | (() => Generator<any, any, any>)>(
 		sequenceName: string,
-		initial: C,
-		options: {aliases: string[]},
+		options?: C | SequenceOptions | SequenceCallback<number>,
+	): Sequence;
+
+	sequence<C extends string | number | (() => Generator<any, any, any>)>(
+		sequenceName: string,
+		initialOrOptions: C | SequenceOptions,
 		callback?: SequenceCallback<C extends (() => Generator<infer U, any, any>) ? U : C>
 	): Sequence;
 
@@ -187,13 +191,9 @@ export class FixtureRiveter {
 
 	sequence<C extends string | number | (() => Generator<any, any, any>)>(
 		sequenceName: string,
-		initialOrOptions: C | SequenceOptions,
+		initial: C,
+		options: {aliases: string[]},
 		callback?: SequenceCallback<C extends (() => Generator<infer U, any, any>) ? U : C>
-	): Sequence;
-
-	sequence<C extends string | number | (() => Generator<any, any, any>)>(
-		sequenceName: string,
-		options?: C | SequenceOptions | SequenceCallback<number>,
 	): Sequence;
 
 	sequence(name: string, ...rest: any[]): Sequence {
