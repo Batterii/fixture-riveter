@@ -314,18 +314,12 @@ export class FixtureRiveter {
 		this.strategyHandler.registerStrategy(strategyName, strategyClass);
 	}
 
-	before<T>(name: string, block: CallbackFunction<T>): void;
-	before<T>(name: string, name2: string, block: CallbackFunction<T>): void;
-	before<T>(name: string, name2: string, name3: string, block: CallbackFunction<T>): void;
-	before(...rest: any[]): void {
-		this.callbackHandler.before(...rest);
+	before<T>(...args: [...names: string[], block: CallbackFunction<T>]): void {
+		this.callbackHandler.before(...args);
 	}
 
-	after<T>(name: string, block: CallbackFunction<T>): void;
-	after<T>(name: string, name2: string, block: CallbackFunction<T>): void;
-	after<T>(name: string, name2: string, name3: string, block: CallbackFunction<T>): void;
-	after(...rest: any[]): void {
-		this.callbackHandler.after(...rest);
+	after<T>(...args: [...names: string[], block: CallbackFunction<T>]): void {
+		this.callbackHandler.after(...args);
 	}
 
 	addCallback<T>(names: string[], block: CallbackFunction<T>): void {
