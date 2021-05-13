@@ -10,12 +10,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 ### Changed
-- Remove `Model` parameter from nested fixture definitions. Now passed in through the options map with the optional key `model`.
+- Remove `Model` parameter from nested fixture definitions. Defaults to parent fixture `Model`, or can be passed in through the options map with the optional key `model`.
 - Remove `Sequence` constructor and `SequenceHandler.registerSequence` overloads. Only implement Sequence-related overloads in `DefinitionProxy` and `FixtureRiveter`.
-- Make `Sequence` not generic.
+- Make `Sequence` not generic, as it should not be used directly.
 - Change `Sequence` constructor to take aliases as an object instead of a list.
-- Allow for all arguments (except callback) in sequence-creating functions to be passed in a single object alongside `aliases`.
-
+- Allow for all arguments in sequence-creating functions to be passed in a single object alongside `aliases`:
+    * `aliases?`: an array of strings (only available to global sequences)
+    * `callback?`: a 1-arg function
+    * `initial?`: a string or number, to use the default generators (excludes using `gen`)
+    * `gen?`: a generator (excludes using `initial`)
+- Change all of the `hierarchy`-related names to `adapterMethods`:
+    * `DefinitionHeirarchy` -> `AdapterMethodBuilder`
+    * `_heirarchyClass` and `hierarchyClass` -> `_adapterMethodsClass` and `adapterMethodsClass`
+    * `_heirarchyInstance` and `hierarchyInstance` -> `_adapterMethodsInstance` and `adapterMethodsInstance`
+    * `buildHierarchy` -> `setAdapterMethods`
 
 ## [v2.3.1]
 ### Changed

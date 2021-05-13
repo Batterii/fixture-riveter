@@ -4,10 +4,12 @@ export type SequenceCallback<C> = (result: C) => any;
 
 export type SequenceOptions = {
 	aliases?: string[];
+	callback?: SequenceCallback<any>;
 	gen?: (() => Generator<any, any, any>);
 	initial?: undefined,
 } | {
 	aliases?: string[];
+	callback?: SequenceCallback<any>;
 	gen?: undefined;
 	initial?: string | number;
 };
@@ -94,13 +96,17 @@ export function optionsParser(name: string, ...args: any[]): SequenceConstructor
 			throw new Error(`Can't define two initial values for sequence "${name}"`);
 		}
 
-		const {aliases, gen, initial} = args.shift();
+		const {aliases, callback, gen, initial} = args.shift();
 
 		if (Array.isArray(aliases)) {
 			if (!aliases.every((s) => isString(s))) {
 				throw new Error(`Can't use non-string aliases for sequence "${name}"`);
 			}
 			options.aliases = aliases;
+		}
+
+		if (isFunction(callback)) {
+			options.callback = callback;
 		}
 
 		if (initial && gen) {
@@ -127,6 +133,9 @@ export function optionsParser(name: string, ...args: any[]): SequenceConstructor
 	// inline final place callback function
 	const inlineCallback = first(args);
 	if (isFunction(inlineCallback)) {
+		if (Reflect.has(options, "callback")) {
+			throw new Error(`Can't define two callbacks for sequence "${name}"`);
+		}
 		options.callback = args.shift();
 	}
 

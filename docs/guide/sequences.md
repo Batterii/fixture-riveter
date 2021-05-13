@@ -153,6 +153,27 @@ fr.generate("email");
 // test1@domain.com
 fr.generate("email");
 // test2@domain.com
+
+fr.sequence("email2", {callback: (x) => `test${x}@domain.com`});
+fr.generate("email2");
+// test1@domain.com
+fr.generate("email2");
+// test2@domain.com
 ```
 
-**NOTE**: If the options aren't bundled in an object, they must be ordered: initial value or generator, aliases, callback. To stay consistent with other functions, callbacks cannot be included in the options object.
+### Combining options
+All of the options can be passed in as an object:
+
+```typescript
+fr.sequence("email", {initial: 100, aliases: ["super email"], callback: (x) => `test${x}@domain.com`});
+fr.generate("super email");
+// test100@domain.com
+```
+
+If the options aren't bundled in an object, they must be ordered: initial value or generator, aliases, callback:
+
+```typescript
+fr.sequence("email", 100, {aliases: ["super email"]}, (x) => `test${x}@domain.com`);
+fr.generate("super email");
+// test100@domain.com
+```

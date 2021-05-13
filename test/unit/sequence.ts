@@ -210,15 +210,31 @@ describe("optionsParser", function() {
 			}
 		}
 
-		beforeEach(function() {
-			initial = 10;
-			aliases = ["alias"];
+		it("accepts aliases", function() {
+			const options = optionsParser("name", {aliases: ["alias"]});
+			sinon.assert.match(options, {
+				aliases: ["alias"],
+				baseGenerator: sinon.match.func,
+				callback: sinon.match.func,
+				initial: 1,
+			});
+		});
+
+		it("accepts callback", function() {
+			const callback = (x: any) => x * 2;
+			const options = optionsParser("name", {callback});
+			sinon.assert.match(options, {
+				aliases: sinon.match([]),
+				baseGenerator: sinon.match.func,
+				callback,
+				initial: 1,
+			});
 		});
 
 		it("accepts initial", function() {
-			const options = optionsParser("name", {initial, aliases});
+			const options = optionsParser("name", {initial: 10});
 			sinon.assert.match(options, {
-				aliases: sinon.match(aliases),
+				aliases: sinon.match([]),
 				baseGenerator: sinon.match.func,
 				callback: sinon.match.func,
 				initial: 10,
@@ -226,11 +242,12 @@ describe("optionsParser", function() {
 		});
 
 		it("accepts gen", function() {
-			const options = optionsParser("name", {gen, aliases});
+			const options = optionsParser("name", {gen});
 			sinon.assert.match(options, {
-				aliases: sinon.match(aliases),
+				aliases: sinon.match([]),
 				baseGenerator: gen,
 				callback: sinon.match.func,
+				initial: "X",
 			});
 		});
 
