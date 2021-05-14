@@ -1,6 +1,6 @@
 import {AdapterHandler} from "./adapter-handler";
 import {Adapter} from "./adapters/adapter";
-import {CallbackFunction, Callback} from "./callback";
+import {Callback, Hook} from "./hook";
 import {CallbackHandler} from "./callback-handler";
 import {DefinitionProxy} from "./definition-proxy";
 import {Fixture} from "./fixture";
@@ -314,20 +314,20 @@ export class FixtureRiveter {
 		this.strategyHandler.registerStrategy(strategyName, strategyClass);
 	}
 
-	before<T>(...args: [...names: string[], block: CallbackFunction<T>]): void {
+	before<T>(...args: [...names: string[], callback: Callback<T>]): void {
 		this.callbackHandler.before(...args);
 	}
 
-	after<T>(...args: [...names: string[], block: CallbackFunction<T>]): void {
+	after<T>(...args: [...names: string[], callback: Callback<T>]): void {
 		this.callbackHandler.after(...args);
 	}
 
-	addCallback<T>(names: string[], block: CallbackFunction<T>): void {
-		this.callbackHandler.addCallback(names, block);
+	registerHook<T>(names: string[], callback: Callback<T>): void {
+		this.callbackHandler.registerHook(names, callback);
 	}
 
-	getCallbacks<T>(): Callback<T>[] {
-		return this.callbackHandler.callbacks;
+	getHooks(): Hook<any>[] {
+		return this.callbackHandler.hooks;
 	}
 
 	async loadFixtures(directory = "."): Promise<void> {

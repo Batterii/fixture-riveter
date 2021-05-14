@@ -299,21 +299,21 @@ describe("FixtureRiveter", function() {
 		});
 	});
 
-	describe("#addCallback", function() {
+	describe("#registerHook", function() {
 		it("passes the call to the callback handler", function() {
 			const name = ["name"];
 			const callback = (): any => true;
-			const addCallback = sinon.spy(fixtureRiveter.callbackHandler, "addCallback");
-			fixtureRiveter.addCallback(name, callback);
-			expect(addCallback).to.be.calledWith(name, callback);
+			const registerHook = sinon.spy(fixtureRiveter.callbackHandler, "registerHook");
+			fixtureRiveter.registerHook(name, callback);
+			expect(registerHook).to.be.calledWith(name, callback);
 		});
 	});
 
-	describe("#getCallbacks", function() {
+	describe("#getHooks", function() {
 		it("returns the callbackHandler's callbacks", function() {
 			const callbacks = [];
-			fixtureRiveter.callbackHandler.callbacks = callbacks;
-			expect(fixtureRiveter.getCallbacks()).to.equal(callbacks);
+			fixtureRiveter.callbackHandler.hooks = callbacks;
+			expect(fixtureRiveter.getHooks()).to.equal(callbacks);
 		});
 	});
 });

@@ -6,7 +6,7 @@ import {addMethodMissing} from "./method-missing";
 import {Assembler} from "./assembler";
 import {Attribute} from "./attributes/attribute";
 import {AttributeAssigner} from "./attribute-assigner";
-import {Callback} from "./callback";
+import {Hook} from "./hook";
 import {Definition} from "./definition";
 import {Evaluator} from "./evaluator";
 import {FixtureRiveter} from "./fixture-riveter";
@@ -113,11 +113,11 @@ export class Fixture<T> extends Definition<T> {
 		return parentAttributes.concat(definedAttributes);
 	}
 
-	getCallbacks(): Callback<T>[] {
+	getHooks(): Hook<T>[] {
 		this.compile();
-		const parentCallbacks = this.parentFixture().getCallbacks();
-		const definedCallbacks = super.getCallbacks();
-		return parentCallbacks.concat(definedCallbacks);
+		const parentHooks = this.parentFixture().getHooks();
+		const definedHooks = super.getHooks();
+		return parentHooks.concat(definedHooks);
 	}
 
 	traitByName(name: string): Trait<T> {
@@ -167,7 +167,7 @@ export class Fixture<T> extends Definition<T> {
 			adapter,
 		);
 
-		const assembler = new Assembler<T>(attributeAssigner, this.getCallbacks(), adapter);
+		const assembler = new Assembler<T>(attributeAssigner, this.getHooks(), adapter);
 
 		return buildStrategy.result(assembler, this.model) as unknown as T;
 	}

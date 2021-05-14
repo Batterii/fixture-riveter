@@ -1,21 +1,21 @@
 import {Adapter} from "./adapters/adapter";
 import {AttributeAssigner} from "./attribute-assigner";
-import {Callback} from "./callback";
+import {Hook} from "./hook";
 import {Pojo} from "./types";
 
 export class Assembler<T> {
 	attributeAssigner: AttributeAssigner<T>;
-	callbacks: Callback<T>[];
+	hooks: Hook<T>[];
 
 	adapter: Adapter;
 
 	constructor(
 		attributeAssigner: AttributeAssigner<T>,
-		callbacks: Callback<T>[],
+		hooks: Hook<T>[],
 		adapter: Adapter,
 	) {
 		this.attributeAssigner = attributeAssigner;
-		this.callbacks = callbacks;
+		this.hooks = hooks;
 		this.adapter = adapter;
 	}
 
@@ -31,11 +31,11 @@ export class Assembler<T> {
 		return this.adapter.save(instance, Model);
 	}
 
-	async runCallbacks(name: string, instance: T): Promise<void> {
-		const callbacks = this.callbacks.filter((c) => c.name === name);
+	async runHooks(name: string, instance: T): Promise<void> {
+		const hooks = this.hooks.filter((c) => c.name === name);
 
-		for (const callback of callbacks) {
-			await callback.run(instance, this.attributeAssigner.evaluator);
+		for (const hook of hooks) {
+			await hook.run(instance, this.attributeAssigner.evaluator);
 		}
 	}
 }

@@ -1,4 +1,4 @@
-import {CallbackHandler, extractCallbackFunction} from "../../lib/callback-handler";
+import {CallbackHandler, extractCallback} from "../../lib/callback-handler";
 import {FixtureRiveter} from "../../lib/fixture-riveter";
 
 import {expect} from "chai";
@@ -14,27 +14,27 @@ describe("CallbackHandler", function() {
 
 	it("can be built", function() {
 		expect(cbh).to.exist;
-		expect(cbh.callbacks).to.be.empty;
+		expect(cbh.hooks).to.be.empty;
 	});
 
-	describe("addCallback", function() {
+	describe("registerHook", function() {
 		it("adds the callback to the internal list of callbacks", function() {
 			const name = "name";
 			const callback = (): any => true;
-			cbh.addCallback([name], callback);
-			expect(cbh.callbacks[0].name).to.equal(name);
-			expect(cbh.callbacks[0].block).to.equal(callback);
+			cbh.registerHook([name], callback);
+			expect(cbh.hooks[0].name).to.equal(name);
+			expect(cbh.hooks[0].callback).to.equal(callback);
 		});
 
 		it("uses the same callback for each name given", function() {
 			const name1 = "name1";
 			const name2 = "name2";
 			const callback = (): any => true;
-			cbh.addCallback([name1, name2], callback);
-			expect(cbh.callbacks[0].name).to.equal(name1);
-			expect(cbh.callbacks[0].block).to.equal(callback);
-			expect(cbh.callbacks[1].name).to.equal(name2);
-			expect(cbh.callbacks[1].block).to.equal(callback);
+			cbh.registerHook([name1, name2], callback);
+			expect(cbh.hooks[0].name).to.equal(name1);
+			expect(cbh.hooks[0].callback).to.equal(callback);
+			expect(cbh.hooks[1].name).to.equal(name2);
+			expect(cbh.hooks[1].callback).to.equal(callback);
 		});
 	});
 
@@ -52,10 +52,10 @@ describe("CallbackHandler", function() {
 			const name2 = "heck";
 			const callback = (): any => true;
 			cbh.before(name1, name2, callback);
-			expect(cbh.callbacks[0].name).to.equal("beforeName1");
-			expect(cbh.callbacks[0].block).to.equal(callback);
-			expect(cbh.callbacks[1].name).to.equal("beforeHeck");
-			expect(cbh.callbacks[1].block).to.equal(callback);
+			expect(cbh.hooks[0].name).to.equal("beforeName1");
+			expect(cbh.hooks[0].callback).to.equal(callback);
+			expect(cbh.hooks[1].name).to.equal("beforeHeck");
+			expect(cbh.hooks[1].callback).to.equal(callback);
 		});
 	});
 
@@ -73,10 +73,10 @@ describe("CallbackHandler", function() {
 			const name2 = "heck";
 			const callback = (): any => true;
 			cbh.after(name1, name2, callback);
-			expect(cbh.callbacks[0].name).to.equal("afterName1");
-			expect(cbh.callbacks[0].block).to.equal(callback);
-			expect(cbh.callbacks[1].name).to.equal("afterHeck");
-			expect(cbh.callbacks[1].block).to.equal(callback);
+			expect(cbh.hooks[0].name).to.equal("afterName1");
+			expect(cbh.hooks[0].callback).to.equal(callback);
+			expect(cbh.hooks[1].name).to.equal("afterHeck");
+			expect(cbh.hooks[1].callback).to.equal(callback);
 		});
 	});
 });
@@ -85,22 +85,22 @@ describe("extractCallbackFunction", function() {
 	it("returns callback function", function() {
 		const callback = () => true;
 		const input = ["name", callback];
-		const result = extractCallbackFunction(input);
+		const result = extractCallback(input);
 		expect(result).to.equal(callback);
 	});
 
 	it("returns callback function", function() {
 		const name = "name";
 		const input = [name, () => true];
-		extractCallbackFunction(input);
+		extractCallback(input);
 		expect(input).to.deep.equal([name]);
 	});
 
 	it("throws if the final arg isn't a function", function() {
-		expect(() => extractCallbackFunction([{}])).to.throw("Callback needs to be a function");
+		expect(() => extractCallback([{}])).to.throw("Callback needs to be a function");
 	});
 
 	it("throws if it doesn't receive any names", function() {
-		expect(() => extractCallbackFunction([() => true])).to.throw("Callback needs a name");
+		expect(() => extractCallback([() => true])).to.throw("Callback needs a name");
 	});
 });

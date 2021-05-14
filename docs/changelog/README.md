@@ -24,6 +24,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     * `_heirarchyClass` and `hierarchyClass` -> `_adapterMethodsClass` and `adapterMethodsClass`
     * `_heirarchyInstance` and `hierarchyInstance` -> `_adapterMethodsInstance` and `adapterMethodsInstance`
     * `buildHierarchy` -> `setAdapterMethods`
+- Change all of the `callback`-related names to `hook`:
+    * `Callback` class -> `Hook`
+    * `CallbackFunction` type -> `Callback`
+    * `addCallback` -> `registerHook`
+  Reasoning: `Hook`s are wrappers around callbacks that hold a reference to the current `fr` instance and have a name. The callback function itself can be pulled out if one wishes, but it should be very clear that all callbacks in `FixtureRiveter` are only functions that are called after the fact.
 
 ## [v2.3.1]
 ### Changed

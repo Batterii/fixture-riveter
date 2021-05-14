@@ -1,5 +1,5 @@
 import {Attribute} from "./attributes/attribute";
-import {Callback, CallbackFunction} from "./callback";
+import {Hook, Callback} from "./hook";
 import {CallbackHandler} from "./callback-handler";
 import {Declaration} from "./declarations/declaration";
 import {DeclarationHandler} from "./declaration-handler";
@@ -57,6 +57,21 @@ export class Definition<T> {
 		}
 	}
 
+	// block is passed in as a function instead of value so it's not generated
+	// until after we've compiled the definition
+	aggregateFromTraitsAndSelf(
+		traitMethod: (x: Trait<any>) => any|any[],
+		block: () => any|any[],
+	): any[] {
+		this.compile();
+
+		return [
+			this.getBaseTraits().map((t) => traitMethod(t)),
+			block(),
+			this.getAdditionalTraits().map((t) => traitMethod(t)),
+		].flat(2).filter(Boolean);
+	}
+
 	attributeNames(): string[] {
 		return this.getAttributes().map((a) => a.name);
 	}
@@ -66,14 +81,11 @@ export class Definition<T> {
 	}
 
 	getAttributes(): Attribute[] {
-		this.compile();
-
 		return this.aggregateFromTraitsAndSelf(
-			"getAttributes",
+			(trait) => trait.getAttributes(),
 			() => this.declarationHandler.getAttributes(),
 		);
 	}
-
 
 	defineTrait(newTrait: Trait<T>): void {
 		if (!this.traitsCache.has(newTrait.name)) {
@@ -109,46 +121,51 @@ export class Definition<T> {
 		this.callbackHandler.after(...rest);
 	}
 
-	addCallback(names: string[], block: CallbackFunction<T>): void {
-		this.callbackHandler.addCallback(names, block);
+	registerHook(names: string[], block: Callback<T>): void {
+		this.callbackHandler.registerHook(names, block);
 	}
 
-	getCallbacks(): Callback<T>[] {
+	getHooks(): Hook<T>[] {
 		return this.aggregateFromTraitsAndSelf(
-			"getCallbacks",
-			() => this.callbackHandler.callbacks,
+			(trait) => trait.getHooks(),
+			() => this.callbackHandler.hooks,
 		);
 	}
 
-	aggregateFromTraitsAndSelf(traitMethod: string, block: () => any|any[]): any[] {
-		this.compile();
-
-		return [
-			this.getBaseTraits().map((t) => t[traitMethod]()),
-			block(),
-			this.getAdditionalTraits().map((t) => t[traitMethod]()),
-		].flat(2).filter(Boolean);
-	}
-
 	toBuild(): ((Model: any) => any) | undefined {
-		return last(this.aggregateFromTraitsAndSelf("toBuild", () => this._toBuild));
+		return last(this.aggregateFromTraitsAndSelf(
+			(trait) => trait.toBuild(),
+			() => this._toBuild,
+		));
 	}
 
 	toSave(): ((instance: any, Model?: any) => Promise<any>) | undefined {
-		return last(this.aggregateFromTraitsAndSelf("toSave", () => this._toSave));
+		return last(this.aggregateFromTraitsAndSelf(
+			(trait) => trait.toSave(),
+			() => this._toSave,
+		));
 	}
 
 	toDestroy(): ((instance: any, Model?: any) => Promise<any>) | undefined {
-		return last(this.aggregateFromTraitsAndSelf("toDestroy", () => this._toDestroy));
+		return last(this.aggregateFromTraitsAndSelf(
+			(trait) => trait.toDestroy(),
+			() => this._toDestroy,
+		));
 	}
 
 	toRelate(): (
 		(instance: any, name: string, other: any, Model?: any) => Promise<any> | any
 	) | undefined {
-		return last(this.aggregateFromTraitsAndSelf("toRelate", () => this._toRelate));
+		return last(this.aggregateFromTraitsAndSelf(
+			(trait) => trait.toRelate(),
+			() => this._toRelate,
+		));
 	}
 
 	toSet(): ((instance: any, key: string, value: any) => Promise<any> | any) | undefined {
-		return last(this.aggregateFromTraitsAndSelf("toSet", () => this._toSet));
+		return last(this.aggregateFromTraitsAndSelf(
+			(trait) => trait.toSet(),
+			() => this._toSet,
+		));
 	}
 }

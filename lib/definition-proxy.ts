@@ -15,7 +15,7 @@ import {
 	OverrideForRelation,
 	CurrentEvaluator,
 } from "./types";
-import {CallbackFunction} from "./callback";
+import {Callback} from "./hook";
 import {FixtureRiveter, nameGuard} from "./fixture-riveter";
 import {Sequence, SequenceCallback, SequenceOptions} from "./sequence";
 import {SequenceHandler} from "./sequence-handler";
@@ -166,11 +166,11 @@ export class DefinitionProxy<T> {
 		block(addMethodMissing(proxy));
 	}
 
-	before(...args: [...names: string[], block: CallbackFunction<T>]): void {
+	before(...args: [...names: string[], callback: Callback<T>]): void {
 		this.definition.before(...args);
 	}
 
-	after(...args: [...names: string[], block: CallbackFunction<T>]): void {
+	after(...args: [...names: string[], callback: Callback<T>]): void {
 		this.definition.after(...args);
 	}
 

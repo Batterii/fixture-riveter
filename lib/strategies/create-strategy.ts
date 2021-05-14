@@ -6,10 +6,10 @@ import {ModelConstructor} from "../types";
 export class CreateStrategy extends Strategy {
 	async result<T>(assembler: Assembler<T>, model: ModelConstructor<T>): Promise<T> {
 		let instance = await assembler.toInstance();
-		await assembler.runCallbacks("afterBuild", instance);
-		await assembler.runCallbacks("beforeCreate", instance);
+		await assembler.runHooks("afterBuild", instance);
+		await assembler.runHooks("beforeCreate", instance);
 		instance = await assembler.save(instance, model);
-		await assembler.runCallbacks("afterCreate", instance);
+		await assembler.runHooks("afterCreate", instance);
 
 		return instance;
 	}

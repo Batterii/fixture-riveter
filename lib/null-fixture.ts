@@ -1,5 +1,5 @@
 import {AdapterMethodBuilder} from "./adapter-method-builder";
-import {Callback} from "./callback";
+import {Hook} from "./hook";
 import {Definition} from "./definition";
 import {FixtureRiveter} from "./fixture-riveter";
 import {ModelConstructor} from "./types";
@@ -14,8 +14,8 @@ export class NullFixture<T> extends Definition<T> {
 
 	compile(): void { }
 
-	getCallbacks(): Callback<T>[] {
-		return this.fixtureRiveter.getCallbacks();
+	getHooks(): Hook<T>[] {
+		return this.fixtureRiveter.getHooks();
 	}
 
 	adapterMethodsClass(): typeof AdapterMethodBuilder {

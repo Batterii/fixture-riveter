@@ -5,7 +5,7 @@ import {Strategy} from "./strategy";
 export class BuildStrategy extends Strategy {
 	async result<T>(assembler: Assembler<T>): Promise<T> {
 		const instance = await assembler.toInstance();
-		await assembler.runCallbacks("afterBuild", instance);
+		await assembler.runHooks("afterBuild", instance);
 
 		return instance;
 	}

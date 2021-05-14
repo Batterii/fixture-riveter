@@ -1,53 +1,53 @@
 import {
-	CallbackFunction,
 	Callback,
-} from "./callback";
+	Hook,
+} from "./hook";
 import {FixtureRiveter} from "./fixture-riveter";
 
 import {isFunction} from "lodash";
 
 export class CallbackHandler {
-	callbacks: Callback<any>[];
 	fixtureRiveter: FixtureRiveter;
+	hooks: Hook<any>[];
 
 	constructor(fixtureRiveter: FixtureRiveter) {
-		this.callbacks = [];
 		this.fixtureRiveter = fixtureRiveter;
+		this.hooks = [];
 	}
 
-	addCallback<T>(names: string[], block: CallbackFunction<T>): void {
+	registerHook<T>(names: string[], callback: Callback<T>): void {
 		for (const name of names) {
-			this.callbacks.push(new Callback(this.fixtureRiveter, name, block));
+			this.hooks.push(new Hook(this.fixtureRiveter, name, callback));
 		}
 	}
 
 	before<T>(...rest: any[]): void {
-		const block = extractCallbackFunction<T>(rest);
+		const callback = extractCallback<T>(rest);
 		const names = rest.map((n: string) => {
 			const string = n.charAt(0).toUpperCase() + n.slice(1);
 			return `before${string}`;
 		});
-		this.addCallback(names, block);
+		this.registerHook(names, callback);
 	}
 
 	after<T>(...rest: any[]): void {
-		const block = extractCallbackFunction<T>(rest);
+		const callback = extractCallback<T>(rest);
 		const names = rest.map((n: string) => {
 			const string = n.charAt(0).toUpperCase() + n.slice(1);
 			return `after${string}`;
 		});
-		this.addCallback(names, block);
+		this.registerHook(names, callback);
 	}
 }
 
-export function extractCallbackFunction<T>(rest: any[]): CallbackFunction<T> {
-	const block = rest.pop();
-	if (!isFunction(block)) {
+export function extractCallback<T>(rest: any[]): Callback<T> {
+	const callback = rest.pop();
+	if (!isFunction(callback)) {
 		throw new Error("Callback needs to be a function");
 	}
 	if (rest.length === 0) {
 		throw new Error("Callback needs a name");
 	}
-	return block;
+	return callback;
 }
 
