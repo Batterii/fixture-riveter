@@ -243,7 +243,7 @@ describe("DefinitionProxy", function() {
 				f.attr("name", () => "Noah");
 				f.age(() => 32);
 			});
-			const user = await fixtureRiveter.build("dummy");
+			await fixtureRiveter.build("dummy");
 			await fixtureRiveter.build("dummy2");
 			expect(i).to.equal(1);
 		});

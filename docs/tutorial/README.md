@@ -25,7 +25,6 @@ yarn add -D fixture-riveter
 :::
 ::::
 
-
 ## 2. Create a fixture
 
 Create a new folder, probably in your test folder, to hold the fixtures you define. Best practices is to make a separate fixture definition file for each model you'll need.
@@ -80,10 +79,10 @@ fr.fixture("user", User, (f) => {
 :::
 ::::
 
-
 ## 3. Load fixture definitions
 
 There are two options for loading fixtures:
+
 1) Manually import each fixture definition file individually
 2) Use the built-in async method `loadFixtures` to load every fixture in a given directory.
 
@@ -115,7 +114,6 @@ before(async function() {
 
 :::
 ::::
-
 
 ## 4. Using a fixture
 

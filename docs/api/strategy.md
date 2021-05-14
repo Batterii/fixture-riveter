@@ -2,6 +2,7 @@
 sidebar: auto
 title: Strategy
 ---
+<!-- markdownlint-disable MD001 MD033 -->
 
 # `Strategy`
 

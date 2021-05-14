@@ -9,6 +9,7 @@
 		"@typescript-eslint/generic-type-naming": "off",
 		"@typescript-eslint/no-non-null-assertion": "off",
 		"@typescript-eslint/naming-convention": "off",
-		"@typescript-eslint/member-naming": "off"
+		"@typescript-eslint/member-naming": "off",
+		"@typescript-eslint/explicit-module-boundary-types": "off"
 	}
 }

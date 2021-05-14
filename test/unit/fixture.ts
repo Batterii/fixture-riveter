@@ -1,4 +1,3 @@
-import {DynamicAttribute} from "../../lib/attributes/dynamic-attribute";
 import {DynamicDeclaration} from "../../lib/declarations/dynamic-declaration";
 import {Fixture} from "../../lib/fixture";
 import {FixtureRiveter} from "../../lib/fixture-riveter";
@@ -7,7 +6,6 @@ import {NullFixture} from "../../lib/null-fixture";
 import {DummyModel} from "../support/dummy-model";
 
 import {expect} from "chai";
-import sinon from "sinon";
 
 describe("Fixture", function() {
 	let fixtureRiveter: FixtureRiveter;

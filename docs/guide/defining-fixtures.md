@@ -1,7 +1,9 @@
 # Defining fixtures
+
 As seen above, each fixture has a name, a model class, and a function for defining the attributes.
 
 ## Naming
+
 When defining fixtures, you can explicitly pass in the fixture's name as a string:
 
 ```typescript
@@ -35,6 +37,7 @@ As seen, no modifications are performed on the derived class name, so the string
 :::
 
 ## Attributes
+
 When defining attributes, you can use the explicit function `attr`, which takes the attribute name as the first argument:
 
 ```typescript
@@ -53,9 +56,10 @@ Implicit calling is the same as explicit calling in all ways except for when an 
 f.attr("sequence", () => "12345")
 ```
 
-The library was initially written to only support explicit definitions, but has since gained implicit definition functionality. I will be using a mix of both throughout the rest of the guide; neither is preferred, both are acceptable.
+The library was initially written to only support explicit definitions, but has since gained implicit definition functionality. The rest of the guide will use a mix of both throughout; neither is preferred, both are acceptable.
 
 ## Dependent attributes
+
 Attributes can be defined with references to other attributes, even when they are defined out of order:
 
 ```typescript
@@ -76,12 +80,13 @@ user.email === "noah-bogart@example.com";
 // > true
 ```
 
-Note: referencing other attributes using the `evaluator` object must be async.
+::: tip
+Note: referencing other attributes must be async. Reasoning for this is discussed in [the notes](../notes/differences-from-factory-bot.md#async).
+:::
 
 ## Argument passing vs Context
-Each definition function is called with the correct context, allowing for `this`-based definitions. It is more verbose than single-character arguments (and eslint will complain about an invalid use of `this`), but it simplifies having to track which "level" of definition a given attribute is being defined within.
 
-NOTE: this only works with "normal" function expressions, not arrow functions.
+Each definition function is called with the correct context, allowing for `this`-based definitions. It is more verbose than single-character arguments (and eslint will complain about an invalid use of `this`), but it simplifies having to track which "level" of definition a given attribute is being defined within.
 
 ```typescript
 fr.fixture("user", User, function() {
@@ -95,7 +100,12 @@ fr.fixture("user", User, function() {
 });
 ```
 
+::: warning
+This only works with "normal" function expressions, not arrow functions.
+:::
+
 ## Aliases
+
 To make fixture reuse and specificity easier, fixtures can be defined with aliases:
 
 ```typescript
@@ -112,6 +122,7 @@ comment.title === "First post!";
 This is different than aliases in attribute and trait definitions, as fixtures can also accept other options (`parent` and `traits`).
 
 ## Transient attributes
+
 Transient attributes are properties that exist on the model but are not persisted in the database. They are quite helpful in defining a "variable" that is only used within a fixture definition:
 
 ```typescript
@@ -160,6 +171,7 @@ Reflect.has(user, "cool");
 ```
 
 ## Nested fixtures
+
 By defining a fixture within a fixture, the child fixture will inherit and override any declared attributes on the parent, all the way up the inheritance chain.
 
 ```typescript
@@ -225,4 +237,3 @@ list.entry2
 list.entry3
 // => 3
 ```
-

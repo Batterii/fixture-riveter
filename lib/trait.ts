@@ -1,4 +1,3 @@
-import {Attribute} from "./attributes/attribute";
 import {Definition} from "./definition";
 import {DefinitionProxy} from "./definition-proxy";
 import {Fixture} from "./fixture";

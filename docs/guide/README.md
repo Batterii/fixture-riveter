@@ -30,8 +30,8 @@ fr.fixture("user", User, (f) => {
 });
 
 // `create` inserts the built fixture into the database (calling the `save` function in
-// the adapater), but you can use `build` to only create an instance of the model, or
-// `attributesFor` to create a plain object.
+// the adapater), but you can use `build` to just return the build an instance of the
+// model, or `attributesFor` to create a plain object.
 // Any attribute can be overridden by passing in an object of the desired changes. These
 // always take precedence over the attributes in the fixture definition.
 const user = await fr.create("user", {name: "Bogart"});

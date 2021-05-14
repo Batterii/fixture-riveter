@@ -6,6 +6,8 @@ This library diverges from [factory_bot][factory_bot] in a couple major ways. Fi
 
 The issue of metaprogramming is handled by a combination of approaches. The first is to pass in the fixture or evaluator wherever it's being used, instead of parsing implicit method calls. The second approach is to use `call` everywhere, making sure that the option of using full `function` statements instead of arrow functions keeps `this` correctly applied.
 
+## Async
+
 The issue of async I handled by biting the bullet and just making all appropriate calls async. Sadly, this makes using an attribute within another attribute _very_ verbose, which is unfortunate (as seen below), but none of the javascript ORMs are synchronous and it's not possible to avoid when a given attribute can reference an association. (I toyed with disallowing referencing associations, which would let all other attributes be synchronous, but that limits any complex async attributes from being defined.)
 
 Example of referencing another attribute within an attribute in javascript:

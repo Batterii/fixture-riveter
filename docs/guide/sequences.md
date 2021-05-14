@@ -1,9 +1,11 @@
 # Sequences
+
 Sequences are wrappers around [Generators][generator], useful in providing unique values for attributes (such as email addresses). They can be defined directly as attributes in fixtures or globally on the `fr` object itself. By default, they generate numbers and start at 1.
 
 [generator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Generator
 
 ## Defining sequences
+
 Global sequences are defined on the `fr` object, just like fixtures and traits.
 
 ```typescript
@@ -40,6 +42,7 @@ user.dayNumber;
 `fr.generate` only works on global sequences. Global sequences must have unique names.
 
 ## Resetting sequences
+
 All sequences can be reset to their initial value, using the global `fr.resetSequences`:
 
 ```typescript
@@ -58,7 +61,9 @@ fr.generate("email");
 ```
 
 ## Sequence options
+
 ### Initial value
+
 Sequences can be given initial values, either a number or a string or an object with key `initial` that contains a number or a string:
 
 ```typescript
@@ -84,6 +89,7 @@ fr.generate("age");
 **NOTE**: Behind the scenes, the initial value is used to select the appropriate pre-built generator. `{initial: "hello"}` is the same as `{gen: () => stringGen("hello")}`, and `{initial: 34}` is the same as `{gen: () => numberGen(34)}`.
 
 ### Generator function
+
 Instead of a number or string, a generator function can be passed in, either by itself or in an object with the key `gen`:
 
 ```typescript
@@ -131,7 +137,9 @@ fr.generate("double");
 fr.generate("double");
 // 6
 ```
+
 ### Aliases
+
 Global sequences can be given aliases, just like fixtures. The aliases point to the same generator, so they increment together:
 
 ```typescript
@@ -145,6 +153,7 @@ fr.generate("increaser");
 ```
 
 ### Callbacks
+
 Sequences can take a callback, which is where their true power lies:
 
 ```typescript
@@ -162,6 +171,7 @@ fr.generate("email2");
 ```
 
 ### Combining options
+
 All of the options can be passed in as an object:
 
 ```typescript

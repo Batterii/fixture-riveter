@@ -54,6 +54,7 @@ post instanceof Post
 ```
 
 ## Changing build strategies of relations
+
 By default, relations are build with the same strategy as their parent object:
 
 ```typescript

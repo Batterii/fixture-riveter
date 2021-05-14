@@ -5,7 +5,9 @@ title: Adapter
 
 # `Adapter`
 
-Instead of writing ORM-specific code for instancing and persisting created objects, we rely on this interface (and the following default implementation of it). This handles the two aforementioned aspects of [factory_bot][factory_bot]: creating an instance of a given model, and then persisting it to the database. (There are other reasons to use it, but that's less important.)
+<!-- markdownlint-disable MD001 -->
+
+Instead of writing ORM-specific code for instancing and persisting created objects, we rely on this interface (and the following default implementation of it). This handles two aspects of [factory_bot][factory_bot]: creating an instance of a given model, and then persisting it to the database. (There are other reasons to use it, but that's less important.)
 
 [factory_bot]: https://github.com/thoughtbot/factory_bot/
 
