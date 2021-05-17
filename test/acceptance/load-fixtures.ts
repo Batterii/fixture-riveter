@@ -26,14 +26,14 @@ describe("#loadFixtures", function() {
 
 	after(async function() {
 		await fs.remove(resolve(".", "fixtures"));
-		await fs.remove(resolve(".", "test", "support", "fixtures"));
+		await fs.remove(resolve(".", "dist/test/support/fixtures"));
 	});
 
 	it("defaults to node's '.'", async function() {
 		const dirPath = resolve(".", "fixtures");
 		await fs.ensureDir(dirPath);
 		const filepath = resolve(".", "fixtures/user-fixture.js");
-		await fs.writeFile(filepath, fixtureFile(".."));
+		await fs.writeFile(filepath, fixtureFile("../dist"));
 
 		await fr.loadFixtures();
 		const user = await fr.build("user");
@@ -41,12 +41,12 @@ describe("#loadFixtures", function() {
 	});
 
 	it("accepts a file path", async function() {
-		const dirPath = resolve(".", "test/support/fixtures");
+		const dirPath = resolve(".", "dist/test/support/fixtures");
 		await fs.ensureDir(dirPath);
-		const filepath = resolve(".", "test/support/fixtures/user-fixture.js");
+		const filepath = resolve(".", "dist/test/support/fixtures/user-fixture.js");
 		await fs.writeFile(filepath, fixtureFile("../../.."));
 
-		await fr.loadFixtures("test/support");
+		await fr.loadFixtures("dist/test/support");
 		const user = await fr.build("user");
 		expect(user).to.exist;
 	});

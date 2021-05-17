@@ -20,8 +20,5 @@
 		"test/**/*",
 		"docs/.vuepress/**/*",
 		"./knexfile.ts"
-	],
-    "exclude": [
-        "test/acceptance/load-fixtures.ts"
-    ]
+	]
 }
