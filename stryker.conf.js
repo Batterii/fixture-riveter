@@ -9,9 +9,7 @@ module.exports = {
 	coverageAnalysis: "perTest",
 	buildCommand: 'npm run build',
 	mochaOptions: {
-		"config": ".mocharc.json",
+		"config": ".mocharc-stryker.json",
 		"spec": [ "dist/test/**/*.js"]
 	},
-	checkers: ["typescript"],
-	tsconfigFile: "tsconfig.json",
 };
