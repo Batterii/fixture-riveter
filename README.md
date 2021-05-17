@@ -29,7 +29,7 @@ npm install --save-dev fixture-riveter
 A complete guide to using fixture-riveter can be found in the [guide][guide]. For those
 interested in code first, here is a simple demonstration:
 
-[guide]: docs/GUIDE.md
+[guide]: https://batterii.github.io/fixture-riveter
 
 ```javascript
 import {fr, ObjectionAdapter} from "fixture-riveter";
