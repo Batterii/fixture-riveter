@@ -2,6 +2,7 @@
 
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Batterii/fixture-riveter/blob/master/LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+[![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2FBatterii%2Ffixture-riveter%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/Batterii/fixture-riveter/master)
 
 fixture-riveter is a fixtures replacement library based on thoughtbot's excellent ruby
 library [factory_bot][factory_bot], with some ideas adapted from
@@ -20,7 +21,7 @@ features don't work as well or at all with them.
 
 Node.js:
 
-```
+```bash
 npm install --save-dev fixture-riveter
 ```
 
@@ -31,7 +32,7 @@ interested in code first, here is a simple demonstration:
 
 [guide]: https://batterii.github.io/fixture-riveter
 
-```javascript
+```typescript
 import {fr, ObjectionAdapter} from "fixture-riveter";
 
 fr.setAdapter(new ObjectionAdapter());
@@ -61,5 +62,5 @@ Conduct][coc] when participating with this project.
 
 ## License
 
-Copyright © 2020 Noah Bogart and Batterii, distributed under the license in
+Copyright © 2021 Noah Bogart and Batterii, distributed under the license in
 [LICENSE](LICENSE).

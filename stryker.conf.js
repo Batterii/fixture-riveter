@@ -3,7 +3,7 @@
  */
 module.exports = {
 	packageManager: "npm",
-	reporters: ["html", "progress"],
+	reporters: ["html", "progress", "dashboard"],
 	thresholds: { high: 80, low: 80, break: 80 },
 	testRunner: "mocha",
 	coverageAnalysis: "perTest",
