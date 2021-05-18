@@ -12,6 +12,6 @@ module.exports = {
 		"config": ".mocharc.json",
 		"spec": ["dist/test/**/*.js"]
 	},
-	checkers: ["typescript"],
-	tsconfigFile: "tsconfig.json",
+	// checkers: ["typescript"],
+	// tsconfigFile: "tsconfig.json",
 };

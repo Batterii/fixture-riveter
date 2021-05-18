@@ -66,7 +66,7 @@ jobs:
         run: npm run build
 
       - name: Stryker
-        run: npm run stryker
+        run: npm run stryker -- --reporters dashboard
 
   test:
     name: Testing

@@ -1,8 +1,15 @@
 # fixture-riveter
 
-[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Batterii/fixture-riveter/blob/master/LICENSE)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
-[![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2FBatterii%2Ffixture-riveter%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/Batterii/fixture-riveter/master)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)][github license]
+[![npm version](https://img.shields.io/npm/v/fixture-riveter)][npm version]
+[![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2FBatterii%2Ffixture-riveter%2Fmaster)][stryker]
+![Test status](https://img.shields.io/github/workflow/status/Batterii/fixture-riveter/tests)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)][mapr]
+
+[github license]: https://github.com/Batterii/fixture-riveter/blob/master/LICENSE
+[npm version]: https://www.npmjs.com/package/fixture-riveter
+[stryker]: https://dashboard.stryker-mutator.io/reports/github.com/Batterii/fixture-riveter/master
+[mapr]: http://makeapullrequest.com
 
 fixture-riveter is a fixtures replacement library based on thoughtbot's excellent ruby
 library [factory_bot][factory_bot], with some ideas adapted from
