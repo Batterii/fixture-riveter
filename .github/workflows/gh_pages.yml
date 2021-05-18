@@ -1,4 +1,4 @@
-name: docs
+name: gh_pages
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
     branches: [ master ]
 
 jobs:
-  docs:
+  gh_pages:
     runs-on: ubuntu-latest
 
     steps:
