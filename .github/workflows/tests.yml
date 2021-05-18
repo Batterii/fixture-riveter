@@ -66,6 +66,8 @@ jobs:
         run: npm run build
 
       - name: Stryker
+        env:
+          STRYKER_DASHBOARD_API_KEY: ${{ secrets.STRYKER_DASHBOARD_API_KEY }}
         run: npm run stryker -- --reporters dashboard
 
   test:
