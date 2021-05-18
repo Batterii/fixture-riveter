@@ -1,4 +1,4 @@
-name: tests
+name: linting
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  test:
+  lint:
     runs-on: ubuntu-latest
 
     steps:
@@ -31,5 +31,8 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Test
-        run: npm test
+      - name: ESLint
+        run: npm run eslint
+
+      - name: MarkdownLint
+        run: npm run markdownlint
