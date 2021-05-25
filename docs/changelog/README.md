@@ -10,13 +10,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [v2.4.1]
+
+### Fixed
+
+- Update types filepath in package.json
+
 ## [v2.4.0]
 
 ### Added
 
 - Add Mutation testing to CI
 - Add Markdown linting to CI
-- Foreign key checking to SQLite in tests
 
 ### Changed
 
@@ -38,7 +43,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - `Callback` class -> `Hook`
   - `CallbackFunction` type -> `Callback`
   - `addCallback` -> `registerHook`
+
+## Fixed
+
 - Fix errors with `evaluator` being passed into the attribute fns.
+- Foreign key checking to SQLite in tests
 
 ## [v2.3.1]
 
@@ -283,7 +292,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Barebones release of Fixture Riveter: fixtures, traits, associations
 - Barebones tutorial
 
-[Unreleased]: https://github.com/Batteri/fixture-riveter/compare/v2.4.0...HEAD
+[Unreleased]: https://github.com/Batteri/fixture-riveter/compare/v2.4.1...HEAD
+[v2.4.1]: https://github.com/Batterii/fixture-riveter/releases/tag/v2.4.1
 [v2.4.0]: https://github.com/Batterii/fixture-riveter/releases/tag/v2.4.0
 [v2.3.1]: https://github.com/Batterii/fixture-riveter/releases/tag/v2.3.1
 [v2.3.0]: https://github.com/Batterii/fixture-riveter/releases/tag/v2.3.0
