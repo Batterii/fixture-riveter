@@ -11,8 +11,8 @@ export class DynamicAttribute extends Attribute {
 		this.block = block;
 	}
 
-	evaluate(): (evaluator?: Evaluator) => any {
-		return (evaluator?: Evaluator) => {
+	evaluate(): (evaluator: Evaluator) => any {
+		return (evaluator: Evaluator) => {
 			return this.block.call(evaluator, evaluator);
 		};
 	}

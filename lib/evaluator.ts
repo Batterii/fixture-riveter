@@ -1,11 +1,9 @@
 import {Attribute} from "./attributes/attribute";
-import {
-	extractOverrides,
-	FixtureRiveter,
-} from "./fixture-riveter";
+import {extractOverrides, FixtureRiveter} from "./fixture-riveter";
 import {Strategy} from "./strategies/strategy";
 import {omit} from "lodash";
 import {Pojo} from "./types";
+import {addMethodMissing} from "./method-missing";
 
 export class Evaluator {
 	attributeFns: Map<string, (e: Evaluator) => any>;
@@ -42,7 +40,7 @@ export class Evaluator {
 		for (const attribute of givenAttributes.reverse()) {
 			const {name} = attribute;
 			if (!this.attributeFns.has(name)) {
-				this.attributeFns.set(name, attribute.evaluate(this));
+				this.attributeFns.set(name, attribute.evaluate());
 			}
 		}
 	}
@@ -54,8 +52,9 @@ export class Evaluator {
 	async attr(name: string): Promise<any> {
 		if (!this.cachedValues.has(name)) {
 			if (this.attributeFns.has(name)) {
-				const fn = this.attributeFns.get(name)!;
-				this.cachedValues.set(name, await fn(this));
+				const block = this.attributeFns.get(name)!;
+				const value = await block(addMethodMissing(this));
+				this.cachedValues.set(name, value);
 			}
 		}
 		this.fetchedAttributes.add(name);

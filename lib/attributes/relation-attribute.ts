@@ -12,11 +12,11 @@ export class RelationAttribute extends Attribute {
 		this.isRelation = true;
 	}
 
-	evaluate(evaluator: Evaluator): () => Promise<Record<string, any>> {
+	evaluate(): (evaluator: Evaluator) => Promise<Record<string, any>> {
 		const traitsAndOverrides = Array.prototype.concat(this.fixture, this.overrides);
 		const fixtureName = traitsAndOverrides.shift();
 
-		return async() => {
+		return async(evaluator: Evaluator) => {
 			return evaluator.relation(fixtureName, ...traitsAndOverrides);
 		};
 	}

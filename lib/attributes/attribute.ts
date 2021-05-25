@@ -13,5 +13,5 @@ export abstract class Attribute {
 		this.ignored = ignored;
 	}
 
-	abstract evaluate(evaluator?: Evaluator): (e: Evaluator) => any;
+	abstract evaluate(): (e: Evaluator) => any;
 }

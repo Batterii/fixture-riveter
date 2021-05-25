@@ -18,7 +18,7 @@ describe("DynamicAttribute", function() {
 			const attribute = new DynamicAttribute("email", false, () => 1);
 			const result = attribute.evaluate();
 
-			expect(result()).to.equal(1);
+			expect(result({} as any)).to.equal(1);
 		});
 
 		it("calls the block on the given argument", function() {

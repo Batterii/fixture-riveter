@@ -147,7 +147,7 @@ describe("Relations", function() {
 		it("can use attributes from the current fixture", async function() {
 			fr.fixture("currentAttrPost", Post, (f) => {
 				f.attr("body", () => "Post body");
-				f.attr("user", async(e) => e.relation("user", {name: await e.attr("body")}));
+				f.attr("user", async(e) => e.relation("user", {name: await e.body()}));
 			});
 
 			const post = await fr.build("currentAttrPost");
@@ -873,6 +873,123 @@ describe("Relations", function() {
 		specify("#create sets to undefined", async function() {
 			expect((await fr.create("post", {user: null})).user).to.be.undefined;
 			expect((await fr.create("post", {user: undefined})).user).to.be.undefined;
+		});
+	});
+
+	describe("evaluator passing", function() {
+		let fr: FixtureRiveter;
+
+		class User extends Model {
+			id: number;
+			name: string;
+			age: number;
+			admin: boolean;
+
+			get props() {
+				return {
+					name: "string",
+				};
+			}
+		}
+
+		class Post extends Model {
+			static relationMappings = {
+				user: {
+					relation: Model.BelongsToOneRelation,
+					modelClass: User,
+					join: {
+						from: "posts.userId",
+						to: "users.id",
+					},
+				},
+			};
+
+			id: number;
+			subject: string;
+			userId: number;
+			user: User;
+
+			get props() {
+				return {
+					userId: "integer",
+					subject: "string",
+				};
+			}
+		}
+
+		class Comment extends Model {
+			static relationMappings = {
+				user: {
+					relation: Model.BelongsToOneRelation,
+					modelClass: User,
+					join: {
+						from: "comments.userId",
+						to: "users.id",
+					},
+				},
+				post: {
+					relation: Model.BelongsToOneRelation,
+					modelClass: Post,
+					join: {
+						from: "comments.postId",
+						to: "posts.id",
+					},
+				},
+			};
+
+			id: number;
+			userId: number;
+			user: User;
+			postId: number;
+			post: Post;
+			body: string;
+
+			get props() {
+				return {
+					userId: "integer",
+					postId: "integer",
+					body: "string",
+				};
+			}
+		}
+
+		before(async function() {
+			await createTable(User);
+			await createTable(Post);
+			await createTable(Comment);
+		});
+
+		beforeEach(function() {
+			fr = new FixtureRiveter();
+			fr.setAdapter(new ObjectionAdapter());
+
+			fr.fixture("user", User, (f) => {
+				f.attr("name", () => "Noah");
+			});
+
+			fr.fixture("post", Post, (f) => {
+				f.relation("user");
+				f.attr("subject", () => "Post subject");
+			});
+
+			fr.fixture("comment", Comment, (f) => {
+				f.user();
+				f.post(async(e) => e.relation("post", {user: await e.user()}));
+				f.postId(async(e) => (await e.post())?.id);
+
+				f.body(() => "Comment body");
+			});
+		});
+
+		specify("e.X is not a function bug", async function() {
+			const comment = await fr.create("comment");
+
+			expect(comment).to.be.an.instanceof(Comment);
+			expect(comment.body).to.equal("Comment body");
+			expect(comment.user).to.be.an.instanceof(User);
+			expect(comment.user.name).to.equal("Noah");
+			expect(comment.post).to.be.an.instanceof(Post);
+			expect(comment.post.subject).to.equal("Post subject");
 		});
 	});
 });
