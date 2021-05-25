@@ -3,8 +3,9 @@
  */
 module.exports = {
 	packageManager: "npm",
-	reporters: ["html", "progress", "dashboard"],
+	reporters: ["html", "dots", "dashboard"],
 	thresholds: { high: 80, low: 80, break: 80 },
+	logLevel: "off",
 	testRunner: "mocha",
 	coverageAnalysis: "perTest",
 	buildCommand: 'npm run build',
