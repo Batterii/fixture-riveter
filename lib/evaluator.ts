@@ -53,7 +53,7 @@ export class Evaluator {
 		if (!this.cachedValues.has(name)) {
 			if (this.attributeFns.has(name)) {
 				const block = this.attributeFns.get(name)!;
-				const value = await block(addMethodMissing(this));
+				const value = await block(this);
 				this.cachedValues.set(name, value);
 			}
 		}

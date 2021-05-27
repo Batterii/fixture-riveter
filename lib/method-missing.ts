@@ -9,7 +9,7 @@ export function addMethodMissing(definitionProxy: any): any {
 				return Reflect.get(target, prop, receiver);
 			}
 			return function(...args: any[]) {
-				return Reflect.get(target, "methodMissing").call(target, prop, ...args);
+				return Reflect.get(target, "methodMissing").call(receiver, prop, ...args);
 			};
 		},
 	};

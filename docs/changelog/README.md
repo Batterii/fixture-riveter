@@ -10,18 +10,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## Changed
+
+- Updated Typescript to 4.3.x
+- Handle nested implicit attribute calls in definitions.
+
 ## [v2.4.1]
 
 ### Fixed
 
-- Update types filepath in package.json
+- Update types filepath in package.json.
 
 ## [v2.4.0]
 
 ### Added
 
-- Add Mutation testing to CI
-- Add Markdown linting to CI
+- Add Mutation testing to CI.
+- Add Markdown linting to CI.
 
 ### Changed
 
