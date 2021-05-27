@@ -10,6 +10,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [v2.4.2]
+
 ## Changed
 
 - Updated Typescript to 4.3.x
@@ -297,7 +299,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Barebones release of Fixture Riveter: fixtures, traits, associations
 - Barebones tutorial
 
-[Unreleased]: https://github.com/Batteri/fixture-riveter/compare/v2.4.1...HEAD
+[Unreleased]: https://github.com/Batteri/fixture-riveter/compare/v2.4.2...HEAD
+[v2.4.2]: https://github.com/Batterii/fixture-riveter/releases/tag/v2.4.2
 [v2.4.1]: https://github.com/Batterii/fixture-riveter/releases/tag/v2.4.1
 [v2.4.0]: https://github.com/Batterii/fixture-riveter/releases/tag/v2.4.0
 [v2.3.1]: https://github.com/Batterii/fixture-riveter/releases/tag/v2.3.1
