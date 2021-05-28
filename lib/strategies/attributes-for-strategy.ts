@@ -8,6 +8,6 @@ export class AttributesForStrategy extends Strategy {
 	}
 
 	async relation(): Promise<any> {
-		return undefined;
+		return null;
 	}
 }

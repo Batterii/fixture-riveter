@@ -19,7 +19,7 @@ export class Strategy {
 		return assembler.toObject();
 	}
 
-	async relation(fixtureName: string, traitsAndOverrides: any[]): Promise<any> {
-		return this.fixtureRiveter.run(fixtureName, "null", traitsAndOverrides);
-	}
+	/* eslint-disable @typescript-eslint/no-empty-function */
+	/* eslint-disable @typescript-eslint/no-unused-vars */
+	async relation(fixtureName: string, traitsAndOverrides: any[]): Promise<any> {}
 }

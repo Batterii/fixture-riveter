@@ -66,9 +66,7 @@ export class AttributeAssigner<T> {
 		this.evaluator.instance = {};
 		for (const name of this.attributesForObject()) {
 			const attribute = await this._get(name);
-			if (attribute === undefined || attribute === null) {
-				this.evaluator.instance[name] = undefined;
-			} else {
+			if (attribute !== undefined) {
 				this.evaluator.instance[name] = attribute;
 			}
 		}
@@ -83,12 +81,16 @@ export class AttributeAssigner<T> {
 
 		for (const name of attributeNames) {
 			const attribute = await this._get(name);
-			if (attribute === undefined || attribute === null) {
-				this.adapter.set(this.evaluator.instance, name, undefined);
-			} else if (relationNames.includes(name)) {
+			if (attribute === undefined) {
+				continue;
+			} else if (attribute !== null && relationNames.includes(name)) {
 				await this.adapter.relate(this.evaluator.instance, name, attribute, this.model);
 			} else {
-				this.adapter.set(this.evaluator.instance, name, attribute);
+				this.evaluator.instance = await this.adapter.set(
+					this.evaluator.instance,
+					name,
+					attribute,
+				);
 			}
 		}
 

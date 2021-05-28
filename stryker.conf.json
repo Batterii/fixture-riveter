@@ -1,0 +1,18 @@
+{
+	"$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+	"packageManager": "npm",
+	"reporters": ["html", "dots", "dashboard"],
+	"thresholds": {
+		"high": 85,
+		"low": 85,
+		"break": 85
+	},
+	"logLevel": "error",
+	"testRunner": "mocha",
+	"coverageAnalysis": "perTest",
+	"buildCommand": "npm run build",
+	"mochaOptions": {
+		"config": ".mocharc.json",
+		"spec": ["dist/test/**/*.js"]
+	}
+}

@@ -70,33 +70,24 @@ describe("Sequelize functionality", function() {
 			expect(user.name).to.equal("Noah");
 		});
 
-		describe("relations set to null or undefined are set to undefined", function() {
-			specify("build", async function() {
-				expect((await fr.build("post", {user: null})).user).to.be.undefined;
-				expect((await fr.build("post", {user: undefined})).user).to.be.undefined;
-			});
+		specify("null or undefined relation overrides are not set", async function() {
+			expect((await fr.build("post", {user: null})).get("user")).to.be.undefined;
+			expect((await fr.create("post", {user: null})).get("user")).to.be.undefined;
 
-			specify("create", async function() {
-				expect((await fr.create("post", {user: null})).user).to.be.undefined;
-				expect((await fr.create("post", {user: undefined})).user).to.be.undefined;
-			});
+			expect((await fr.build("post", {user: undefined})).get("user")).to.be.undefined;
+			expect((await fr.create("post", {user: undefined})).get("user")).to.be.undefined;
 		});
 
-		describe("attributes set to null or undefined are changed to undefined", function() {
-			specify("attributesFor", async function() {
-				expect((await fr.attributesFor("user", {name: null})).name).to.be.undefined;
-				expect((await fr.attributesFor("user", {name: undefined})).name).to.be.undefined;
-			});
+		specify("null attribute overrides are set correctly", async function() {
+			expect((await fr.attributesFor("user", {name: null})).name).to.be.null;
+			expect((await fr.build("user", {name: null})).get("name")).to.be.null;
+			expect((await fr.create("user", {name: null})).get("name")).to.be.null;
+		});
 
-			specify("build", async function() {
-				expect((await fr.build("user", {name: null})).name).to.be.undefined;
-				expect((await fr.build("user", {name: undefined})).name).to.be.undefined;
-			});
-
-			specify("create", async function() {
-				expect((await fr.create("user", {name: null})).name).to.be.undefined;
-				expect((await fr.create("user", {name: undefined})).name).to.be.undefined;
-			});
+		specify("undefined attribute overrides are not set", async function() {
+			expect(await fr.attributesFor("user", {name: undefined})).to.not.have.property("name");
+			expect((await fr.build("user", {name: undefined})).get("name")).to.be.undefined;
+			expect((await fr.create("user", {name: undefined})).get("name")).to.be.undefined;
 		});
 	});
 

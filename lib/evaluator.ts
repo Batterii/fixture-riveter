@@ -3,7 +3,6 @@ import {extractOverrides, FixtureRiveter} from "./fixture-riveter";
 import {Strategy} from "./strategies/strategy";
 import {omit} from "lodash";
 import {Pojo} from "./types";
-import {addMethodMissing} from "./method-missing";
 
 export class Evaluator {
 	attributeFns: Map<string, (e: Evaluator) => any>;

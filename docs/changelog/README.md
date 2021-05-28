@@ -10,9 +10,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- Make explicit that overriding an attribute to `undefined` will leave the property entirely off the resulting object.
+- Allow overriding an attribute to `null`.
+- Set relations in `attributeFor` to `null`, not `undefined`.
+
 ## [v2.4.2]
 
-## Changed
+### Changed
 
 - Updated Typescript to 4.3.x
 - Handle nested implicit attribute calls in definitions.

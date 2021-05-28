@@ -1,12 +1,12 @@
 {
 	"name": "fixture-riveter",
 	"version": "2.4.2",
-	"description": "Fixture replacement inspired by thoughtbot's fixture_bot",
+	"description": "Fixture replacement library for Typescript",
 	"author": "Batterii, LLC",
 	"contributors": [
 		{
 			"name": "Noah Bogart",
-			"email": "nbtheduke@gmail.com",
+			"email": "noah.bogart@hey.com",
 			"url": "https://github.com/noahtheduke"
 		}
 	],

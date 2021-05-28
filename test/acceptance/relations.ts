@@ -562,7 +562,7 @@ describe("Relations", function() {
 			const post = await fr.attributesFor("post");
 			expect(post).to.be.an.instanceof(Object);
 			expect(post.body).to.equal("Post body");
-			expect(post.user).to.be.undefined;
+			expect(post.user).to.be.null;
 		});
 
 		specify("#build creates an association", async function() {
@@ -806,16 +806,16 @@ describe("Relations", function() {
 				f.attr("photos", async(e) => [await e.relation("photo")]);
 			});
 
-			const createdListing = await fr.create("listing");
-			expect(createdListing.photos[0]).to.be.an.instanceof(Photo);
-			expect(createdListing.photos[0].id).to.exist;
+			const recordListing = await fr.attributesFor("listing");
+			expect(recordListing.photos[0]).to.be.null;
 
 			const builtListing = await fr.build("listing");
 			expect(builtListing.photos[0]).to.be.an.instanceof(Photo);
 			expect(builtListing.photos[0].id).to.not.exist;
 
-			const recordListing = await fr.attributesFor("listing");
-			expect(recordListing.photos[0]).to.be.undefined;
+			const createdListing = await fr.create("listing");
+			expect(createdListing.photos[0]).to.be.an.instanceof(Photo);
+			expect(createdListing.photos[0].id).to.exist;
 		});
 	});
 
@@ -865,14 +865,14 @@ describe("Relations", function() {
 			});
 		});
 
-		specify("#build sets to undefined", async function() {
-			expect((await fr.build("post", {user: null})).user).to.be.undefined;
-			expect((await fr.build("post", {user: undefined})).user).to.be.undefined;
+		specify("null is set", async function() {
+			expect((await fr.build("post", {user: null})).user).to.be.null;
+			expect((await fr.create("post", {user: null})).user).to.be.null;
 		});
 
-		specify("#create sets to undefined", async function() {
-			expect((await fr.create("post", {user: null})).user).to.be.undefined;
-			expect((await fr.create("post", {user: undefined})).user).to.be.undefined;
+		specify("undefined is excluded", async function() {
+			expect(await fr.build("post", {user: undefined})).to.not.have.property("user");
+			expect(await fr.create("post", {user: undefined})).to.not.have.property("user");
 		});
 	});
 
