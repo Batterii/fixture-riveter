@@ -15,6 +15,19 @@
 		"type": "git",
 		"url": "http://github.com/Batterii/fixture-riveter.git"
 	},
+	"keywords": [
+		"bdd",
+		"data",
+		"factory-bot",
+		"fixture",
+		"fixtures",
+		"objection",
+		"objection.js",
+		"sequelize",
+		"tdd"
+	],
+	"main": "dist/lib/index.js",
+	"types": "dist/types/lib/index.d.ts",
 	"files": [
 		"dist/lib",
 		"dist/types"
@@ -35,8 +48,6 @@
 		"test:mutation": "npm run build && stryker run",
 		"test:unit": "npm run build && mocha dist/test/unit"
 	},
-	"main": "dist/lib/index.js",
-	"types": "dist/types/lib/index.d.ts",
 	"devDependencies": {
 		"@batterii/eslint-config-ts": "^3.1.0",
 		"@stryker-mutator/core": "^5.0.0",
