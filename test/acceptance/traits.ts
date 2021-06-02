@@ -279,7 +279,9 @@ describe("tests from fixture_bot", function() {
 
 		specify("fixture outside of scope", async function() {
 			const fn = async() => fr.build("userWithoutAdminScoping");
-			expect(fn).to.throw;
+			expect(Promise.resolve(fn())).to.eventually.be.rejectedWith(
+				"Trait adminTrait hasn't been defined yet",
+			);
 		});
 
 		specify("child fixture using grandparents' trait", async function() {
@@ -293,7 +295,9 @@ describe("tests from fixture_bot", function() {
 			const fr = new FixtureRiveter();
 			fr.fixture("user", User);
 			const fn = async() => fr.build("user", ["missing trait"]);
-			return expect(Promise.resolve(fn())).to.eventually.be.rejected;
+			return expect(Promise.resolve(fn())).to.eventually.be.rejectedWith(
+				"Trait missing trait hasn't been defined yet",
+			);
 		});
 	});
 

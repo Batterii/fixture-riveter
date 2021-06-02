@@ -7,6 +7,10 @@
 		"low": 85,
 		"break": 85
 	},
+	"ignorePatterns": [
+		"docs/.vuepress/.cache/",
+		"tags*"
+	],
 	"logLevel": "error",
 	"testRunner": "mocha",
 	"coverageAnalysis": "perTest",

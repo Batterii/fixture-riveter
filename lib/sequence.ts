@@ -89,7 +89,7 @@ export function optionsParser(name: string, ...args: any[]): SequenceConstructor
 	const optionsMap = first(args);
 	if (isPlainObject(optionsMap)) {
 		// Throw errors if the gen or initial value was provided inline (not in an object)
-		if (Reflect.has(options, "gen") && Reflect.has(optionsMap, "gen")) {
+		if (Reflect.has(options, "baseGenerator") && Reflect.has(optionsMap, "gen")) {
 			throw new Error(`Can't define two generator functions for sequence "${name}"`);
 		}
 		if (Reflect.has(options, "initial") && Reflect.has(optionsMap, "initial")) {
@@ -159,6 +159,9 @@ export function optionsParser(name: string, ...args: any[]): SequenceConstructor
 }
 
 export function *numberGen(input: number): Generator<number, number, number> {
+	if (!isNumber(input)) {
+		throw new Error("numberGen requires a number");
+	}
 	let base = input;
 	while (true) {
 		base += 1;
@@ -168,9 +171,17 @@ export function *numberGen(input: number): Generator<number, number, number> {
 
 // Taken from: https://gist.github.com/devongovett/1081265
 export function *stringGen(input: string): Generator<string, string, string> {
+	if (!isString(input)) {
+		throw new Error("stringGen requires a string");
+	}
 	const alphabet = "abcdefghijklmnopqrstuvwxyz";
 	const length = 26;
 	let current = input;
+
+	if (input.length === 0) {
+		current = "a";
+		yield "a";
+	}
 
 	while (true) {
 		let result = current;
@@ -198,7 +209,7 @@ export function *stringGen(input: string): Generator<string, string, string> {
 					carry = index + 1 >= length;
 					if (carry && i === 0) {
 						const added = isUpperCase ? "A" : "a";
-						result = added + next + result.slice(1);
+						result = `${added}${next}${result.slice(1)}`;
 						break;
 					}
 				}
@@ -213,9 +224,11 @@ export function *stringGen(input: string): Generator<string, string, string> {
 					result = `1${nextNumber}${result.slice(1)}`;
 					break;
 				}
+
+				next = nextNumber.toString();
 			}
 
-			result = result.slice(0, i) + next + result.slice(i + 1);
+			result = `${result.slice(0, i)}${next}${result.slice(i + 1)}`;
 			if (!carry) {
 				break;
 			}

@@ -4,62 +4,6 @@ import {capitalize} from "lodash";
 import {expect} from "chai";
 
 describe("Sequence", function() {
-	describe("constructor", function() {
-		function *g() {
-			while (true) {
-				yield "X";
-			}
-		}
-
-		specify("1 arg", function() {
-			const seq = new Sequence("name");
-			expect(seq.name).to.equal("name");
-			expect(seq.baseGenerator).to.be.an.instanceOf(Function);
-			expect(seq.generator).to.be.an.instanceOf(Object);
-			expect(seq.generator.next).to.be.an.instanceOf(Function);
-			expect(seq.value).to.equal(1);
-			expect(seq.initialValue).to.equal(1);
-		});
-
-		specify("2 args", function() {
-			expect(new Sequence("name1", "a")).to.exist;
-			expect(new Sequence("name2", 1)).to.exist;
-			expect(new Sequence("name3", {aliases: ["alias3"]})).to.exist;
-			expect(new Sequence("name4", (x) => `4result${x}`)).to.exist;
-			expect(new Sequence("name5", g)).to.exist;
-		});
-
-		specify("3 args", function() {
-			expect(new Sequence("name1", "a", {aliases: ["alias1"]})).to.exist;
-			expect(new Sequence("name2", "a", (x) => `2result${x}`)).to.exist;
-			expect(new Sequence("name3", 1, {aliases: ["alias3"]})).to.exist;
-			expect(new Sequence("name4", 1, (x) => `4result${x}`)).to.exist;
-			expect(new Sequence("name5", g, {aliases: ["alias5"]})).to.exist;
-			expect(new Sequence("name6", g, (x) => `6result${x}`)).to.exist;
-			expect(new Sequence("name7", {aliases: ["alias7"]}, (x) => `7result${x}`)).to.exist;
-		});
-
-		specify("4 args", function() {
-			expect(new Sequence("name1", "a", {aliases: ["alias1"]}, (x) => {
-				return `1result${x}`;
-			})).to.exist;
-			expect(new Sequence("name2", 1, {aliases: ["alias2"]}, (x) => `2result${x}`)).to.exist;
-			expect(new Sequence("name3", g, {aliases: ["alias3"]}, (x) => `3result${x}`)).to.exist;
-		});
-
-		it("throws up if the generator needs an argument to work", function() {
-			function *brokenGenerator(input: number) {
-				while (true) {
-					yield input.toString();
-				}
-			}
-
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
-			expect(() => new Sequence("broken", brokenGenerator)).to.throw;
-		});
-	});
-
 	describe("names", function() {
 		it("returns a list", function() {
 			const seq = new Sequence("name");
@@ -197,13 +141,12 @@ describe("optionsParser", function() {
 			callback2,
 		];
 
-		expect(() => optionsParser("name", ...args)).to.throw;
+		expect(() => optionsParser("name", ...args)).to.throw(
+			"Incorrect options for sequence \"name\"",
+		);
 	});
 
 	describe("options in a map", function() {
-		let initial: number;
-		let aliases: string[];
-
 		function *gen() {
 			while (true) {
 				yield "X";
@@ -220,6 +163,11 @@ describe("optionsParser", function() {
 			});
 		});
 
+		it("throws if given an array of non-strings", function() {
+			const options = () => optionsParser("name", {aliases: ["alias", 1]});
+			expect(options).to.throw("Can't use non-string aliases for sequence \"name\"");
+		});
+
 		it("accepts callback", function() {
 			const callback = (x: any) => x * 2;
 			const options = optionsParser("name", {callback});
@@ -229,9 +177,16 @@ describe("optionsParser", function() {
 				callback,
 				initial: 1,
 			});
+			expect(options.callback(4)).to.equal(8);
 		});
 
-		it("accepts initial", function() {
+		it("throws if given two callbacks", function() {
+			const callback = (x: any) => x * 2;
+			const options = () => optionsParser("name", {callback}, callback);
+			expect(options).to.throw("Can't define two callbacks for sequence \"name\"");
+		});
+
+		it("accepts numeric initial", function() {
 			const options = optionsParser("name", {initial: 10});
 			sinon.assert.match(options, {
 				aliases: sinon.match([]),
@@ -239,6 +194,23 @@ describe("optionsParser", function() {
 				callback: sinon.match.func,
 				initial: 10,
 			});
+			expect(options.baseGenerator().next().value).to.equal(11);
+		});
+
+		it("accepts string initial", function() {
+			const options = optionsParser("name", {initial: "aaa"});
+			sinon.assert.match(options, {
+				aliases: sinon.match([]),
+				baseGenerator: sinon.match.func,
+				callback: sinon.match.func,
+				initial: "aaa",
+			});
+			expect(options.baseGenerator().next().value).to.equal("aab");
+		});
+
+		it("throws an error when passed an implement and explicit initial", function() {
+			const options = () => optionsParser("name", 10, {initial: 10});
+			expect(options).to.throw("Can't define two initial values for sequence \"name\"");
 		});
 
 		it("accepts gen", function() {
@@ -249,10 +221,97 @@ describe("optionsParser", function() {
 				callback: sinon.match.func,
 				initial: "X",
 			});
+			expect(options.baseGenerator().next().value).to.equal("X");
+		});
+
+		it("throws an error when passed both a implicit and explicit gen", function() {
+			const options = () => optionsParser("name", () => gen(), {gen});
+			expect(options).to.throw("Can't define two generator functions for sequence \"name\"");
 		});
 
 		it("throws when given both initial and gen", function() {
-			expect(() => optionsParser("name", {initial, gen, aliases})).to.throw;
+			const options = () => optionsParser("name", {initial: 10, gen, aliases: ["a"]});
+			expect(options).to.throw(
+				"Can't provide both initial value and generator function for sequence \"name\"",
+			);
 		});
+	});
+});
+
+describe("numberGen", function() {
+	it("returns the succ of input", function() {
+		const gen = numberGen(1);
+		expect(gen.next().value).to.equal(2);
+		expect(gen.next().value).to.equal(3);
+	});
+
+	it("throws if given a string", function() {
+		const gen = (numberGen as any)("1");
+		expect(() => gen.next()).to.throw("numberGen requires a number");
+	});
+});
+
+describe("stringGen", function() {
+	it("returns the succ of input", function() {
+		const gen = stringGen("a");
+		expect(gen.next().value).to.equal("b");
+		expect(gen.next().value).to.equal("c");
+	});
+
+	it("throws if given a string", function() {
+		const gen = (stringGen as any)(1);
+		expect(() => gen.next()).to.throw("stringGen requires a string");
+	});
+
+	it("handles rollover", function() {
+		const gen = stringGen("z");
+		expect(gen.next().value).to.equal("aa");
+		expect(gen.next().value).to.equal("ab");
+	});
+
+	it("handles uppercase strings", function() {
+		const gen = stringGen("Z");
+		expect(gen.next().value).to.equal("AA");
+		expect(gen.next().value).to.equal("AB");
+	});
+
+	it("handles mixed case strings", function() {
+		const gen = stringGen("Zz");
+		expect(gen.next().value).to.equal("AAa");
+		expect(gen.next().value).to.equal("AAb");
+	});
+
+	it("handles numbers", function() {
+		const gen = stringGen("1");
+		expect(gen.next().value).to.equal("2");
+		expect(gen.next().value).to.equal("3");
+	});
+
+	it("handles number rollver", function() {
+		const gen = stringGen("9");
+		expect(gen.next().value).to.equal("10");
+		expect(gen.next().value).to.equal("11");
+	});
+
+	it("skips non-alphanumeric characters", function() {
+		const gen = stringGen("<<abc>>");
+		expect(gen.next().value).to.equal("<<abd>>");
+		expect(gen.next().value).to.equal("<<abe>>");
+	});
+
+	it("handles mixed alphabetic and numeric strings", function() {
+		const gen1 = stringGen("1999zzz");
+		expect(gen1.next().value).to.equal("2000aaa");
+		expect(gen1.next().value).to.equal("2000aab");
+
+		const gen2 = stringGen("ZZZ9999");
+		expect(gen2.next().value).to.equal("AAAA0000");
+		expect(gen2.next().value).to.equal("AAAA0001");
+	});
+
+	it("handles empty strings", function() {
+		const gen = stringGen("");
+		expect(gen.next().value).to.equal("a");
+		expect(gen.next().value).to.equal("b");
 	});
 });
