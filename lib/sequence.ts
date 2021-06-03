@@ -185,10 +185,8 @@ export function *stringGen(input: string): Generator<string, string, string> {
 
 	while (true) {
 		let result = current;
-		let i = current.length;
 
-		while (i >= 0) {
-			i -= 1;
+		for (let i = current.length - 1; i >= 0; i -= 1) {
 			const last = current.charAt(i);
 			let next = "";
 			let carry = false;
