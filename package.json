@@ -1,6 +1,6 @@
 {
 	"name": "fixture-riveter",
-	"version": "2.4.2",
+	"version": "3.0.0",
 	"description": "Fixture replacement library for Typescript",
 	"author": "Batterii, LLC",
 	"contributors": [
