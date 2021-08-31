@@ -344,7 +344,9 @@ export class FixtureRiveter {
 	}
 
 	async cleanUp(): Promise<void> {
-		await Promise.all(this.instances.map(([name, instance]) => {
+		const {instances} = this;
+		instances.reverse();
+		await Promise.all(instances.map(([name, instance]) => {
 			const fixture = this.getFixture(name);
 			const adapter = this.getAdapter(name);
 			if (fixture && adapter) {
