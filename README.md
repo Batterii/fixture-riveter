@@ -44,13 +44,13 @@ import {fr, ObjectionAdapter} from "fixture-riveter";
 
 fr.setAdapter(new ObjectionAdapter());
 
-fr.fixture("user", User, (f) => {
+fr.fixture(User, (f) => {
     f.name(() => "Noah");
     f.age(() => 32);
     f.sequence("email", (n) => `test${n}@example.com`);
 });
 
-const user = await fr.create("user", {name: "Bogart"});
+const user = await fr.create(User, {name: "Bogart"});
 
 expect(user).to.be.an.instanceof(User);
 expect(user.id).to.exist;
