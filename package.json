@@ -32,6 +32,9 @@
 		"dist/lib",
 		"dist/types"
 	],
+	"engines": {
+		"node": ">=13"
+	},
 	"scripts": {
 		"prepublishOnly": "tsc",
 		"build": "tsc",

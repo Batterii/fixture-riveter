@@ -10,6 +10,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Removed
+- Support for Node < 13.
+
 ### Changed
 
 - Make explicit that overriding an attribute to `undefined` will leave the property entirely off the resulting object.
