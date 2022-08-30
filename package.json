@@ -33,7 +33,7 @@
 		"dist/types"
 	],
 	"scripts": {
-		"prepublish": "tsc",
+		"prepublishOnly": "tsc",
 		"build": "tsc",
 		"clean": "rm -rf dist",
 		"coverage": "npm run build && nyc --reporter=html mocha dist/test",
