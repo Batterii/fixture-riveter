@@ -343,6 +343,16 @@ export class FixtureRiveter {
 		await Promise.all(filepaths.map((filepath) => import(filepath)));
 	}
 
+	/* When using loader: ts-node/esm */
+	async loadFixturesTs(directory = "."): Promise<void> {
+		const filepaths = await fg(
+			resolve(".", `${directory}/fixtures/**/*.ts}`),
+			{onlyFiles: true},
+		);
+
+		await Promise.all(filepaths.map((filepath) => import(filepath)));
+	}
+
 	async cleanUp(): Promise<void> {
 		const {instances} = this;
 		instances.reverse();
