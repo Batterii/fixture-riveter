@@ -346,7 +346,7 @@ export class FixtureRiveter {
 	/* When using loader: ts-node/esm */
 	async loadFixturesTs(directory = "."): Promise<void> {
 		const filepaths = await fg(
-			resolve(".", `${directory}/fixtures/**/*.ts}`),
+			resolve(".", `${directory}/fixtures/**/*.ts`),
 			{onlyFiles: true},
 		);
 
